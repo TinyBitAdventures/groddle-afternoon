@@ -11,8 +11,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=a2eeb5d2';
-import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=d1d15ac0';
+import * as kit from '../public/js/quest-rooms/kit.js?v=f2c0da0c';
+import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js?v=6b5e8bd9';
 import {
   DAIS,
   DRINK_TEXT,

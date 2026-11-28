@@ -13392,6 +13392,15 @@
       "platforms": 47,
       "decos": 211,
       "reconstructed": true
+    },
+    "GQRMM1200BLOCK1": {
+      "label": "Marylpole Mount Quarter, 1200 block",
+      "file": "assets/streets/GQRMM1200BLOCK1.json",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
+      "platforms": 14,
+      "decos": 330,
+      "reconstructed": true
     }
   }
 }

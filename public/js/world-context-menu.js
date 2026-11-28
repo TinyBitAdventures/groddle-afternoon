@@ -165,15 +165,16 @@ export function worldContextAction({ blocked = '', board = null, thing = null, o
 
 /**
  * PURE: a post's arms as menu rows, top first (their numbers): each row takes its road.
- * `boards`: [{ board }]; `inGame(board)`: the road leads to a street in the game; `label(board)`.
+ * `boards`: [{ board }]; `inGame(board)`: the road leads to a street in the game; `label(board)`;
+ * `tip(board)`: the row's tip, when not "Take this road to <label>" (a quarter's blocks, G1186).
  * `notInGame`: the reason a road that leads nowhere in the game shows.
  * @returns {{ id: string, label: string, tip: string, disabled: boolean, reason: string }[]}
  */
-export function signpostArmRows(boards, { inGame = () => true, label = (b) => b?.label?.text || '', notInGame = '' } = {}) {
+export function signpostArmRows(boards, { inGame = () => true, label = (b) => b?.label?.text || '', tip = null, notInGame = '' } = {}) {
   const ordered = [...(boards || [])].sort((a, b) => (Number(a.board?.key) || 99) - (Number(b.board?.key) || 99) || (a.board?.index || 0) - (b.board?.index || 0));
   return ordered.map(({ board }, i) => {
     const ok = inGame(board);
     const name = label(board) || 'This road';
-    return { id: String(i), label: name, tip: `Take this road to ${name}`, disabled: !ok, reason: ok ? '' : notInGame, board };
+    return { id: String(i), label: name, tip: (tip && tip(board)) || `Take this road to ${name}`, disabled: !ok, reason: ok ? '' : notInGame, board };
   });
 }

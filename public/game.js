@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=10e0b69b';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=5f3621a9';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -142,7 +142,7 @@ import {
 } from './js/legalize-it.js?v=53865df2';
 import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=43a5a02b';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
-import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=0bbff84f';
+import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=0483a457';
 import { WINTER_WALK_BOUNDS, WINTER_WALK_PASSAGE } from './js/winter-walk-streets.js?v=c921bf92';
 import {
   WINTER_HAVEN_STREET_ID,
@@ -747,7 +747,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=99a33148';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=9d47e610';
 import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
@@ -782,7 +782,7 @@ import {
   signpostBoardAt,
   signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=16933720';
+} from './js/street-render.js?v=c463d2c6';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -848,7 +848,7 @@ import { renderResolution, resolutionCap, RESOLUTION_STEP, phoneZoomResolution }
 import { createCanvasCover, createStageResize, splitStageResize } from './js/stage-resize.js?v=70c3cb79';
 // g458: low energy and mood turn amber and red, and a click offers something from the pack.
 import { makingNeeds, vitalMenuEmpty, vitalMenuHeading, vitalSnacks } from './js/vitals.js?v=5efac5f3';
-import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=b178fe66';
+import { DEFAULT_VP_H, LOCATION_VIEW_W, VIEW_CEIL_H, stageFor, sceneViewCap, sceneViewWidthCap, zoomMovesStage, phoneZoomSpan, phoneCameraAnchor, phoneFeetWorldHeight, phoneGroundWorldHeight, phoneSceneDrop, reachableFloorY, sceneBottomLine, sceneGroundLine, stageBandColour, stageEdgeColour, stageEdgeSampler, stageRoomBeside, stageRoomInBand } from './js/location-view.js?v=f0a5f17d';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -878,13 +878,13 @@ import {
 import { momentMoreText } from './js/ui/moment-card.js?v=b383144f';
 import { CHAT_MAX_CHARS, chatBubbleText } from './js/ui/chat-input.js?v=8f2479a3';
 // HUB: the hub is the Modern skin's; Classic owns X in its skin (js/classic/classic-hub.js).
-import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=12843953';
+import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js/classic/ui-mode.js?v=a8deea36';
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=38816228';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
 import { homePlaceAt, skyFollowsClock, skyLook } from './js/sky-clock.js?v=dbd21266';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=faab9586';
-import './js/classic/classic-zoom.js?v=d1b8d5b0';
+import './js/classic/classic-zoom.js?v=280d70a8';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
 import { newDayBubble, shuffleNewDayMessages, waitForScreenGates } from './js/screen-queue.js?v=40222620';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillArtFor, skillLearnedActivity } from './js/familiar.js?v=b9597cd3';
@@ -1171,7 +1171,7 @@ import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } 
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
 import { heldDirection, installHeldKeyGuard, isMacPlatform } from './js/held-keys.js?v=a28eb293';
-import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=e4c99c05';
+import { isOneClickDoor, oneClickChoice, signpostArmRows, worldContextAction } from './js/world-context-menu.js?v=00e2eb03';
 import { blockedPlayerVerbs, listPlayerTarget, opensPlayerMenu, playerMenuRows } from './js/ui/player-menu.js?v=25bb0a6f';
 import { forgetTexture, frameTexture, isFailed, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from './js/world-art.js?v=a67514c8';
@@ -1201,7 +1201,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=c7aeb9ef';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=24f4f276';
 import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=0d9a7a93';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=849541a8';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
@@ -28474,26 +28474,39 @@ function openWorldMenuFor(target) {
   if (menuTarget === target) setCanvasData('contextMenu', `world:${target.classId || target.kind || ''}`);
 }
 
+/**
+ * A post whose boards are all one thing, so a click or Enter opens them as a menu instead of taking
+ * one: a lift drawn as its deco (G1153) and a QUARTER board with more than one block (G1186: the
+ * client's LocationSelectorDialog, its grid of blocks).
+ */
+function signMenuView(view) {
+  return Boolean(view?.signDeco || view?.signQuarter?.blocks > 1);
+}
+
 /** RIGHTCLICK: a signpost's arms as a menu at the pointer, the arm clicked focused; a pick takes that road. */
 function openSignpostArmsMenu(hit, at, { keys = false } = {}) {
   const view = hit?.view;
   if (!view) return false;
   const avail = availableStreetTsids();
+  const quarter = view.signQuarter?.blocks > 1 ? view.signQuarter : null;
   const rows = signpostArmRows((view.signBoards || []).map((board) => ({ board })), {
     inGame: (board) => Boolean(pickConnection({ connects: [board.connection] }, avail)),
-    label: signBoardLabel,
+    // G1186: a block reads its number (showQuarters: "1100"), the tip its whole name.
+    label: (board) => (quarter && board.menuLabel) || signBoardLabel(board),
+    tip: quarter ? (board) => `Go to ${signBoardLabel(board)}` : undefined,
     notInGame: ROAD_NOT_IN_GAME,
   });
-  // G1153: every board of a lift is the whole lift, so no floor is the one clicked.
+  // G1153: every board of a lift is the whole lift, so no floor is the one clicked (a quarter's blocks too).
   const lift = Boolean(view.signDeco);
-  const clicked = lift ? -1 : rows.findIndex((r) => r.board === hit.board);
+  const whole = signMenuView(view);
+  const clicked = whole ? -1 : rows.findIndex((r) => r.board === hit.board);
   clearSignpostBoardHover();
   return worldContextMenu().open({
-    title: lift ? 'Lift' : 'Signpost',
+    title: lift ? 'Lift' : quarter ? quarter.label : 'Signpost',
     rows,
     at,
     keys,
-    owner: `signpost:${lift ? 'lift' : signBoardLabel(hit.board) || ''}`,
+    owner: `signpost:${lift ? 'lift' : quarter ? 'quarter' : signBoardLabel(hit.board) || ''}`,
     focusIndex: clicked < 0 ? (keys ? 0 : null) : clicked,
     onPick: (id) => {
       const row = rows.find((r) => r.id === id);
@@ -28734,9 +28747,14 @@ function releaseSignpostFocus() {
 function liftMenuPoint(view) {
   const bounds = app?.canvas?.getBoundingClientRect?.();
   if (!bounds || !bounds.width || !bounds.height) return null;
-  const hit = view.signBoards?.[0]?.hitArea || { x: 0, y: 0, width: 0, height: 0 };
-  const wx = (Number(view.x) || 0) + hit.x + hit.width;
-  const wy = (Number(view.y) || 0) + hit.y;
+  const board = view.signBoards?.[0];
+  const hit = board?.hitArea || { x: 0, y: 0, width: 0, height: 0 };
+  // G1186: a QUARTER board's hit area is its arm's (in the post's 0.8 holder): beside the board.
+  const k = view.signQuarter ? Number(view.signScale) || 0.8 : 1;
+  const ox = view.signQuarter ? Number(board?.x) || 0 : 0;
+  const oy = view.signQuarter ? Number(board?.y) || 0 : 0;
+  const wx = (Number(view.x) || 0) + (ox + hit.x + hit.width) * k;
+  const wy = (Number(view.y) || 0) + (oy + hit.y) * k;
   return {
     x: bounds.left + (wx - camTarget) * (bounds.width / VIEW_W),
     y: bounds.top + (wy - (camY || 0)) * (bounds.height / VIEW_H),
@@ -28757,8 +28775,8 @@ function enterSignpost() {
     return;
   }
   // G1153: at a lift drawn as its deco (no arms to light), Enter opens its floors as a menu beside
-  // the lift, as the client's LocationSelectorDialog listed them.
-  if (at.view?.signDeco) {
+  // the lift, as the client's LocationSelectorDialog listed them; a QUARTER board its blocks (G1186).
+  if (signMenuView(at.view)) {
     openSignpostArmsMenu({ view: at.view, board: boards[0].board }, liftMenuPoint(at.view), { keys: true });
     return;
   }
@@ -36712,8 +36730,9 @@ async function main() {
       takeSceneArm(signBoard);
       return;
     }
-    // G1153: a lift drawn as its deco offers its floors (LocationSelectorDialog), never one at once.
-    if (signBoard?.view?.signDeco) {
+    // G1153: a lift drawn as its deco offers its floors (LocationSelectorDialog), never one at once;
+    // a QUARTER board of several blocks its blocks (G1186).
+    if (signMenuView(signBoard?.view)) {
       openSignpostArmsMenu(signBoard, { x: e.clientX, y: e.clientY });
       return;
     }
@@ -37945,7 +37964,7 @@ async function main() {
               : arms.length === 1
                 ? { key: 'Enter', label: signBoardLabel(arms[0].board) || arms[0].board.connection?.label || conn?.label || '', x: nearSign.screen.x, y }
                 // G1153: a lift drawn as its deco offers floors.
-                : { key: 'Enter', label: postAtHand?.view?.signDeco ? 'Choose a floor' : 'Choose a road', x: nearSign.screen.x, y };
+                : { key: 'Enter', label: postAtHand?.view?.signDeco ? 'Choose a floor' : postAtHand?.view?.signQuarter ? 'Choose a block' : 'Choose a road', x: nearSign.screen.x, y };
         }
         // TOUCH: a phone's hint chips name a tap or the stick, not a key (js/touch-controls.js touchPrompt).
         settlePrompt(TOUCH_PHONE ? touchPrompt(want) : want, performance.now());

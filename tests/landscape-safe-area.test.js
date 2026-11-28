@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { phoneStage, stageFor } from '../public/js/location-view.js?v=b178fe66';
-import { STREET_GROUND_LINES } from '../public/js/street-ground-lines.js?v=ded4ee4e';
+import { phoneStage, stageFor } from '../public/js/location-view.js?v=f0a5f17d';
+import { STREET_GROUND_LINES } from '../public/js/street-ground-lines.js?v=28a24073';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

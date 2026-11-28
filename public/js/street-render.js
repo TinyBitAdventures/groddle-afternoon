@@ -437,8 +437,8 @@ export const QUARTER_ARM_MIN_W = 150;
  * the post's top, tilted as a right arm (makeSign: 2 px out, -5.5 degrees), with the quarter's
  * name (info.label) and the signpost_quarter_grid scaled as the board was and centred on it. The
  * client drew the grid over the words; here the words go over the grid so they stay readable.
- * A click takes the board's connect (the client opened LocationSelectorDialog's grid of blocks;
- * this quarter has one block). Exported for tests.
+ * The client opened LocationSelectorDialog's grid of blocks on a click; here a quarter of one
+ * block takes it at once, and of more opens them as a menu (one board per block). Exported for tests.
  */
 export function addQuarterBoard(PIXI, g, holder, signpost, postH, tex = {}) {
   const info = signpost.quarter;
@@ -497,23 +497,29 @@ export function addQuarterBoard(PIXI, g, holder, signpost, postH, tex = {}) {
   g.signHoverParts.arms.push(arm);
   g.signHoverParts.labels.push(label);
   g.signHoverParts.baseLabelFills.push(SIGN_TEXT_FILL);
-  g.signQuarter = { label: words, width: w };
-  if (conn) {
+  // G1186 (the 1200 block): one board per block, all the one QUARTER board; with more than one the
+  // board opens the blocks as a menu (game.js signMenuView), as the client's LocationSelectorDialog
+  // opened its grid (showQuarters: a button per block reading the number from its label, 1100).
+  const blocks = (signpost.connects || []).filter((c) => c && (c.label || c.tsid));
+  g.signQuarter = { label: words, width: w, blocks: blocks.length };
+  blocks.forEach((c, i) => {
+    const part = String(c.label || '').split(',')[1];
     g.signBoards.push({
-      index: 0,
-      connection: conn,
+      index: i,
+      connection: c,
       arm,
       glow,
       label,
-      keyCap,
-      key: '1',
+      keyCap: i === 0 ? keyCap : null,
+      key: String(i + 1),
       baseFill: SIGN_TEXT_FILL,
+      menuLabel: part ? part.trim() : '',
       x: armHolder.x,
       y: armHolder.y,
       rotation: armHolder.rotation,
       hitArea: { x: 0, y: -h / 2, width: w, height: h },
     });
-  }
+  });
   return armHolder;
 }
 

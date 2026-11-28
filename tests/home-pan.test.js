@@ -16,8 +16,8 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 
-import { HOME_LAYOUT_LIMITS, HOME_STREET_LIMITS, HOME_STREET_VERSION, buildHomeLayout, homeLayoutJson, homeLayoutKeyOf } from '../public/js/home-layout.js?v=99b09c80';
-import { walkHomeScene } from '../public/js/home-layout-scene.js?v=a8228cd0';
+import { HOME_LAYOUT_LIMITS, HOME_STREET_LIMITS, HOME_STREET_VERSION, buildHomeLayout, homeLayoutJson, homeLayoutKeyOf } from '../public/js/home-layout.js?v=a1b3d988';
+import { walkHomeScene } from '../public/js/home-layout-scene.js?v=8c33bec8';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=0367f90f';
 import { HOUSE_LOT_W, YARD_SEGMENT_W } from '../public/js/home-cultivation.js?v=122d6f45';
 import { CAMERA_RANGE } from '../public/js/features/camera-mode-feature.js?v=1dbbcbd3';

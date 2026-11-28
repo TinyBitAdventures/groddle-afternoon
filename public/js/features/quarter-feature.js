@@ -13,6 +13,10 @@
  * hears `quarter_lots` and reads the owners' houses from the site (GET groddle/v1/quarter/<tsid>).
  * Solo: your own lot (the feature's save slice) and For Sale houses, nobody else.
  *
+ * One lot per player across every block (pols_canBuy has_other): online the site's answer names the
+ * lot you hold on any block (`mine`), solo the slice does. The home street's quarter arm
+ * (home-street-mp-feature) asks quarterGo to take you to a lot.
+ *
  * QA: canvas data quarterLots ("1105:7,1115:9"), quarterMine (your lot), quarterLast (the last
  * line); window.groddleQuarter { claim(lot), release(), refresh(), state } on a local host.
  * Solo demo: ?autostart=1&questoffer=off&streetdemo=GQRMM1100BLOCK1 (&quarterlot=1135 claims
@@ -26,19 +30,27 @@ import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { houseLot } from '../home-house.js?v=3c88c47c';
-import { houseContainer, houseOf } from './homes-feature.js?v=74b17565';
+import { STREET_GROUND_Y, homesFeature, houseContainer, houseOf } from './homes-feature.js?v=5049e51c';
+import { SIGN_FIRST_ARM_Y, addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=c463d2c6';
+import { homeStreetLayout } from '../home-cultivation.js?v=122d6f45';
+import { signpostX } from '../home-street-fixtures.js?v=d4e5b56a';
+import { loadStreetData } from '../street-loader.js?v=10376267';
 import {
   QUARTER_TEXT,
+  blockOfLot,
+  homeArm,
   isQuarterLot,
   isQuarterTsid,
   judgeClaim,
   lotLabel,
   lotOf,
+  lotArrival,
   lotsKey,
+  normalizeHeld,
   normalizeLots,
   normalizeQuarterSlice,
   refusalText,
-} from '../quarter.js?v=6eb35ef4';
+} from '../quarter.js?v=e278522a';
 
 export const QUARTER_FEATURE_ID = 'quarter';
 const DECO_BASE = 'assets/decos/groddle/';
@@ -49,6 +61,8 @@ const REFRESH_GAP_MS = 1500;
 let slice = normalizeQuarterSlice(null);
 /** The claimed lots now: Map lot -> { owner, house, style }. */
 let lots = new Map();
+/** Online: the lot you hold on any block, as the site last said (0: none). One lot across blocks. */
+let held = 0;
 let views = [];
 let generation = 0;
 let last = '';
@@ -205,7 +219,9 @@ async function refresh(engine, { force = false } = {}) {
       const answer = await online.account.quarter(tsid);
       fetchedAt = Date.now();
       if (mine !== generation || engine.street?.tsid !== tsid) return null;
-      lots = normalizeLots(answer?.lots);
+      lots = normalizeLots(answer?.lots, blockLotNumbers(engine.street));
+      // The site says which lot you hold on any block (src/Quarter.php block `mine`): one across blocks.
+      held = normalizeHeld(answer?.mine)?.lot || 0;
       draw(engine);
     } catch (err) {
       console.warn('[quarter]', err?.message || err);
@@ -255,10 +271,15 @@ function ensureOnline(engine) {
 /* Claiming, giving up, visiting                                       */
 /* ------------------------------------------------------------------ */
 
+/** A block street's own lot numbers. */
+function blockLotNumbers(street) {
+  return (street?.quarter?.lots || []).map((s) => s.lot);
+}
+
 function claimWhy(engine, lot) {
   const home = engine.homeContext?.() || {};
-  const all = (engine.street?.quarter?.lots || []).map((s) => s.lot);
-  return judgeClaim({ lots, me: myId(engine), lot, hasHome: home.owned === true, all });
+  const mine = multiplayer(engine) ? held : slice.lot;
+  return judgeClaim({ lots, me: myId(engine), lot, mine, hasHome: home.owned === true, all: blockLotNumbers(engine.street) });
 }
 
 function claim(engine, lot) {
@@ -306,12 +327,123 @@ function visit(engine, row) {
   return true;
 }
 
+/**
+ * The home street's quarter arm (ours, home-street-mp-feature): to the block of `heldRow`
+ * ({ street, lot }, the owner's lot), standing at that lot. From your own home or a visit, as a
+ * signpost trip (engine.enter ends either, as Back to Ur's does). True once under way.
+ */
+async function goToLot(engine, heldRow) {
+  const arm = homeArm(heldRow);
+  if (!arm) return false;
+  let street = null;
+  try {
+    street = await loadStreetData(arm.tsid);
+  } catch (err) {
+    console.warn('[quarter]', err?.message || err);
+  }
+  const at = lotArrival(street, arm.lot);
+  if (!at) {
+    tell(engine, QUARTER_TEXT.off);
+    return false;
+  }
+  return engine.enter(at.tsid, { spawnX: at.spawnX, spawnY: at.spawnY });
+}
+
+/** Tiny Speck's signpost arm (TSEngineAssets signpost_arm.png), as every home street arm. */
+const SIGN_ARM_ART = 'assets/ui/signpost/signpost_arm.webp';
+
+/**
+ * The home street's quarter arm (ours, Austin 2026-11-27; inventions home-quarter-arm): an arm on
+ * the post's top row (street-render oneArmSignpost's first slot, where Back to Ur is) pointing
+ * right, with the lot's name ("1105 Marylpole Mount Quarter", generate_pol_label), into `holder`
+ * (the post's 0.8 holder) as a board of `box` (addSignBoard: hover glow, click, number `key`).
+ * Online home-street-mp-feature hangs it on the friends' signpost; solo this feature draws it.
+ * Null when `heldRow` is no lot.
+ */
+export function addQuarterArm(PIXI, box, holder, heldRow, { key, verbId = 'sign_quarter' } = {}) {
+  const arm = homeArm(heldRow);
+  if (!arm) return null;
+  const row = new PIXI.Container();
+  row.y = SIGN_FIRST_ARM_Y;
+  row.x = 2;
+  row.rotation = (-5.5 * Math.PI) / 180;
+  row.label = 'quarter-arm';
+  const w = signArmWidth(PIXI, arm.label);
+  const board = new PIXI.Sprite(textureFromUrl(SIGN_ARM_ART));
+  board.anchor.set(0, 0.5);
+  board.width = w;
+  board.height = 30;
+  const label = signLabel(PIXI, arm.label);
+  label.x = w / 2;
+  label.y = -1;
+  row.addChild(board, label);
+  holder.addChild(row);
+  addSignBoard(PIXI, box, row, { width: w, left: false, key, arm: board, label, verbId, tip: QUARTER_TEXT.armVerb(arm.label) });
+  return { ...arm, held: { street: arm.tsid, lot: arm.lot }, key };
+}
+
+/** Solo: the arm drawn on your own home street for your lot (the slice), { scene, key, box, target }. */
+let soloArm = null;
+
+function dropSoloArm(engine) {
+  if (soloArm?.target) engine.unregister?.(soloArm.target);
+  if (soloArm?.box && !soloArm.box.destroyed) soloArm.box.destroy({ children: true });
+  soloArm = null;
+}
+
+/** Solo: on your home street, your lot's arm beside Back to Ur (online, home-street-mp-feature's). */
+function tickSoloArm(engine) {
+  if (multiplayer(engine) || !engine.PIXI || !engine.entityLayer) return;
+  const home = engine.homeContext?.() || {};
+  const st = home.inHome && home.room === 'street' ? homesFeature._state?.() : null;
+  const scene = st?.scene?.room === 'street' ? st.scene : null;
+  const block = slice.lot ? blockOfLot(slice.lot) : null;
+  const want = scene && block ? String(slice.lot) : '';
+  if (soloArm && soloArm.scene === scene && soloArm.key === want && (!soloArm.box || soloArm.box.parent)) return;
+  dropSoloArm(engine);
+  soloArm = { scene, key: want, box: null, target: null };
+  if (!want) return;
+  const { PIXI } = engine;
+  const box = new PIXI.Container();
+  box.x = Math.round(signpostX(homeStreetLayout(st.cult)));
+  box.y = STREET_GROUND_Y + 2;
+  // Over homes-feature's post (zIndex 20), as the friends' arms are online.
+  box.zIndex = 21;
+  const holder = new PIXI.Container();
+  holder.scale.set(0.8);
+  box.addChild(holder);
+  // Back to Ur is 1; solo has no friends' arms, so the lot is 2.
+  const arm = addQuarterArm(PIXI, box, holder, { street: block.tsid, lot: slice.lot }, { key: 2, verbId: 'quarter_arm_go' });
+  if (!arm) return;
+  // Only its arm takes a click (a scene board): no box of its own over Back to Ur's post.
+  box._worldHitW = 1;
+  box._worldHitH = 1;
+  engine.entityLayer.addChild(box);
+  soloArm.box = box;
+  soloArm.target = engine.register({
+    classId: 'quarter_home_arm',
+    featureId: QUARTER_FEATURE_ID,
+    label: arm.label,
+    subtitle: QUARTER_TEXT.armVerb(arm.label),
+    sprite: box,
+    quarterArm: arm.held,
+  });
+  engine.setData?.('quarterArm', arm.label);
+}
+
 /* ------------------------------------------------------------------ */
 /* Feature                                                             */
 /* ------------------------------------------------------------------ */
 
 export const quarterFeature = {
   id: QUARTER_FEATURE_ID,
+
+  /** home-street-mp-feature's quarter arm: go to the owner's lot ({ street, lot }). */
+  quarterGo(heldRow, engine) {
+    if (!homeArm(heldRow)) return null;
+    goToLot(engine, heldRow);
+    return true;
+  },
 
   /** Solo only: online the lot is the site's (restore leaves the slice empty there). */
   save() {
@@ -329,7 +461,7 @@ export const quarterFeature = {
     if (!street?.quarter || !isQuarterTsid(street.tsid)) return;
     // QA: &quarterlot=<lot> claims that lot (solo) before the block is drawn.
     const want = Number(engine.param?.('quarterlot'));
-    if (!multiplayer(engine) && isQuarterLot(want, (street.quarter.lots || []).map((s) => s.lot)) && !slice.lot) slice = { lot: want };
+    if (!multiplayer(engine) && isQuarterLot(want, blockLotNumbers(street)) && !slice.lot) slice = { lot: want };
     if (multiplayer(engine)) {
       // What the last visit knew until the site answers (empty the first time: all For Sale).
       ensureOnline(engine);
@@ -353,9 +485,21 @@ export const quarterFeature = {
   onStreetClear(engine) {
     generation += 1;
     clearViews(engine);
+    if (soloArm) {
+      dropSoloArm(engine);
+      engine.setData?.('quarterArm', '');
+    }
+  },
+
+  onTick(dtMs, now, engine) {
+    tickSoloArm(engine);
   },
 
   verbsFor(target, engine) {
+    if (target?.quarterArm) {
+      const arm = homeArm(target.quarterArm);
+      return arm ? [{ id: 'quarter_arm_go', label: QUARTER_TEXT.armVerb(arm.label), tooltip: QUARTER_TEXT.armVerb(arm.label), enabled: true, durationMs: 0 }] : [];
+    }
     const lot = target?.quarterLot;
     if (!lot) return [];
     const row = lots.get(lot);
@@ -374,6 +518,10 @@ export const quarterFeature = {
   },
 
   runVerb(target, verbId, engine) {
+    if (verbId === 'quarter_arm_go' && target?.quarterArm) {
+      goToLot(engine, target.quarterArm);
+      return true;
+    }
     const lot = target?.quarterLot;
     if (!lot) return false;
     if (verbId === 'quarter_claim') return claim(engine, lot) || true;
@@ -385,7 +533,7 @@ export const quarterFeature = {
 
 /** For tests: the module's state. */
 export function _quarterState() {
-  return { slice: { ...slice }, lots, views: views.length, pending, last };
+  return { slice: { ...slice }, lots, held, views: views.length, pending, last };
 }
 
 export function _resetQuarter() {
@@ -395,4 +543,6 @@ export function _resetQuarter() {
   online = null;
   pending = '';
   last = '';
+  held = 0;
+  soloArm = null;
 }

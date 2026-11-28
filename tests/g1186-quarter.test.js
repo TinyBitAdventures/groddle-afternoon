@@ -29,11 +29,11 @@ import {
   normalizeLots,
   quarterStreet,
   refusalText,
-} from '../public/js/quarter.js?v=6eb35ef4';
+} from '../public/js/quarter.js?v=e278522a';
 import { HOUSE_STYLE_IDS, houseLot } from '../public/js/home-house.js?v=3c88c47c';
 import { doorSaleArt } from '../public/js/door-sign-art.js?v=69daffff';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
-import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=950d9ba4';
+import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=88a82f25';
 import { quartersData } from '../tools/build-realtime-quarters.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { Display, fakePixi } from './fake-scene.js';
@@ -127,8 +127,9 @@ describe('the block street (tools/build-rebuilt-rooms.mjs)', () => {
 
   it('a QUARTER signpost on Marylpole Mount leads in, and the block\'s signpost leads back beside it', () => {
     const sign = parent.signposts.find((p) => p.id === QUARTER_PARENT_SIGN_ID);
-    assert.deepEqual(sign.quarter, { style: 'normal', label: 'Marylpole Mount Quarter', cols: 1, rows: 1 });
-    assert.equal(sign.connects.length, 1);
+    // The 1200 block (2026-11-27) made the grid two rows: tests/g1186-quarter-blocks.test.js.
+    assert.deepEqual(sign.quarter, { style: 'normal', label: 'Marylpole Mount Quarter', cols: 1, rows: 2 });
+    assert.equal(sign.connects.length, 2);
     assert.equal(sign.connects[0].tsid.slice(1), QUARTER_TSID.slice(1));
     assert.equal(sign.connects[0].label, blockLabel());
     const back = block.signposts[0].connects[0];

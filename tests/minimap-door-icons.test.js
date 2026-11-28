@@ -12,8 +12,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { DOOR_ART, DOOR_LOOKS, createStreetMinimap, doorArtName, doorLook, doorMarks, markArt, sceneDoorMarks, withDoorArt } from '../public/js/ui/street-minimap.js?fresh=minimap-door-icons';
-import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=9f1e7c03';
-import { subwayFeature } from '../public/js/features/subway-feature.js?v=297fe13b';
+import { phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=7b6c12eb';
+import { subwayFeature } from '../public/js/features/subway-feature.js?v=9f40e2a9';
 import { imageSize } from '../tools/image-size.mjs';
 import { python311 } from './python311.js';
 

@@ -32,7 +32,7 @@ import { createMineRock } from '../public/js/mining.js?v=7ecaa572';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import { ecologyForStreet, planStreetPlacements, populationForStreet, rockSpawnPlan, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=da5177b2';
-import { FEATURES } from '../public/js/features/index.js?v=10e0b69b';
+import { FEATURES } from '../public/js/features/index.js?v=5f3621a9';
 import { setWildlifeCatalog } from '../public/js/wildlife.js?v=670c3a7f';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 import { placementRequests } from '../tools/build-realtime-objects.mjs';

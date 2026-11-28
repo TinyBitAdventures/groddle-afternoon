@@ -29,7 +29,7 @@
 import { readbackCanvas } from './render-probe.js?v=519c86ef';
 import { isLoaded, whenLoaded } from './textures.js?v=b8e38103';
 import { homeShotBands, homeShotRows, homeShotScale, homeShotSize } from './home-shot.js?v=8198618a';
-import { homeFrameFor } from './home-layout-scene.js?v=a8228cd0';
+import { homeFrameFor } from './home-layout-scene.js?v=8c33bec8';
 import { withPublicView } from './public-picture.js?v=1a0b03fa';
 
 /** How long a texture still loading is waited for before the picture is drawn anyway (ms). */

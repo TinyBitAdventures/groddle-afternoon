@@ -65,7 +65,7 @@ import {
   ticketDue,
 } from '../hell-tickets.js?v=33bd7064';
 import { hellFeature } from './hell-feature.js?v=8679fcab';
-import { doorsFeature } from './doors-feature.js?v=c7cc50d0';
+import { doorsFeature } from './doors-feature.js?v=ce813285';
 
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';
 

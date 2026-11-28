@@ -69,7 +69,8 @@ describe('the style profile (tools/builder/style-profile.mjs, assets/content/sty
     // G1312: Archimedes Acres's Group Hall (Fanfoot Flare's decos on a second copy of its street): 27.8 before.
     assert.deepEqual(world.roles.middleground.density, [0.4, 27.7, 86.5]);
     // R5 rooms (Room 15, the Ventilation Room, Room 23): 86 before, 87 after; the missing floor's bulbs and Symphonious Maximus' eyes and spiral ferns (laid from their full-street templates, 2026-11-23): 86 again.
-    assert.deepEqual(world.roles.middleground.decoW, [86, 249, 703]);
+    // G1186: the Quarter's 1200 block (Herring Bone Hatch's decos on a second copy of its street): 703 before.
+    assert.deepEqual(world.roles.middleground.decoW, [86, 249, 704]);
     assert.ok(world.roles.sky.filters.saturation.band[1] < world.roles.middleground.filters.saturation.band[1], 'further back is greyer');
     for (const role of Object.values(world.roles)) {
       assert.equal(role.palette.hue.length, 12);

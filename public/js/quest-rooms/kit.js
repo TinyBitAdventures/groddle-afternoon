@@ -13,7 +13,7 @@ import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from 
 import { quoinTouches } from '../quoins.js?v=f9187edb';
 import { sharpRoomDeco } from '../deco-hires.js?v=34f36d77';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
-import { VIEW_FLOOR_H } from '../location-view.js?v=b178fe66';
+import { VIEW_FLOOR_H } from '../location-view.js?v=f0a5f17d';
 
 export const DECO_DIR = 'assets/decos/groddle/';
 export const ICON_DIR = 'assets/sprites/icons/';

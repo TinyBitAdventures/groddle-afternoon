@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as kit from '../public/js/quest-rooms/kit.js?v=a2eeb5d2';
-import * as club from '../public/js/quest-rooms/clubhouse.js?v=f642b0b8';
+import * as kit from '../public/js/quest-rooms/kit.js?v=f2c0da0c';
+import * as club from '../public/js/quest-rooms/clubhouse.js?v=46dce7e6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const JUMP_RISE = 100;

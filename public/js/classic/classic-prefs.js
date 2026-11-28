@@ -21,9 +21,9 @@
  * focus goes back where it was. Its modern look is the <style> below; Classic
  * restyles it in public/css/classic.css.
  */
-import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=12843953';
-import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=f9c0adfc';
-import { installClassicChrome } from './classic-chrome.js?v=ad77e475';
+import { CLASSIC, MODERN, onUiModeChange, setUiMode, setUiSize, uiState } from './ui-mode.js?v=a8deea36';
+import { CLASSIC_MIN_W, CLASSIC_MIN_H } from './classic-layout.js?v=a73e3958';
+import { installClassicChrome } from './classic-chrome.js?v=d10ac8db';
 import { ZOOM_KEYS_HINT, clampZoom, onZoomChange, setWorldZoom, worldZoom, zoomLabel, zoomValueText } from '../world-zoom.js?v=38816228';
 import { NIGHT_TINT_HINT, NIGHT_TINT_LABEL, nightTintOn, onNightTintChange, setNightTint } from '../night-tint.js?v=1dfc9c89';
 import { STREET_MAP_HINT, STREET_MAP_LABEL, onStreetMapChange, setStreetMap, streetMapOn } from '../ui/street-minimap.js?v=faab9586';

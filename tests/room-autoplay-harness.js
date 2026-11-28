@@ -19,7 +19,7 @@ export const testPixi = new Proxy({ ImageSource: FakeSource, Texture: FakeTextur
 globalThis.PIXI ||= testPixi;
 globalThis.document ||= { createElement: (tag) => new FakeEl(tag), querySelector: () => null, querySelectorAll: () => [], body: new FakeEl('body') };
 
-const kit = await import('../public/js/quest-rooms/kit.js?v=a2eeb5d2');
+const kit = await import('../public/js/quest-rooms/kit.js?v=f2c0da0c');
 
 /** A fake clock: Date.now() reads it while installed. */
 export function fakeClock(start = 1_700_000_000_000) {

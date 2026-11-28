@@ -106,7 +106,7 @@ import { likeStackAt, mergeDroppedStacks, pickupCountTitle } from '../world-item
 import { groundKey, groundStacks, ownGroundRows, ownGroundState } from '../ground-stacks.js?v=22792362';
 import { restingStackYAt, settleStackY, STACK_SINK_PX } from '../walk-surface.js?v=76def2f6';
 import { keepsOwnStack } from '../tools.js?v=4156bba8';
-import { PHONE_HOME_MIN_VIEW_W } from '../location-view.js?v=b178fe66';
+import { PHONE_HOME_MIN_VIEW_W } from '../location-view.js?v=f0a5f17d';
 import { createCountChooser } from '../ui/count-chooser.js?v=75f69512';
 import { createTilePainter } from '../ui/style-tile-paint.js?v=d0e1312b';
 import { isBagClass } from '../pack-slots.js?v=38e4aea5';
@@ -231,11 +231,11 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=7f778c85';
+import { projectApi } from './street-jobs-feature.js?v=2d626553';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=a39637c6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
-import { renderHomeLocation } from '../home-shot-render.js?v=a03860d4';
+import { renderHomeLocation } from '../home-shot-render.js?v=be7225d2';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
 import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=94a385e9';
@@ -262,7 +262,7 @@ import {
 } from '../home-styles.js?v=ec5d2f69';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=a67514c8';
-import { oneArmSignpost } from '../street-render.js?v=16933720';
+import { oneArmSignpost } from '../street-render.js?v=c463d2c6';
 import { ROCK_CATALOG } from '../mining.js?v=7ecaa572';
 import {
   HOUSE_SIGN,

@@ -28,7 +28,7 @@ import { TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 import { holdNote, placeIndex, questHold, questPlaceNeeds } from '../public/js/quest-reach.js?v=1de854ff';
 import { fewestClosures, reachableStreets, streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=7f778c85';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=2d626553';
 
 const root = join(import.meta.dirname, '..');
 const PUB = join(root, 'public');
@@ -76,10 +76,11 @@ before(async () => {
 });
 
 describe('which quests wait for a road on a fresh world', () => {
-  it('a fresh world reaches 243 streets: every door counts now that Dust Traps give every key (Level 2 West into Oppidan Avenue), Louise Pasture\'s door to its villa (G371) and Marylpole Mount\'s QUARTER signpost (G1186)', () => {
+  it('a fresh world reaches 244 streets: every door counts now that Dust Traps give every key (Level 2 West into Oppidan Avenue), Louise Pasture\'s door to its villa (G371) and Marylpole Mount\'s QUARTER signpost to both blocks (G1186)', () => {
     const w = world(freshJobs());
-    assert.equal(w.reach.size, 243);
-    assert.equal(w.reach.has('GQRMM1100BLOCK1'), true, 'the Quarter\'s block, by the QUARTER signpost');
+    assert.equal(w.reach.size, 244);
+    assert.equal(w.reach.has('GQRMM1100BLOCK1'), true, 'the Quarter\'s 1100 block, by the QUARTER signpost');
+    assert.equal(w.reach.has('GQRMM1200BLOCK1'), true, 'and its 1200 block');
     assert.equal(w.reach.has('GCRDGMREPJ02ORK'), true, 'Louise Pasture Villa, by its door on Louise Pasture');
     const level2 = 'GHH1011JSO11ORS';
     const oppidan = 'GDOHDJ84BST2UI2';
