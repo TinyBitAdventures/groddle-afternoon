@@ -19,7 +19,7 @@ import {
   createCraftybotState,
   setCraftybotSpecs,
   setJobTotal,
-} from '../public/js/craftybot.js?v=06550c66';
+} from '../public/js/craftybot.js?v=7640bf14';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CATALOG = join(ROOT, 'public/assets/content/craftybot-specs.json');
@@ -108,7 +108,7 @@ describe('#753: word when the queue is done (ours)', () => {
     assert.ok(CRAFTYBOT_COPY.queueDone, 'its words');
     assert.ok(!/—/.test(CRAFTYBOT_COPY.queueDone), 'no em dash');
     assert.ok(CRAFTYBOT_COPY.queueDone.length <= 60, 'short');
-    const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=8053cbd4');
+    const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js?v=e0f9ed4d');
     craftybotFeature.restore({ owned: true, where: 'pack' });
     const feed = [];
     const toasts = [];

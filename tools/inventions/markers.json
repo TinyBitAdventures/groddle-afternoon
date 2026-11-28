@@ -277,6 +277,7 @@
   },
   "public/js/craftybot.js": {
     "glitch-had-none: // #753 (ours, Austin 2026-11-27): Glitch never said when the queue was done; one feed line when": "craftybot-queue-done-line",
+    "ours: * across reloads. Ours: the step it was in runs again a second later": "craftybot-unstall",
     "ours: // #753 (ours): the last job of the queue just finished: one": "craftybot-queue-done-line",
     "ours: // #753 (ours, Austin 2026-11-27): Glitch never said when the": "craftybot-queue-done-line",
     "ours: // Ours: Glitch gave no words where the bot could not be": "ours-craftybot",

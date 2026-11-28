@@ -26,12 +26,13 @@ import {
   createBot,
   createCraftybotState,
   fetchAnswered,
+  noticeSourceChange,
   normalizeCraftybotState,
   serializeCraftybotState,
   setCraftybotSpecs,
   setJobTotal,
-} from '../public/js/craftybot.js?v=06550c66';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=8053cbd4';
+} from '../public/js/craftybot.js?v=7640bf14';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=e0f9ed4d';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=78d0151e';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
@@ -48,6 +49,80 @@ function runUntil(bot, world, from, until, { stepMs = 100, maxMs = 120_000 } = {
 
 before(() => {
   setCraftybotSpecs(JSON.parse(readFileSync(CATALOG, 'utf8')).specs);
+});
+
+/** Whether a job is under way with nothing that will ever run its next step (the reviewer's stuck bot). */
+function stuck(bot) {
+  const row = bot.active != null ? bot.queue[bot.active] : null;
+  if (!bot.crafting || bot.awaiting || !row || row.activeSeq == null || row.paused || row.locked || row.halted) return false;
+  return !Object.entries(bot.timers).some(([name, t]) => name === 'craftStep' || name === 'arrive' || name === 'queueIterate' || (name === 'setState' && t.arg !== 'sleep'));
+}
+
+describe('a saved bot left crafting with nothing scheduled (review of G1316, 2026-11-27)', () => {
+  const slice = () => JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/craftybot/g1316-stuck-slice.json'), 'utf8'));
+
+  it('the slice as a player\'s save held it: crafting, its fetch step, no step timer, nothing awaited', () => {
+    const s = slice();
+    assert.equal(s.crafting, true);
+    assert.equal(s.queue[0].activeSeq, 0);
+    assert.equal(s.awaiting, null);
+    assert.deepEqual(Object.keys(s.timers), ['setState']);
+    assert.equal(s.timers.setState.arg, 'sleep');
+  });
+
+  it('loads repaired: it fetches again from what lies on the floor', () => {
+    const s = slice();
+    const bot = normalizeCraftybotState(s);
+    assert.equal(stuck(bot), false, 'load schedules the step it was in');
+    const stacks = [{ id: 'drop-c4ca5f48c5f2472f', cls: 'cherry', count: 6, x: 572 }, { id: 'drop-9ae3acc086610a27', cls: 'fruit_changing_machine', count: 1, x: 1072 }];
+    const taken = [];
+    const world = {
+      inLocation: true,
+      count: (cls) => stacks.filter((x) => String(cls).split('|').includes(x.cls)).reduce((n, x) => n + x.count, 0),
+      find: (cls) => stacks.find((x) => String(cls).split('|').includes(x.cls) && x.count > 0) || null,
+      take: (id, cls, n) => { taken.push([id, n]); return -1; },
+      wear: () => ({ broke: false }), drop: () => {}, give: () => {}, imagination: () => {}, say: () => {}, sound: () => {}, stopSound() {},
+      fuelCell: () => null,
+    };
+    runUntil(bot, world, s.clock, () => taken.length > 0, { maxMs: 30_000, stepMs: 500 });
+    assert.deepEqual(taken, [['drop-c4ca5f48c5f2472f', 1]], 'it asks for the Plum\'s one Cherry');
+  });
+
+  it('with the floor empty it gives the job up cleanly instead of hanging', () => {
+    const s = slice();
+    const bot = normalizeCraftybotState(s);
+    const world = {
+      inLocation: true, count: () => 0, find: () => null, take: () => 0,
+      wear: () => ({ broke: false }), drop: () => {}, give: () => {}, imagination: () => {}, say: () => {}, sound: () => {}, stopSound() {},
+      fuelCell: () => null,
+    };
+    runUntil(bot, world, s.clock, () => false, { maxMs: 60_000, stepMs: 500 });
+    assert.equal(stuck(bot), false);
+    assert.equal(bot.crafting, false, 'nothing to make it from: idle, to start again when something comes');
+  });
+
+  it('a stack gone by the time it walks there (own or shared) never leaves it hanging', () => {
+    const stacks = [{ id: 'far', cls: 'cherry', count: 3, x: 900 }, { id: 'm', cls: 'fruit_changing_machine', count: 1, x: 240 }];
+    const world = {
+      inLocation: true,
+      count: (cls) => stacks.filter((x) => String(cls).split('|').includes(x.cls)).reduce((n, x) => n + x.count, 0),
+      find: (cls) => stacks.find((x) => String(cls).split('|').includes(x.cls) && x.count > 0) || null,
+      take: (id, cls, n) => { const x = stacks.find((y) => y.id === id); if (!x) return 0; const k = Math.min(n, x.count); x.count -= k; return k; },
+      wear: () => ({ broke: false }), drop: () => {}, give: () => {}, imagination: () => {}, say: () => {}, sound: () => {}, stopSound() {},
+      fuelCell: () => null,
+    };
+    const bot = createBot(createCraftybotState(), 200, 'interior', 0);
+    advanceCraftybot(bot, 1500, world);
+    setJobTotal(bot, world, 'apple', 1);
+    assert.ok(bot.timers.arrive, 'walking to the far stack');
+    stacks.splice(0, 1); // picked up by someone while the bot walked
+    runUntil(bot, world, 1500, () => false, { maxMs: 30_000, stepMs: 500 });
+    assert.equal(stuck(bot), false);
+    // A new stack later: it is fetched (the source change rescans an idle bot).
+    stacks.push({ id: 'new', cls: 'cherry', count: 3, x: 260 });
+    noticeSourceChange(bot);
+    assert.ok(runUntil(bot, world, 31_500, () => bot.queue[0].crafted === 1), 'the Apple, from the new stack');
+  });
 });
 
 describe('the rules: a fetch the server answers later', () => {
@@ -141,7 +216,7 @@ describe('the rules: a fetch the server answers later', () => {
   });
 
   it('a Fuel Cell on the shared floor: Add More walks there and the cell fills the tank when it comes', async () => {
-    const { autoRefuel } = await import('../public/js/craftybot.js?v=06550c66');
+    const { autoRefuel } = await import('../public/js/craftybot.js?v=7640bf14');
     const stacks = [{ id: 'f', cls: 'fuel_cell', count: 2, x: 230, shared: true }];
     const asks = [];
     const world = sharedWorld(stacks, asks);
@@ -315,6 +390,40 @@ describe('the feature online: the owner\'s bot in the house takes from the share
     runUntil(bot, world, 2500, () => false, { maxMs: 20_000, stepMs: 500 });
     assert.equal(client.sent.length, before + 1, 'asked once');
     assert.ok(Object.keys(bot().timers).length > 0 || bot().craftState === 'idle', 'not stuck mid-step');
+  });
+
+  it('refused, then a reload mid-walk before the floor comes back: it asks again once the floor is listed (review repro)', () => {
+    const NEAR = 'drop-00000000000000c1';
+    const FAR = 'drop-00000000000000c2';
+    client.emit('msg:ground_state', { street: 'HOUSE_7', stacks: [
+      { id: NEAR, c: 'cherry', n: 1, x: 80, y: 620, by: { id: 7, name: 'Ada' } },
+      { id: FAR, c: 'cherry', n: 6, x: 900, y: 620, by: { id: 9, name: 'Bo' } },
+    ] });
+    freshBot();
+    setJobTotal(bot(), world(), 'plum', 1);
+    // Plum takes one: the nearest stack (one Cherry) is asked for first, and someone else had it.
+    assert.equal(client.sent.at(-1)[1].id, NEAR);
+    client.emit('msg:ground_taken', { t: 'ground_taken', id: NEAR, status: 'refused', why: 'gone', text: 'Someone else picked that up.' });
+    client.emit('msg:ground_gone', { id: NEAR, by: { id: 9, name: 'Bo' }, why: 'picked' });
+    // Then it walks to Bo's six, far down the floor.
+    const walking = runUntil(bot, world, 2500, () => Boolean(bot().timers.arrive), { maxMs: 5000 });
+    assert.ok(walking, 'walking to the six');
+    // A reload mid-walk: the page's floor list is empty until the server lists it again.
+    const saved = JSON.parse(JSON.stringify(craftybotFeature.save()));
+    client.state = 'connecting';
+    client.emit('state', { state: 'connecting' });
+    craftybotFeature.restore(saved);
+    craftybotFeature._checkSource(engine);
+    runUntil(bot, world, walking, () => false, { maxMs: 30_000, stepMs: 500 });
+    assert.equal(stuck(bot()), false, 'not crafting with nothing scheduled');
+    // Back online and the floor listed: it fetches the six.
+    const sent = client.sent.length;
+    client.state = 'online';
+    client.emit('state', { state: 'online' });
+    client.emit('msg:ground_state', { street: 'HOUSE_7', stacks: [{ id: FAR, c: 'cherry', n: 6, x: 900, y: 620, by: { id: 9, name: 'Bo' } }] });
+    craftybotFeature._checkSource(engine);
+    runUntil(bot, world, walking + 30_000, () => client.sent.length > sent, { maxMs: 60_000, stepMs: 500 });
+    assert.deepEqual(client.sent.at(-1), ['ground_pickup', { id: FAR, n: 1, ox: HOUSE_X }]);
   });
 
   it('a stack still being dropped, or a floor drawn while the window waits on Play here, is not the bot\'s', () => {

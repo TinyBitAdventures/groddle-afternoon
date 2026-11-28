@@ -6758,6 +6758,22 @@
    "rows": [
     "G443"
    ]
+  },
+  {
+   "id": "craftybot-unstall",
+   "title": "A Crafty Bot whose fetch found its stack gone tries the step again instead of hanging until a Kick",
+   "kind": "behaviour",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/craftybot.js",
+     "symbol": "stalled unstall"
+    }
+   ],
+   "why": "Glitch's bot stopped where a fetch took nothing (npc_crafty_bot.js onDonePathing: if (!pickup_count) return false) or its machine was gone, crafting still set, until the owner kicked it. With shared floors that happens often (a stack picked up while the bot walks, a reload before the floor is listed) and the rescan skips a crafting bot, so it hung across reloads. Ours: a job under way with nothing scheduled runs its step again a second later (on load too, repairing saves already stuck), fetching from what is there or letting the job go idle until something new comes.",
+   "rows": [
+    "G1316"
+   ]
   }
  ]
 }

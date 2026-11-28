@@ -250,12 +250,35 @@ export function normalizeCraftybotState(seed = {}) {
   if (bot.active != null && (bot.active < 0 || bot.active >= bot.queue.length)) bot.active = bot.queue.length ? 0 : undefined;
   // G1316: a take the server was asked for does not outlive the page (its answer, if any, reaches the
   // pack through the site's list): the step it waited in runs again.
-  const waited = s.awaiting && typeof s.awaiting === 'object' ? s.awaiting : null;
-  if (waited && !waited.fuel && waited.seq != null && !bot.timers.craftStep) {
-    bot.timerSeq += 1;
-    bot.timers.craftStep = { at: bot.clock + 1000, arg: int(waited.seq), seq: bot.timerSeq };
-  }
+  // A save from before this repair may hold a bot crafting with nothing scheduled (unstall below).
+  unstall(bot);
   return bot;
+}
+
+/**
+ * G1316 review (2026-11-27): a job under way whose next step nothing will ever run. A fetch that
+ * arrives where its stack no longer is (picked up by someone while the bot walked, or a reload whose
+ * shared floor is not listed yet) took 0 and stopped there with crafting set (onDonePathing, as the
+ * source's `if (!pickup_count) return false` did: Glitch's bot then waited for a Kick), and so did a
+ * machine gone before its fetch (doFetchMachine). The rescan skips a crafting bot, so it hung for good,
+ * across reloads. Ours: the step it was in runs again a second later (it fetches from what is there, or
+ * moves on and lets the job go idle until something new comes). Only a take the server is weighing
+ * (awaiting) waits with nothing scheduled.
+ */
+function stalled(bot) {
+  const row = activeRow(bot);
+  if (!bot.crafting || bot.awaiting || !row || row.activeSeq == null || row.paused || row.locked || row.halted) return false;
+  for (const [name, t] of Object.entries(bot.timers)) {
+    if (name === 'craftStep' || name === 'arrive' || name === 'queueIterate') return false;
+    if (name === 'setState' && t.arg !== 'sleep') return false;
+  }
+  return true;
+}
+
+function unstall(bot) {
+  if (!stalled(bot)) return false;
+  setTimer(bot, 'craftStep', 1000, activeRow(bot).activeSeq);
+  return true;
 }
 
 export function serializeCraftybotState(bot) {
@@ -1475,6 +1498,7 @@ export function advanceCraftybot(bot, now, world, { maxSteps = 5000 } = {}) {
     fire(bot, world, next.name, next.t.arg);
   }
   bot.clock = Math.max(bot.clock, now);
+  unstall(bot);
   if (bot.move) bot.xNow = moveX(bot, now);
   else bot.xNow = bot.x;
   return steps;

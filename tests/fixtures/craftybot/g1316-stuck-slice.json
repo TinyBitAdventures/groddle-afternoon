@@ -1,0 +1,211 @@
+{
+ "version": 1,
+ "owned": true,
+ "boxRead": true,
+ "where": "interior",
+ "floor": 0,
+ "x": 572,
+ "dir": "left",
+ "fuel": 2977,
+ "crystals": 3,
+ "slots": 9,
+ "crystalHp": 993,
+ "queue": [
+  {
+   "item": "plum",
+   "count": 1,
+   "crafted": 0,
+   "paused": false,
+   "locked": false,
+   "halted": false,
+   "iterator": 11,
+   "holder": {},
+   "seq": [
+    {
+     "type": "fetch_ingredient",
+     "can_step": true,
+     "data": {
+      "class_id": "cherry",
+      "count": 1,
+      "source_count": 6
+     }
+    },
+    {
+     "type": "fetch_tool",
+     "can_step": true,
+     "data": {
+      "class_id": "fruit_changing_machine",
+      "source_count": 1,
+      "count": 1
+     }
+    },
+    {
+     "type": "craft",
+     "can_step": true,
+     "data": {
+      "class_id": [
+       "plum"
+      ],
+      "count": [
+       1
+      ],
+      "tool": "fruit_changing_machine",
+      "tool_wear": 0,
+      "energy_cost": 3,
+      "fuel_cost": 3,
+      "duration": 2300,
+      "tool_verb": null,
+      "ingredient_class": [
+       "cherry"
+      ],
+      "ingredient_count": [
+       1
+      ]
+     }
+    },
+    {
+     "type": "craft_complete",
+     "can_step": true,
+     "data": {
+      "class_id": "plum",
+      "count": 1,
+      "ingredients": {
+       "cherry": 6
+      },
+      "missing_ingredients": {},
+      "tools": {
+       "fruit_changing_machine": 1
+      },
+      "missing_tools": {},
+      "energy_cost": 3,
+      "fuel_cost": 3,
+      "duration": 2300
+     }
+    }
+   ],
+   "activeSeq": 0,
+   "ingredients": {
+    "cherry": 6
+   },
+   "missing_ingredients": {},
+   "tools": {
+    "fruit_changing_machine": 1
+   },
+   "missing_tools": {},
+   "status": "craftable"
+  },
+  {
+   "item": "apple",
+   "count": 1,
+   "crafted": 0,
+   "paused": false,
+   "locked": false,
+   "halted": false,
+   "iterator": null,
+   "holder": {},
+   "seq": [
+    {
+     "type": "fetch_ingredient",
+     "can_step": true,
+     "data": {
+      "class_id": "cherry",
+      "count": 3,
+      "source_count": 6
+     }
+    },
+    {
+     "type": "fetch_tool",
+     "can_step": true,
+     "data": {
+      "class_id": "fruit_changing_machine",
+      "source_count": 1,
+      "count": 1
+     }
+    },
+    {
+     "type": "craft",
+     "can_step": true,
+     "data": {
+      "class_id": [
+       "apple"
+      ],
+      "count": [
+       1
+      ],
+      "tool": "fruit_changing_machine",
+      "tool_wear": 0,
+      "energy_cost": 3,
+      "fuel_cost": 3,
+      "duration": 2300,
+      "tool_verb": null,
+      "ingredient_class": [
+       "cherry"
+      ],
+      "ingredient_count": [
+       3
+      ]
+     }
+    },
+    {
+     "type": "craft_complete",
+     "can_step": true,
+     "data": {
+      "class_id": "apple",
+      "count": 1,
+      "ingredients": {
+       "cherry": 6
+      },
+      "missing_ingredients": {},
+      "tools": {
+       "fruit_changing_machine": 1
+      },
+      "missing_tools": {},
+      "energy_cost": 3,
+      "fuel_cost": 3,
+      "duration": 2300
+     }
+    }
+   ],
+   "ingredients": {
+    "cherry": 6
+   },
+   "missing_ingredients": {},
+   "tools": {
+    "fruit_changing_machine": 1
+   },
+   "missing_tools": {},
+   "status": "craftable"
+  }
+ ],
+ "active": 0,
+ "iterator": 13,
+ "crafting": true,
+ "craftState": "idle",
+ "anim": "idle0",
+ "animAt": 1795824933852.1428,
+ "collapsed": false,
+ "walkTarget": "craft",
+ "moveTarget": "drop-c4ca5f48c5f2472f",
+ "move": null,
+ "refuelling": false,
+ "awaiting": null,
+ "craftingTool": null,
+ "timers": {
+  "setState": {
+   "at": 1795825113852.1428,
+   "arg": "sleep",
+   "seq": 73
+  }
+ },
+ "timerSeq": 75,
+ "lastPeek": 0,
+ "clock": 1795825002358,
+ "dropped": {},
+ "stats": {
+  "crafted": 7,
+  "crystalsBurnt": 0,
+  "fuelUsed": 23,
+  "kicks": 0
+ },
+ "xNow": 572
+}
