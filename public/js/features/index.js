@@ -223,7 +223,7 @@ import { calendarFeature } from './calendar-feature.js?v=6cbe4537'; FEATURES.pus
 import { newUrFeature } from './new-ur-feature.js?v=ad7a5eb8'; FEATURES.push(newUrFeature);
 import { newUrPartyFeature } from './new-ur-party-feature.js?v=73d30d79'; FEATURES.push(newUrPartyFeature);
 // Meteor showers and lone shooting stars in the night sky (ours): started from the console, synced by the server.
-import { meteorShowerFeature } from './meteor-shower-feature.js?v=d3775541'; FEATURES.push(meteorShowerFeature);
+import { meteorShowerFeature } from './meteor-shower-feature.js?v=92ea62c2'; FEATURES.push(meteorShowerFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=286e6139'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=087837ca'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=7cda2116'; FEATURES.push(accountBackupFeature);

@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs?v=00000000';
 import { HAS_PHP, PHP } from './php.js?v=00000000';
-import { METEOR, meteorEventOf } from '../public/js/meteor-shower.js?v=833f0d52';
+import { METEOR, meteorEventOf } from '../public/js/meteor-shower.js?v=5fa94f41';
 import { dametimeParts } from '../public/js/game-day.js?v=57fecfcb';
 import { skyPhaseWeights } from '../public/js/sky-clock.js?v=dbd21266';
 
