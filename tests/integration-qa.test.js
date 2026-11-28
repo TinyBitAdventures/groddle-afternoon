@@ -43,7 +43,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('the Magic Rock waits out rook attacks, Naraka and meditation', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js?v=b87e2cbc');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=436b6d78');
     const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js?v=b7568300');
     const { hellFeature } = await import('../public/js/features/hell-feature.js?v=a45d6184');
     const { createRookAttack } = await import('../public/js/rook-attack.js?v=5e62a79f');
@@ -58,7 +58,7 @@ test.describe('integration playtest regressions', () => {
     assert.equal(host.query('holdQuestOffers', { streetTsid: 'L1' }), null);
     const offers = fs.readFileSync(path.join(root, 'public/js/features/quest-offers-feature.js'), 'utf8');
     assert.match(offers, /engine\.busy\(\) \|\| engine\.questOffersHeld\?\.\(\)/);
-    assert.match(game, /questOffersHeld: \(\) => (?:(?:!state\.started|startHeld\(\)) \|\| )?features\.query\('holdQuestOffers', engine\) === true/);
+    assert.match(game, /questOffersHeld: \(\) => (?:(?:!state\.started|startHeld\(\)) \|\| )?features\.held\('holdQuestOffers', engine\)/);
     const meditation = fs.readFileSync(path.join(root, 'public/js/features/meditation-feature.js'), 'utf8');
     assert.match(meditation, /holdQuestOffers\(\) \{\n    return session \? true : null;/);
   });
@@ -81,7 +81,7 @@ test.describe('integration playtest regressions', () => {
   });
 
   test('closed roads refuse signposts, doors and teleports, not other ways in (ticket 37)', async () => {
-    const { createFeatureHost } = await import('../public/js/feature-host.js?v=b87e2cbc');
+    const { createFeatureHost } = await import('../public/js/feature-host.js?v=436b6d78');
     const seen = [];
     const host = createFeatureHost([{ id: 'probe', travelGate: (tsid, engine, meta) => { seen.push(meta); return meta.via === 'signpost' ? { ok: false } : null; } }]);
     assert.equal(host.travelGate('L1', {}, { via: 'signpost' }).ok, false);

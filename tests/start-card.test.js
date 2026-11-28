@@ -62,7 +62,7 @@ describe('the start card holds what the game raises at boot', () => {
     assert.match(hold, /!\(startHeld\(\) \|\| menuTarget/);
     const release = between(game, 'function releaseHeldScriptedDialog()', 'function closeQuestDialogue(');
     assert.match(release, /if \(startHeld\(\) \|\| !heldScriptedDialogs\.length/);
-    assert.match(game, /questOffersHeld: \(\) => startHeld\(\) \|\| features\.query\('holdQuestOffers', engine\) === true/);
+    assert.match(game, /questOffersHeld: \(\) => startHeld\(\) \|\| features\.held\('holdQuestOffers', engine\)/);
     assert.match(game, /afterStart: \(\) => afterStart\(\),/);
     assert.match(between(game, 'function promptStackUi()', 'function isVogOpen()'), /held: \(\) => startHeld\(\),/);
   });

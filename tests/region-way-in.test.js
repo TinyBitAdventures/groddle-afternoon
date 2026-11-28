@@ -16,7 +16,7 @@ import { streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
 import { SUBWAY_STREETS, closedStreets, normalizeStreetJobState } from '../public/js/street-jobs.js?v=76471e42';
 import { locationLinkTarget, renderQuestText } from '../public/js/quest-text.js?v=92213536';
 import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=c7a6b235';
-import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
+import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
 import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
 
 const root = join(import.meta.dirname, '..');

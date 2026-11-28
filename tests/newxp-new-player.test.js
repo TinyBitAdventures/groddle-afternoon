@@ -19,7 +19,7 @@ import { join } from 'node:path';
 import { newPlayerInventory, newPlayerStats } from '../public/js/new-player.js?v=f76dcbaf';
 import { createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { PARADISE_TICKET_IDS } from '../public/js/paradise-flight.js?v=fe7ba6de';
-import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=365ee72d';
+import { createPlayerSave, parsePlayerSave, restorePlayerSave, serializePlayerSave, normalizePlayerSnapshot } from '../public/js/player-save.js?v=87efe3df';
 import { cloudsLayout, SCENE_TSIDS, GENTLE_ISLAND } from '../public/js/newxp.js?v=43f8df2c';
 import { newxpFeature, __newxpTest, cloudEdge, cloudStepOff, cloudStepOffAny, CLOUD_BODY_DEPTH, CLOUD_EDGE_CLEAR, CLOUD_END_PUFFS } from '../public/js/features/newxp-feature.js?v=348b34b2';
 
@@ -143,7 +143,7 @@ describe('2. no quest offers during the tutorial', () => {
     assert.ok(src.indexOf('quest-offers-feature.js') < src.indexOf('newxp-feature.js'));
     assert.match(feature, /holdQuestOffers\(engine\) \{\n\s+if \(pendingStage \|\| active\(\)\) return true;\n\s+return isNewxpSceneTsid\(engine\?\.streetTsid\) \? true : null;/);
     assert.match(read('public/js/features/quest-offers-feature.js'), /if \(offerOpen \|\| engine\.busy\(\) \|\| engine\.questOffersHeld\?\.\(\)\) return false;/);
-    assert.match(game, /questOffersHeld: \(\) => (?:(?:!state\.started|startHeld\(\)) \|\| )?features\.query\('holdQuestOffers', engine\) === true,/);
+    assert.match(game, /questOffersHeld: \(\) => (?:(?:!state\.started|startHeld\(\)) \|\| )?features\.held\('holdQuestOffers', engine\),/);
   });
 
   it('cites inc_quests.js', { skip: !existsSync(gsjs) && 'no GSJS checkout' }, () => {

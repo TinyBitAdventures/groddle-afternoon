@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
 import { createQuestState, listQuestLog, listQuestTracker } from '../public/js/quests.js?v=d9b316eb';
 import { acceptOffer, routeQuestEvent, makingUnitQuestEvents, COUNTER_ROUTES } from '../public/js/quest-offers.js?v=9e1855e7';
-import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=365ee72d';
+import { normalizeQuestSnapshot } from '../public/js/player-save.js?v=87efe3df';
 import { questRequirementText } from '../public/js/quest-text.js?v=92213536';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

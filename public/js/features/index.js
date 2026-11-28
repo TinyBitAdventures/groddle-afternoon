@@ -7,7 +7,7 @@
 import { questFlagsFeature } from './quest-flags-feature.js?v=17c6ef48';
 import { hellFeature } from './hell-feature.js?v=a45d6184';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=5922a1ed';
-import { questOffersFeature } from './quest-offers-feature.js?v=50a92bf8';
+import { questOffersFeature } from './quest-offers-feature.js?v=7ced7fa2';
 import { meditationFeature } from './meditation-feature.js?v=24a45bbf';
 import { teleportationFeature } from './teleportation-feature.js?v=1daecbe4';
 import { racesFeature } from './races-feature.js?v=9ccefff9';
@@ -215,7 +215,7 @@ import { gameTeleporterFeature } from './game-teleporter-feature.js?v=3803484c';
 import { levelUpMpFeature } from './level-up-mp-feature.js?v=22659e6d'; FEATURES.push(levelUpMpFeature);
 // G982 Pot Luck Day, part A: the chicken costumes (after seasons-feature, whose seasonOn it asks).
 import { potLuckFeature } from './pot-luck-feature.js?v=26c13460'; FEATURES.push(potLuckFeature);
-import { potLuckFeastFeature } from './pot-luck-feast-feature.js?v=378a60e4'; FEATURES.push(potLuckFeastFeature);
+import { potLuckFeastFeature } from './pot-luck-feast-feature.js?v=12e886bc'; FEATURES.push(potLuckFeastFeature);
 // G1009 Thanksgiving Day's feast: eat-in-place piles of the week's table food (asks pot-luck-feast for its counts).
 import { feastDayFeature } from './feast-day-feature.js?v=688a19df'; FEATURES.push(feastDayFeature);
 import { calendarFeature } from './calendar-feature.js?v=6cbe4537'; FEATURES.push(calendarFeature);

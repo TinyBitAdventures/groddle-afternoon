@@ -38,7 +38,7 @@ globalThis.Image = class { constructor() { this.naturalWidth = 40; this.naturalH
 const { installPixiFixes } = await import('../public/js/pixi-fixes.js?v=0f42b75e');
 installPixiFixes(PIXI);
 const { SEASON_NOTICES, TABLE_STREET, noticesDue } = await import('../public/js/pot-luck-feast.js?v=971888be');
-const { potLuckFeastFeature } = await import('../public/js/features/pot-luck-feast-feature.js?v=378a60e4');
+const { potLuckFeastFeature } = await import('../public/js/features/pot-luck-feast-feature.js?v=12e886bc');
 
 let date = '2026-11-21';
 const awards = [];
@@ -100,6 +100,19 @@ describe('the feature shows them once each', () => {
   it('nothing before the festival', () => {
     tick();
     assert.equal(awards.length, 0);
+  });
+
+  it('#771: no card (and no quest offer) while the quest offers are held, as in the tutorial', () => {
+    date = '2026-11-22';
+    let offered = 0;
+    engine.offerQuestDialogue = () => { offered += 1; };
+    engine.questOffersHeld = () => true;
+    // Long enough for the quest's offer delay to pass: still nothing while held.
+    for (let i = 0; i < 3; i += 1) { clock += 60_000; potLuckFeastFeature.onTick(16, clock, engine); }
+    assert.equal(awards.length, 0, 'the festival card waits for the tutorial');
+    assert.equal(offered, 0, 'the Pot Luck quest offer waits too');
+    engine.questOffersHeld = () => false;
+    engine.offerQuestDialogue = null;
   });
 
   it('Pot Luck Day\'s card the first time the player plays during it, anywhere, and not again', () => {

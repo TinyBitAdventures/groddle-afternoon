@@ -18,7 +18,7 @@ import { ownerHintCtx } from '../public/js/features/butler-feature.js?v=14b95342
 import { countHouseVisit, homesFeature } from '../public/js/features/homes-feature.js?v=746956c7';
 import { homeTowerFeature, towerApi } from '../public/js/features/home-tower-feature.js?v=10826be6';
 import { slashCommandsFeature } from '../public/js/features/slash-commands-feature.js?v=e6e7cf66';
-import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
+import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

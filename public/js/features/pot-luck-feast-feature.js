@@ -165,6 +165,9 @@ function tableOn() {
  */
 function tellSeason(engine) {
   if (engine.param?.('seasonnotice') === 'off' || engine.param?.('questoffer') === 'off') return;
+  // #771: the card waits while the quest offers are held (the tutorial, a start card, a meditation),
+  // as Glitch queued its offers until the intro was done (players/inc_quests.js 622-624).
+  if (engine.questOffersHeld?.()) return;
   const now = nowForCalendar(engine);
   const key = yearKey(engine);
   const due = noticesDue(told, key, feastDayKey(now));
@@ -625,7 +628,7 @@ export const potLuckFeastFeature = {
     }
     if (!engine.started || !seasonOn()) return;
     tellSeason(engine);
-    if (quest.status === '' && now >= offerAt && engine.param?.('questoffer') !== 'off' && !engine.query?.('holdQuestOffers', engine) && !engine.questDialogueOpen?.()) {
+    if (quest.status === '' && now >= offerAt && engine.param?.('questoffer') !== 'off' && !engine.questOffersHeld?.() && !engine.questDialogueOpen?.()) {
       offerAt = now + 10 * 60_000;
       offerQuest(engine);
     }

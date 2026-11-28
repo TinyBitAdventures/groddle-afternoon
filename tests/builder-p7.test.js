@@ -116,8 +116,8 @@ describe('routes to play back, and the scripted play-test (tools/builder/playtes
   it('a draft play-test holds quest offers unless ?questoffer=now (they are never part of a zone)', () => {
     assert.match(read('public/js/features/quest-offers-feature.js'), /const draft = Boolean\(engine\.param\('draft'\)\);\s*quiet = mode === 'off' \|\| \(\(qaRoute \|\| draft\) && mode !== 'now'\);/);
     // Other features' offers (quest instances, resource nodes, seasons) wait on engine.questOffersHeld, which asks every feature's holdQuestOffers.
-    assert.match(read('public/js/features/quest-offers-feature.js'), /holdQuestOffers\(engine\) \{\s*return Boolean\(engine\.param\?\.\('draft'\)\) && engine\.param\('questoffer'\) !== 'now';/);
-    assert.match(read('public/game.js'), /questOffersHeld: \(\) => startHeld\(\) \|\| features\.query\('holdQuestOffers', engine\) === true/);
+    assert.match(read('public/js/features/quest-offers-feature.js'), /holdQuestOffers\(engine\) \{[^}]*return engine\.param\?\.\('draft'\) && engine\.param\('questoffer'\) !== 'now' \? true : null;/);
+    assert.match(read('public/game.js'), /questOffersHeld: \(\) => startHeld\(\) \|\| features\.held\('holdQuestOffers', engine\)/);
   });
 });
 

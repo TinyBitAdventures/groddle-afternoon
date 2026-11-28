@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=1c0f4a21';
-import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=8849e01b';
+import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=436b6d78';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e4cef7c7';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -570,7 +570,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=365ee72d';
+} from './js/player-save.js?v=87efe3df';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -15064,7 +15064,8 @@ const engine = {
   /** Ticket 21: when the player last dismissed an emergency card (Escape or its X); features wait for another street before showing it again. */
   questDialogueDismissedAt: () => urgentDismissedAt,
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
-  questOffersHeld: () => startHeld() || features.query('holdQuestOffers', engine) === true,
+  // R58 (#771): every feature's hold counts (features.held asks them all; the first answer alone missed newxp's).
+  questOffersHeld: () => startHeld() || features.held('holdQuestOffers', engine),
   /** STARTCARD: resolves once the player has left the start card (familiar-dialog-feature waits on it). */
   afterStart: () => afterStart(),
   /** A quest offer: the recovered beats, then accept / decline. `inLog` opens it inside the Quests dialog (G225). */

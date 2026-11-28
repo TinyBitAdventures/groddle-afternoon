@@ -765,7 +765,8 @@ export const questOffersFeature = {
 
   /** P7: a level builder play-test (?draft=) holds every quest offer (other features' too) unless ?questoffer=now. */
   holdQuestOffers(engine) {
-    return Boolean(engine.param?.('draft')) && engine.param('questoffer') !== 'now';
+    // Null, not false, when it has no opinion: false hid newxp's hold from the first-answer lookup (#771).
+    return engine.param?.('draft') && engine.param('questoffer') !== 'now' ? true : null;
   },
 
   init(engine) {

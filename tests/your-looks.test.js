@@ -10,9 +10,9 @@ import {
   YOUR_LOOKS_KEEP_MS, YOUR_LOOKS_MAX, YOUR_LOOKS_TEXT, cleanLook, createYourLooks, findLook, lookId,
   normalizeYourLooks, noteWear, pastLooks, recordLook, removeLook, totalLine, wearLook,
 } from '../public/js/your-looks.js?v=e2a62a96';
-import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
+import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
 import { yourLooksFeature, YOUR_LOOKS_FEATURE_ID } from '../public/js/features/your-looks-feature.js?v=e2077bab';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=365ee72d';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=87efe3df';
 import { APPEARANCE_PRESETS } from '../public/js/character-builder.js?v=13bbcfff';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

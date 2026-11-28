@@ -30,7 +30,7 @@ import {
   offerableMultiplayerQuest,
   tradeHoochCount,
 } from '../public/js/quests-mp.js?v=e697cec3';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=50a92bf8';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=7ced7fa2';
 import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=0130bd22';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';

@@ -9,7 +9,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createFeatureHost } from '../public/js/feature-host.js?v=b87e2cbc';
+import { createFeatureHost } from '../public/js/feature-host.js?v=436b6d78';
 import { OFFLINE_LINE, PLAY_HERE_STATES } from '../public/js/online-request.js?v=5fa7a635';
 
 const featureCopy = async (name) => (await import(`../public/js/features/rook-attack-feature.js?fresh=play-here-rook-${name}`)).rookAttackFeature;

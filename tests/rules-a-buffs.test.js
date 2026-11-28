@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 
 import { loadContentCatalogsFromDir, getBuffCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
 import { applyBuff, createBuffState, resumeBuffsAfterAway, tickBuffs } from '../public/js/buffs.js?v=09184e60';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=365ee72d';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=87efe3df';
 
 const MIN = 60_000;
 

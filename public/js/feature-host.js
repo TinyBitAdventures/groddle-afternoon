@@ -259,9 +259,22 @@ export function createFeatureHost(features = [], { onError } = {}) {
       }
       return out;
     },
-    /** First non-null answer from any feature implementing `hook`. */
+    /**
+     * First non-null answer from any feature implementing `hook`. "No opinion" is null: a feature
+     * that answers false here hides every later feature's answer (R58, #771).
+     */
     query(hook, ...args) {
       return first(hook, ...args);
+    },
+    /**
+     * A hold-type question (holdQuestOffers): true when any feature answers true, so one feature's
+     * false or null never hides another's hold (R58, #771).
+     */
+    held(hook, ...args) {
+      for (const feature of list) {
+        if (typeof feature[hook] === 'function' && feature[hook](...args) === true) return true;
+      }
+      return false;
     },
     metabolicGate(stat, direction, engine) {
       for (const feature of list) {
