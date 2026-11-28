@@ -40,7 +40,7 @@ import {
   takenMailIds,
   unreadLetters,
   whereWords,
-} from '../public/js/phone/companion-data.js?v=fbe7f87a';
+} from '../public/js/phone/companion-data.js?v=78b7629a';
 import { PHP } from './php.js';
 
 const pub = join(import.meta.dirname, '..', 'public');

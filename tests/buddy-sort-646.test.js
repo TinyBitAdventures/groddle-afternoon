@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUDDY_SORTS, BUDDY_SORT_KEY, loadBuddySort, normalizeBuddySort, saveBuddySort, sortBuddies } from '../public/js/buddies.js?v=4457d8a4';
+import { BUDDY_SORTS, BUDDY_SORT_KEY, loadBuddySort, normalizeBuddySort, saveBuddySort, sortBuddies } from '../public/js/buddies.js?v=81cadb4b';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

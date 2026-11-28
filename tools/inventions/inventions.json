@@ -6974,6 +6974,25 @@
    "why": "Austin 2026-11-27. Glitch had neither (no code, art or snaps of a meteor or shooting star in the client, GSJS or the archived snaps). Ours: a shower of 3 to 4 real minutes (50 to 90 quick streaks, one every 2.5 to 5 s with bursts of two or three, all radiating from one radiant point picked from the seed, mostly faint with a few bright) or one lone star (a slow 4 s crossing with a long trail, a bigger sparkling head and a train that lingers 2.5 s; Austin 2026-11-27: the two must look clearly different), drawn in code like #749's stars (a tapered trail, a glowing head) in the clock's night sky only (faint at dusk and dawn, none indoors, on own-sky streets or with NIGHT TINT off; slower and dimmer under prefers-reduced-motion); never in rotation, only the console's Night sky panel starts one (the site's AdminSky, the realtime server's meteor.go: one event with a seed, so every page draws the same streaks at the same moment; a late joiner joins in progress; an optional activity-feed hint two minutes before); a Snap taken while a streak shows keeps it and its page shows a Shooting star tag. No achievement.",
    "ruling": "",
    "rows": []
+  },
+  {
+   "id": "buddy-notice-threshold",
+   "title": "A buddy going on and off quickly is announced at most once each way per five minutes",
+   "kind": "behaviour",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/buddies.js",
+     "symbol": "applyPresence"
+    },
+    {
+     "file": "public/js/features/buddies-feature.js",
+     "symbol": "msg:buddy_online"
+    }
+   ],
+   "why": "Austin 2026-11-28: a friend must not be able to spam their friends with online and offline notices by going on and off quickly. Glitch had no such notice at all (glitch-client NCMsgHandler.as do_BUDDY_ONLINE and ContactList.as buddyUpdate only moved the contact between Online and Offline; GSJS player.js onLogin/onLogout sent buddy_online/buddy_offline every time, with no debounce), so the toasts and their limit are both ours. Ours: the realtime server (groddle-afternoon-server buddies.go) waits 30 s (buddyGrace, was 15 s) before a dropped game counts as offline, so a reload, Play here or a phone's dropped connection says nothing and the dot waits too; it says a buddy is online at most once each 5 minutes (buddyAnnounceEvery) per player, and went offline only to close an online it said or after a stay of 5 minutes or more; a block, an un-block and Appear offline flapping follow the same rule; every other change goes out quiet, which moves the dot and shows no toast or activity line.",
+   "ruling": "",
+   "rows": []
   }
  ]
 }

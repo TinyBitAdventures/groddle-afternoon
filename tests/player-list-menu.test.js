@@ -7,10 +7,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=fc31e1d5';
+import { FROM_LIST_VERBS, PLAYER_TARGET_FEATURE, listPlayerTarget, opensPlayerMenu, playerMenuRows } from '../public/js/ui/player-menu.js?v=2add6a78';
 import { PROFILE_PAGE_VERB } from '../public/js/profiles.js?v=1daccbb9';
 import { IM_VERB_ID } from '../public/js/player-im.js?v=2c6339e8';
-import { BUDDY_VERBS } from '../public/js/buddies.js?v=4457d8a4';
+import { BUDDY_VERBS } from '../public/js/buddies.js?v=81cadb4b';
 import { VISIT_VERB } from '../public/js/neighbours-mp.js?v=de82fd7d';
 import { PARTY_FEATURE_ID } from '../public/js/features/party-feature.js?v=b7587871';
 

@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FIND_TEXT, activityMatches, foldFind, mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=c491afb2';
+import { FIND_TEXT, activityMatches, foldFind, mountSocialDrawer } from '../public/js/ui/social-drawer.js?v=25697b7e';
 import { createNotifier } from '../public/js/notify.js?v=c9d79ec5';
 import { memoryStore, page } from './social-fake-dom.js';
 

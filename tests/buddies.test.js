@@ -28,13 +28,13 @@ import {
   buddyWhere,
   freshReverse,
   normalizeList,
-} from '../public/js/buddies.js?v=4457d8a4';
+} from '../public/js/buddies.js?v=81cadb4b';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=7ca9abe8';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=0f913eef';
 import { BUDDY_DESTINATION_TEXT, BUDDY_DESTINATION_VERB, buddyDestination, buddyFaceUrl, createFaceMemory } from '../public/js/buddy-list.js?v=b418f3f2';
 import { STREET_INDEX } from '../public/js/street-loader.js?v=10376267';
-import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=fc31e1d5';
-import { FEATURES } from '../public/js/features/index.js?v=9d4c0283';
+import { FROM_LIST_VERBS, playerMenuRows } from '../public/js/ui/player-menu.js?v=2add6a78';
+import { FEATURES } from '../public/js/features/index.js?v=3c85d4c4';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';
 
@@ -122,6 +122,9 @@ describe('buddies rules (js/buddies.js)', () => {
     applyPresence(online, { t: 'buddy_offline', id: 2, name: 'Bo' });
     assert.equal(online.has(2), false);
     assert.equal(applyPresence(online, { t: 'buddy_online' }), null);
+    // The server's quiet flag rides along (buddies.go: a change for the list, no notice).
+    assert.equal(applyPresence(online, { t: 'buddy_online', id: 2, name: 'Bo', quiet: true }).quiet, true);
+    assert.equal(applyPresence(online, { t: 'buddy_offline', id: 2, name: 'Bo' }).quiet, false);
     applyStatus(online, { online: [{ id: 4, name: 'Di', street: 'GA2' }, { id: 0 }] });
     assert.deepEqual([...online.keys()], [4]);
   });
@@ -400,6 +403,24 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
     assert.ok(panel.find('data-buddy-unignore', '3'), 'Cy is in the blocked list');
     client.msg({ t: 'buddy_offline', id: 2, name: 'Bo' });
     assert.ok(events.includes(`toast:${BUDDY_TEXT.offline('Bo')}`));
+    globalThis.groddleBuddies.close();
+  });
+
+  it('a buddy flapping on and off: the server\'s quiet changes move the dot and say nothing (Austin 2026-11-28)', () => {
+    globalThis.groddleBuddies.open();
+    const panel = () => body.find('data-buddies-panel');
+    events.length = 0;
+    for (let i = 0; i < 4; i++) {
+      client.msg({ t: 'buddy_online', id: 2, name: 'Bo', street: 'GA5101HF7F429V5', quiet: true });
+      assert.equal(panel().find('data-buddy', '2').dataset.online, 'true');
+      client.msg({ t: 'buddy_offline', id: 2, name: 'Bo', quiet: true });
+      assert.equal(panel().find('data-buddy', '2').dataset.online, 'false');
+    }
+    assert.deepEqual(events.filter((e) => e.includes('Bo')), [], 'no toast, no feed line');
+    // What the server does say aloud still shows.
+    client.msg({ t: 'buddy_online', id: 2, name: 'Bo', street: 'GA5101HF7F429V5' });
+    assert.ok(events.includes(`toast:${BUDDY_TEXT.online('Bo')}`));
+    client.msg({ t: 'buddy_offline', id: 2, name: 'Bo' });
     globalThis.groddleBuddies.close();
   });
 

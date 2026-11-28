@@ -123,7 +123,7 @@ import { avatarOf, createBuddyFaces } from './buddy-face.js?v=cb11f179';
 import { WHOS_HERE_TEXT, streetOthers, whosHereView } from '../whos-here.js?v=82e3aca7';
 import { DELETE_CONFIRM_FOCUS, DELETE_TEXT, deleteConfirmRows } from '../chat-delete.js?v=14ae5bda';
 import { htmlToText } from '../html-text.js?v=6bbf4d1f';
-import { BUDDY_SORTS, BUDDY_SORT_TEXT } from '../buddies.js?v=4457d8a4';
+import { BUDDY_SORTS, BUDDY_SORT_TEXT } from '../buddies.js?v=81cadb4b';
 
 export const SOCIAL_STORE_KEY = 'groddle-social-drawer';
 /** The drawer opens by default at this window width and up (the mock's 1440 rule). */

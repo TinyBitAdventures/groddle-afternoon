@@ -21,7 +21,8 @@
  *   prompt), so Block keeps Yes and Never mind and Report is the next row instead.
  * - Menu, Buddies: your buddies with online or offline and the street they
  *   are on, Remove; who added you (Add back); who you block (Un-block).
- * - Toasts: a buddy online or offline, "X just added you as a contact!"
+ * - Toasts: a buddy online or offline (not the changes the server marks quiet, a buddy going on
+ *   and off again: buddies.go), "X just added you as a contact!"
  *   live from the server (the source's activity line, inc_buddies.js:209).
  * - Adds made while you were away (the site marks those new; they may come
  *   from the website's "Add to buddy list" on your page): a prompt each,
@@ -84,7 +85,7 @@ import {
   normalizeList,
   saveBuddySort,
   sortBuddies,
-} from '../buddies.js?v=4457d8a4';
+} from '../buddies.js?v=81cadb4b';
 import { UNNAMED_PLAYER } from '../player-names.js?v=f9b78094';
 import { PLAYER_REPORT_TEXT, playerReportView } from '../player-report.js?v=8d7e5653';
 import { openReportView } from '../note-view.js?v=c512b345';
@@ -546,8 +547,9 @@ function createSession(engine, client) {
     client.on(`msg:${kind}`, (msg) => {
       const change = applyPresence(online, msg);
       if (!change) return;
-      // Toasts for your own buddies; who only added you just updates the panel.
-      if (isBuddy(list, change.id)) {
+      // Toasts for your own buddies; who only added you just updates the panel, and so does a
+      // change the server marks quiet (a buddy flapping on and off: buddies.go, Austin 2026-11-28).
+      if (isBuddy(list, change.id) && !change.quiet) {
         if (change.kind === 'online') notice(BUDDY_TEXT.online(change.name), 3200);
         if (change.kind === 'offline') notice(BUDDY_TEXT.offline(change.name), 3200);
       }

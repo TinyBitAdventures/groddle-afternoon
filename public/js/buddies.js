@@ -146,21 +146,27 @@ export function addedYouOnly(list) {
   return (list?.reverse || []).filter((r) => !isBuddy(list, r.id) && !isIgnoring(list, r.id));
 }
 
-/** One of the server's presence messages applied to id -> { name, street }; returns what changed. */
+/**
+ * One of the server's presence messages applied to id -> { name, street }; returns what changed.
+ * `quiet` is the server's word that the change is for the list alone, with no notice: a buddy going
+ * on and off again inside its window (groddle-afternoon-server buddies.go sayOnline/sayOffline,
+ * ours: Glitch showed no notice at all, Austin 2026-11-28).
+ */
 export function applyPresence(online, msg) {
   const id = n0(msg?.id);
   if (!id) return null;
   const name = String(msg.name || UNNAMED_PLAYER);
+  const quiet = msg.quiet === true;
   switch (msg.t) {
     case 'buddy_online':
       online.set(id, { name, street: String(msg.street || '') });
-      return { id, name, kind: 'online' };
+      return { id, name, kind: 'online', quiet };
     case 'buddy_moved':
       online.set(id, { name, street: String(msg.street || '') });
-      return { id, name, kind: 'moved' };
+      return { id, name, kind: 'moved', quiet };
     case 'buddy_offline':
       online.delete(id);
-      return { id, name, kind: 'offline' };
+      return { id, name, kind: 'offline', quiet };
     default:
       return null;
   }
