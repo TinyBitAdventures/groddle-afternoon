@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3908,
+  "commits": 3910,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "The Crafty Bot no longer leaves a later job waiting behind a finished one"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2926,11 +2931,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Drag a placed machine to move it along the floor of your house or Tower, in Decoration Mode or out of it"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "Rooks' Woods stops asking \"Are you stuck?\" once its quest is done, so it never covers the Quest complete card"
    }
   ]
  },
