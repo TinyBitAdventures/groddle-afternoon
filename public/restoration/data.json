@@ -2814,9 +2814,19 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3901,
+  "commits": 3906,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "new",
+    "text": "Your home street's signpost points to your Quarter lot, and takes anyone there to it"
+   },
+   {
+    "date": "2026-11-27",
+    "kind": "new",
+    "text": "Marylpole Mount Quarter's 1200 block: ten more lots, picked from the QUARTER signpost, one lot each across both blocks"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2926,19 +2936,9 @@
     "date": "2026-11-27",
     "kind": "improve",
     "text": "What's new's All versions is a picker, and ‹ › or the arrow keys step through the versions"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The encyclopedia says Metal Rocks need a working Fancy Pick"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The street no longer flashes black on an iPhone when a bag opens or closes"
    }
   ]
  },
- "tests": 1500,
+ "tests": 1502,
  "generatedAt": "2026-11-27"
 }
