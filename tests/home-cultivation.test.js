@@ -24,7 +24,7 @@ import {
   quoteYardExpansion,
   removeCultivation,
 } from '../public/js/home-cultivation.js?v=61295953';
-import { cultivationIcon } from '../public/js/features/homes-feature.js?v=86da0fc9';
+import { cultivationIcon } from '../public/js/features/homes-feature.js?v=6c2d961d';
 
 const root = join(import.meta.dirname, '..', 'public');
 const rich = () => ({ level: 60, imagination: 1_000_000 });

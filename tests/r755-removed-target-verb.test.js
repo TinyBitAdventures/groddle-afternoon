@@ -10,7 +10,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=fa0035e8';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=1a9f29cd';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

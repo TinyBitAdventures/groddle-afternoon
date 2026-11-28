@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { BARNACLE_NUDGES, nudgedBarnacleSpots } from '../public/js/barnacle-nudges.js?v=159f11bf';
 import { BARNACLE_SPOTS } from '../public/js/barnacle-spots-data.js?v=cea3daec';
-import { measuredNodeSpots } from '../public/js/street-ecology.js?v=1c840641';
+import { measuredNodeSpots } from '../public/js/street-ecology.js?v=36fd044b';
 
 describe('G952 barnacle nudges', () => {
   it('every nudge names a measured barnacle, a small shift and a reason', () => {

@@ -31,8 +31,8 @@ import {
   rockSpawnPlan,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=1c840641';
-import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=b8fc0749';
+} from '../public/js/street-ecology.js?v=36fd044b';
+import { resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=479849b6';
 import { creatureRequests, plannedStreet, setCreatureEcology, streetEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 
 const root = join(import.meta.dirname, '..');

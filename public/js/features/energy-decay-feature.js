@@ -33,9 +33,9 @@
 import { createEnergyLossClock, ENERGY_LOSS_TICK_MS, energyLossSkip, periodicEnergyLoss } from '../energy-decay.js?v=01009c8b';
 import { energyMax, loseEnergy } from '../metabolics.js?v=48f784bf';
 import { isNewxpSceneTsid } from '../newxp.js?v=eedf8fe3';
-import { homesFeature } from './homes-feature.js?v=86da0fc9';
+import { homesFeature } from './homes-feature.js?v=6c2d961d';
 import { meditationFeature } from './meditation-feature.js?v=40abda92';
-import { newxpFeature } from './newxp-feature.js?v=ea0fd9da';
+import { newxpFeature } from './newxp-feature.js?v=bea5a918';
 
 export const ENERGY_DECAY_FEATURE_ID = 'energy-decay';
 const BEAM_ME_DOWN_TSID = 'PUZZLESCENE_BEAM_ME_DOWN';

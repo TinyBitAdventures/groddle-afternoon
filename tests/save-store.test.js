@@ -36,14 +36,14 @@ import { HANDOFF_KEY, claimCharacter, leaveHandoff, listenForClaims, takeHandoff
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 import { spawnSync } from 'node:child_process';
 import { persist as persistGarden } from '../public/js/features/shared-gardens-feature.js?v=e889ddce';
-import { persist as persistPatch } from '../public/js/features/shared-patches-feature.js?v=bfb5f2e9';
+import { persist as persistPatch } from '../public/js/features/shared-patches-feature.js?v=04535b6e';
 import { persist as persistTrade } from '../public/js/features/trade-feature.js?v=dd6f986b';
 import { persist as persistFeat } from '../public/js/features/solo-feats-feature.js?v=c26fffcd';
 import { persist as persistMayhem } from '../public/js/features/mayhem-feature.js?v=4bb316b5';
 import { mpPersist as persistCrowns } from '../public/js/features/crowns-feature.js?v=26923396';
-import { flush as flushHomeStreet } from '../public/js/features/home-street-mp-feature.js?v=f871f3fd';
-import { flush as flushHomeStorage } from '../public/js/features/home-storage-feature.js?v=f79ab3dc';
-import { persist as persistBoards } from '../public/js/features/boards-mp-feature.js?v=9b69cc9b';
+import { flush as flushHomeStreet } from '../public/js/features/home-street-mp-feature.js?v=d0273ca3';
+import { flush as flushHomeStorage } from '../public/js/features/home-storage-feature.js?v=a2f0318b';
+import { persist as persistBoards } from '../public/js/features/boards-mp-feature.js?v=d78a9aba';
 import { persist as persistDrops } from '../public/js/features/drops-mp-feature.js?v=c48e2640';
 import { createOnlineRequests } from '../public/js/online-request.js?v=5fa7a635';
 import { AUDIO_MUTED_KEY } from '../public/js/audio-pref.js?v=683f27c8';

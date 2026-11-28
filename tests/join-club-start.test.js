@@ -15,7 +15,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { questSceneTsid, wayBackFrom } from '../public/js/quest-instance.js?v=39e4ca2e';
-import * as club from '../public/js/quest-rooms/clubhouse.js?v=42253624';
+import * as club from '../public/js/quest-rooms/clubhouse.js?v=ccd4b686';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, 'public', p), 'utf8');

@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { jobIndicatorTip } from '../public/js/job-indicator.js?v=8bea518d';
-import { topClearOver } from '../public/js/features/street-jobs-feature.js?v=e06912e8';
+import { topClearOver } from '../public/js/features/street-jobs-feature.js?v=caa20b5e';
 
 const src = readFileSync(join(import.meta.dirname, '..', 'public', 'js', 'features', 'street-jobs-feature.js'), 'utf8');
 

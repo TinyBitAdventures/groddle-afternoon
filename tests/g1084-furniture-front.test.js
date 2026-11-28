@@ -26,7 +26,7 @@ import {
   populationForStreet,
   setStreetEcologyCatalog,
   streetReservedSpots,
-} from '../public/js/street-ecology.js?v=1c840641';
+} from '../public/js/street-ecology.js?v=36fd044b';
 import { FURNITURE_GROUPS, measuredStones } from '../public/js/street-furniture.js?v=071203fc';
 import { creatureRequests, setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 import { census } from '../tools/furniture-front-census.mjs';

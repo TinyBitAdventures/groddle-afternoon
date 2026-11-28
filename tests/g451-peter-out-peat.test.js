@@ -13,8 +13,8 @@ import { PEAT_ANSWER_GRACE_MS, PEAT_EVENT, PEAT_FOR_MS, PEAT_FULL, PEAT_QUEST, P
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
 import { MULTIPLAYER_QUESTS, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=e697cec3';
 import { ensureQuestOfferState, tickQuestTimers } from '../public/js/quest-offers.js?v=36e610b5';
-import { peatQuestMpFeature } from '../public/js/features/peat-quest-mp-feature.js?v=620cacb0';
-import { FEATURES } from '../public/js/features/index.js?v=e3f90bae';
+import { peatQuestMpFeature } from '../public/js/features/peat-quest-mp-feature.js?v=a42ab71f';
+import { FEATURES } from '../public/js/features/index.js?v=6ebe7a39';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

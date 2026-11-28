@@ -18,7 +18,7 @@
  */
 
 import { ensureQuestOfferState } from '../quest-offers.js?v=36e610b5';
-import { nodeId } from '../street-objects.js?v=7f174327';
+import { nodeId } from '../street-objects.js?v=8cdf5355';
 import { PEAT_ANSWER_GRACE_MS, PEAT_EVENT, PEAT_QUEST, PEAT_TEXT, fullBogNear, peatHelperRow, peatHelperRun } from '../peat-quest.js?v=654cdb1b';
 import { getBuffCatalog } from '../content-catalogs.js?v=b6a173ae';
 import { BUFF_ICONS } from '../buff-triggers.js?v=9fd877c4';

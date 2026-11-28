@@ -44,7 +44,7 @@ import {
 import { doorSaleArt } from '../public/js/door-sign-art.js?v=69daffff';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
 import { addQuarterBoard } from '../public/js/street-render.js?v=d76d4268';
-import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=9b85681e';
+import { quarterFeature, _quarterState, _resetQuarter } from '../public/js/features/quarter-feature.js?v=940195a0';
 import { quartersData } from '../tools/build-realtime-quarters.mjs';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { Display, fakePixi } from './fake-scene.js';

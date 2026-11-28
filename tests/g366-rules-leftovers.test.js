@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b6a173ae';
 import { worldVerbAchievementCounters } from '../public/js/achievements.js?v=4af6091c';
-import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=692aa092';
+import { createAnimalState, resetAnimalDay } from '../public/js/animals.js?v=060b5c65';
 import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
 import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=36e610b5';
 import { applyBuff, createBuffState } from '../public/js/buffs.js?v=fc742885';

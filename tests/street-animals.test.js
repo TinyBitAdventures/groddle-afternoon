@@ -12,8 +12,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { populationForStreet, setStreetEcologyCatalog, RENDER_ANIMAL_CAPS, STREET_ANIMAL_CAPS } from '../public/js/street-ecology.js?v=1c840641';
-import { batterflyCountForStreet } from '../public/js/animal-husbandry.js?v=b79a1eab';
+import { populationForStreet, setStreetEcologyCatalog, RENDER_ANIMAL_CAPS, STREET_ANIMAL_CAPS } from '../public/js/street-ecology.js?v=36fd044b';
+import { batterflyCountForStreet } from '../public/js/animal-husbandry.js?v=9d2e832d';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/street-ecology.json'), 'utf8'));

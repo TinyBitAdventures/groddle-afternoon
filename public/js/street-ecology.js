@@ -1845,6 +1845,10 @@ export const FRONT_BOXES = Object.freeze({
   furnitureStone: [81, UNDER_CANOPY_HEIGHTS.furnitureStone],
   furnitureMailbox: [UNDER_CANOPY_WIDTHS.furnitureMailbox, UNDER_CANOPY_HEIGHTS.furnitureMailbox],
   furnitureBoard: [211, 145],
+  // #760 review: Cranbury Coppice's Race Ticket Dispenser, moved out of a fir's crown, stood wholly
+  // behind the front fir's trunk (middleplus tree_coniferous_fg_2), the player vanishing there too.
+  // Its art as drawn (UNDER_CANOPY_WIDTHS / _HEIGHTS: 58 x 94); found and clicked, so FRONT_FIND_SHARE.
+  raceDispenser: [UNDER_CANOPY_WIDTHS.raceDispenser, UNDER_CANOPY_HEIGHTS.raceDispenser],
 });
 /**
  * G1236: the planned things players click that nothing planned after them may stand on (the planner
@@ -1877,7 +1881,7 @@ function nodeArtBox(request, point, planned, tsid) {
 export const FIXTURE_ART_BOXES = Object.freeze({ furnitureNote: [45, 14] });
 export const CLICK_FIXTURE_GROUPS = Object.freeze(['shrine', 'vendor', 'furnitureStone', 'furnitureMailbox', 'furnitureBoard']);
 /** The FRONT_BOXES things a player has to find and click (FRONT_FIND_SHARE); the other nodes keep FRONT_HIDE_SHARE. */
-export const FRONT_FIND_KEYS = Object.freeze(['shrine', 'vendor', 'resource:jellisac']);
+export const FRONT_FIND_KEYS = Object.freeze(['shrine', 'vendor', 'resource:jellisac', 'raceDispenser']);
 /** #490, #574: the nodes and furniture moved once their group is planned when the front art covers them (planStreetPlacements reseatHiddenNodes). */
 export const NODE_FRONT_KEYS = Object.freeze(Object.keys(FRONT_BOXES).filter((k) => !FRONT_FIND_KEYS.includes(k)));
 /**

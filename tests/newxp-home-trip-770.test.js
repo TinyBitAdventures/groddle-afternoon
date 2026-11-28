@@ -14,9 +14,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GENTLE_ISLAND, HOME_TRIP_REFUSED, ISLAND_STEPS, homeTripOpen } from '../public/js/newxp.js?v=eedf8fe3';
-import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=ea0fd9da';
+import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=bea5a918';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=e3f90bae';
+import { FEATURES } from '../public/js/features/index.js?v=6ebe7a39';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

@@ -17,6 +17,11 @@ import {
   branchArtCovers,
   branchFreeGroup,
   ecologyForStreet,
+  FRONT_FIND_SHARE,
+  FRONT_HIDE_SHARE,
+  frontCoverShare,
+  frontDecoCovers,
+  hiddenBehindFront,
   onBranchArt,
   PERCH_DROP_PX,
   planStreetPlacements,
@@ -24,7 +29,7 @@ import {
   setStreetEcologyCatalog,
   streetReservedSpots,
   WHOLE_TREE_ART,
-} from '../public/js/street-ecology.js?v=1c840641';
+} from '../public/js/street-ecology.js?v=36fd044b';
 import { creatureRequests, setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -115,5 +120,35 @@ describe('#760: a rock in a fir drawn whole', () => {
       }
     }
     assert.deepEqual(up, []);
+  });
+});
+
+// #760 review: moved out of the fir's crown, Cranbury Coppice's Race Ticket Dispenser stood at 5959
+// wholly behind the front fir's trunk (middleplus tree_coniferous_fg_2), and a player at it vanished
+// too. The front-art check (hiddenBehindFront) had no box for the dispenser; it has its art's now.
+describe('#760 review: no dispenser or rock behind front art', () => {
+  it('Cranbury Coppice: the dispenser stands where it can be seen', () => {
+    const data = street('GLI2HHRC84F1TJ6');
+    const [d] = plan('GLI2HHRC84F1TJ6', data).groups.raceDispenser;
+    assert.ok(frontCoverShare(d, 58, 94, frontDecoCovers(data)) < FRONT_FIND_SHARE, `at ${Math.round(d.x)}, ${Math.round(d.y)}`);
+  });
+
+  it('every street: no planned dispenser or rock the front art hides', () => {
+    const hidden = [];
+    for (const [tsid, meta] of Object.entries(index.streets)) {
+      let data;
+      try { data = JSON.parse(readFileSync(join(root, 'public', meta.file), 'utf8')); } catch { continue; }
+      if (!data.bounds) continue;
+      const p = plan(tsid, data);
+      const fronts = frontDecoCovers(data);
+      // The dispenser by its art (58 x 94, races/race_ticket_dispenser.webp), apart from the planner's boxes.
+      (p.groups.raceDispenser || []).forEach((s, i) => {
+        if (frontCoverShare(s, 58, 94, fronts) >= FRONT_FIND_SHARE) hidden.push(`${data.label} raceDispenser[${i}] @${Math.round(s.x)},${Math.round(s.y)}`);
+      });
+      (p.groups.rocks || []).forEach((s, i) => {
+        if (!s.fixed && hiddenBehindFront(s, 'rocks', fronts, FRONT_HIDE_SHARE)) hidden.push(`${data.label} rocks[${i}] @${Math.round(s.x)},${Math.round(s.y)}`);
+      });
+    }
+    assert.deepEqual(hidden, []);
   });
 });

@@ -168,7 +168,7 @@ import { upgradeSource } from '../sprite-hires.js?v=6a4569c4';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=243cef7d';
 import { HOME_MACHINE } from '../home-ticket.js?v=c0db4904';
-import { createAnimalState } from '../animals.js?v=692aa092';
+import { createAnimalState } from '../animals.js?v=060b5c65';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
