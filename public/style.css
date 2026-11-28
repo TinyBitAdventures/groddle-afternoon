@@ -15422,8 +15422,8 @@ body.is-booting .touch-controls { display: none; }
    Rename prompt) and .glitch-modal is such a scrim too, and so are the street map's sheet and the
    keys card's shade; their cards keep their own widths. G1178: the house's Customize sheet (.hp-card)
    runs edge to edge upright, docked under the street (js/ui/house-picker.js). G1240: the Snaps album and
-   viewer fill a phone's screen. */
-:root.touch-phone[data-ui="modern"] :is(.glitch-modal-card, .side-card, .ui-sheet, [role="dialog"]):not(.ui-sheet-center, .award-screen, .new-day-screen, .hog-haul-screen, .overlay, .quest-dialogue, .rook-museum-exhibit, .feed-picker, .emotional-bear-picker, .verb-menu, .glitch-modal, .smm-sheet, .hotkeys-shade, .imagination-hub, .img-reveal, .game-splash, .vog-overlay, .hp-card, .snap-win, .snap-viewer) { max-width: calc(100vw - 8px); }
+   viewer fill a phone's screen. #759: so does the Giant's screen. */
+:root.touch-phone[data-ui="modern"] :is(.glitch-modal-card, .side-card, .ui-sheet, [role="dialog"]):not(.ui-sheet-center, .award-screen, .new-day-screen, .hog-haul-screen, .overlay, .quest-dialogue, .rook-museum-exhibit, .feed-picker, .emotional-bear-picker, .verb-menu, .glitch-modal, .smm-sheet, .hotkeys-shade, .imagination-hub, .img-reveal, .game-splash, .vog-overlay, .hp-card, .snap-win, .snap-viewer, .giant-screen) { max-width: calc(100vw - 8px); }
 :root.touch-phone[data-ui="modern"] body { overflow-x: hidden; }
 /* The tutorial's pill (top left) waits while a sheet or window is open: it covered their titles. */
 :root.touch-phone[data-ui="modern"]:has(#game-root :is(.ui-sheet, .side-panel, .glitch-modal, .map-panel):not([hidden])) #newxp-pill { visibility: hidden; }

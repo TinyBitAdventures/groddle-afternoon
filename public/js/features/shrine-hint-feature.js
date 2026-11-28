@@ -208,20 +208,24 @@ function placeGiantScreen(settle = false) {
   const packTop = pack && pack.offsetParent !== null ? pack.getBoundingClientRect().top - (r?.top || 0) : fullH;
   const h = packTop > fullH * 0.5 && packTop < fullH ? packTop : fullH;
   el.querySelector('.gs-stage').style.height = `${h}px`;
-  const k = giantScreenScale(giant, w, h);
+  // #759 review: lay the Giant and its words out left of the Social drawer (--inset-r), as the street's
+  // other screens do; the colour still dims the whole view.
+  const insetR = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--inset-r')) || 0;
+  const lw = Math.max(w * 0.6, w - insetR);
+  const k = giantScreenScale(giant, lw, h);
   el.style.setProperty('--gs-k', String(k));
   const text = el.querySelector('.gs-text');
   // Measure the text at this k: the line wraps at MAX_BODY_W (350 px at the snaps' scale), the stage edge on a phone.
-  text.style.maxWidth = `${Math.min((GIANT_LAYOUT.maxTextW / 0.627) * k, w - 2 * GIANT_LAYOUT.edge)}px`;
+  text.style.maxWidth = `${Math.min((GIANT_LAYOUT.maxTextW / 0.627) * k, lw - 2 * GIANT_LAYOUT.edge)}px`;
   el.classList.remove('stacked');
   let tw = text.offsetWidth;
   let th = text.offsetHeight;
-  let lay = giantScreenLayout(giant, { w, h, textW: tw, textH: th, k });
+  let lay = giantScreenLayout(giant, { w: lw, h, textW: tw, textH: th, k });
   if (lay.stacked) {
     el.classList.add('stacked');
     tw = text.offsetWidth;
     th = text.offsetHeight;
-    lay = giantScreenLayout(giant, { w, h, textW: tw, textH: th, k });
+    lay = giantScreenLayout(giant, { w: lw, h, textW: tw, textH: th, k });
   }
   const slide = el.querySelector('.gs-slide');
   Object.assign(slide.style, { width: `${lay.artW}px`, height: `${lay.artH}px`, left: `${lay.start.x - lay.artW / 2}px`, top: `${lay.start.y - lay.artH / 2}px` });
