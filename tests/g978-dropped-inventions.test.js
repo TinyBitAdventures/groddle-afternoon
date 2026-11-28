@@ -35,7 +35,8 @@ describe('G978: dropped inventions stay gone', () => {
     assert.doesNotMatch(spawn, /crest|badge|\.circle\(/);
     for (const v of Object.values(VENDOR_PROFILES)) assert.equal('badge' in v, false, v.key);
     assert.doesNotMatch(read('build-stores.mjs'), /badge/);
-    assert.match(read('public/js/features/street-spirits-feature.js'), /const \[body, label\] = g\.children;/);
+    // #757: the stand-in is still just a body and a name, found by name now.
+    assert.match(read('public/js/features/street-spirits-feature.js'), /const \{ body, label \} = vendorStandInParts\(g\);/);
   });
 });
 
