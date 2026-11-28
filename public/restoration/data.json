@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-28"
  },
  "git": {
-  "commits": 3976,
+  "commits": 3978,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-28",
+    "kind": "fix",
+    "text": "race ticket dispensers no longer stand hidden behind front-layer trees and huts"
+   },
    {
     "date": "2026-11-28",
     "kind": "new",
