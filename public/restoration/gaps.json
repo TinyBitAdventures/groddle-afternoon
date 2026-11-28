@@ -41,8 +41,8 @@
   "counts": {
     "fixing": 3,
     "known": 18,
-    "unreleased": 0,
-    "fixed": 672,
+    "unreleased": 1,
+    "fixed": 671,
     "lost": 5,
     "purpose": 18,
     "idea": 10
@@ -4813,8 +4813,7 @@
         {
           "id": "F202",
           "text": "A friend going on and off quickly sent you an online or offline notice every time.",
-          "state": "fixed",
-          "version": "v0.81.0"
+          "state": "unreleased"
         }
       ]
     }
