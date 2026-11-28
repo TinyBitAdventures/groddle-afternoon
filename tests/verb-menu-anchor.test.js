@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { spriteWorldHitBox } from '../public/js/pick.js?v=8137f9fc';
+import { spriteWorldHitBox } from '../public/js/pick.js?v=c09a14e3';
 
 const src = readFileSync(new URL('../public/game.js', import.meta.url), 'utf8');
 

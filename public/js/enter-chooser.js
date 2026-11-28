@@ -272,6 +272,19 @@ export function rimArtParts(spr, PIXI) {
 }
 
 /**
+ * #757: whether a thing's rims still trace its art parts (rimArtParts), one each. A Street Spirit
+ * dressed while it glowed hid the stand-in its rim traced and showed the real spirit: the rim must
+ * be made again, on the spirit.
+ * @param {any[]} rims each with its _outlineSource
+ * @param {any[]} parts rimArtParts of the thing now
+ */
+export function rimsTraceParts(rims = [], parts = []) {
+  if (rims.length !== parts.length) return false;
+  const srcs = new Set(rims.map((rim) => rim?._outlineSource));
+  return parts.every((part) => srcs.has(part));
+}
+
+/**
  * #669 (Austin 2026-11-26): whether the thing under the mouse takes its rim. On a computer a
  * mouse-over rims it only in reach (the in-reach glow's rule), as Glitch glowed only what the avatar
  * touched (MiddleGroundRenderer.as glowRenderer 1157-1165) and a mouse-over only named a thing

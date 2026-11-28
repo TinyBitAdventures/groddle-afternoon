@@ -24,7 +24,7 @@ import { isStorageClass } from '../public/js/home-storage.js?v=17bf7f79';
 import { worldArtFor } from '../public/js/world-art.js?v=a67514c8';
 import { itemZ } from '../public/js/item-bands.js?v=ec366be3';
 import { nearestPlotIndex } from '../public/js/garden-view.js?v=04fe8467';
-import { PICK_REACH, SOLID_ALPHA, pickByRectangle, pickFront, pickTarget, resetPickMasks, pickStats } from '../public/js/pick.js?v=8137f9fc';
+import { PICK_REACH, SOLID_ALPHA, pickByRectangle, pickFront, pickTarget, resetPickMasks, pickStats } from '../public/js/pick.js?v=c09a14e3';
 
 let magick = true;
 try {

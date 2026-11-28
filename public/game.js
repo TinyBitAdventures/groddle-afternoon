@@ -4,8 +4,9 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=50a42470';
-import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=09a4c760';
+import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=2a97502d';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=6996c6f5';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=02f04426';
@@ -721,7 +722,7 @@ import {
 } from './js/garden.js?v=fefa7bcd';
 import { GARDEN_SCALE, PLOT_H as GARDEN_PLOT_H, PLOT_W as GARDEN_PLOT_W, gardenFrame, gardenLayout, gardenStyle, plotPieces } from './js/garden-view.js?v=04fe8467';
 import { nearestPlotIndex } from './js/garden-view.js?v=04fe8467';
-import { pickTarget, pickByRectangle, pickExplain, spriteWorldHitBox, pickStats } from './js/pick.js?v=8137f9fc';
+import { pickTarget, pickByRectangle, pickExplain, spriteWorldHitBox, pickStats } from './js/pick.js?v=c09a14e3';
 import {
   ROCK_CATALOG,
   ROCK_SHAPE_SHEETS,
@@ -1001,7 +1002,7 @@ import {
   learnFasterOpen,
   learnFasterSummary,
 } from './js/shrines.js?v=48318bec';
-import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=832a5e61';
+import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=150850d3';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=b1bafb71';
 import {
@@ -8916,7 +8917,7 @@ function syncHoverRims() {
   if (!target?.sprite || target.sprite.destroyed) return;
   const want = hoverRimShown({ pointer: hoverByPointer, phone: TOUCH_PHONE, inReach: inGlowReach(hoverTarget) });
   const has = Boolean(target._hoverRimOn);
-  if (want && (!has || rimsStale(target._hoverGlow))) {
+  if (want && (!has || rimsStale(target._hoverGlow, target))) {
     dropRims(target._hoverGlow);
     // The reach glow's rim gives way to the hover's (#669: one rim per thing).
     dropReachGlow(target);
@@ -8953,10 +8954,11 @@ function dropRims(rims) {
   }
 }
 /** A rim whose part has gone (destroyed or taken out of its holder) is made again. */
-const rimsStale = (rims) => !rims?.length || rims.some((rim) => {
+/** #757: so is one whose thing's art changed (a Street Spirit dressed over its stand-in). */
+const rimsStale = (rims, target) => !rims?.length || rims.some((rim) => {
   const src = rim._outlineSource;
   return rim.destroyed || !src || src.destroyed || (src.parent && src.parent !== rim.parent);
-});
+}) || (target ? !rimsTraceParts(rims, rimParts(target)) : false);
 
 /** The cyan rim (tsSprite_GlowA) behind one art sprite, in the sprite's own holder. */
 function addSpriteRim(spr) {
@@ -9016,7 +9018,7 @@ function updateReachGlow(now = performance.now()) {
   if (now - reachGlowAt > 150) {
     reachGlowAt = now;
     const want = new Set(reachGlowWanted());
-    for (const t of [...reachGlows.keys()]) if (!want.has(t) || rimsStale(reachGlows.get(t))) dropReachGlow(t);
+    for (const t of [...reachGlows.keys()]) if (!want.has(t) || rimsStale(reachGlows.get(t), t)) dropReachGlow(t);
     for (const t of want) if (!reachGlows.has(t) && entityLayer && !entityLayer.destroyed) reachGlows.set(t, addTargetRims(t));
     const line = [...reachGlows.keys()].map((t) => t.classId || '').join(',');
     if (app?.canvas && app.canvas.dataset.reachGlow !== line) app.canvas.dataset.reachGlow = line;
@@ -33911,9 +33913,12 @@ function spawnVendorNpc(placement = null) {
   const body = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/vendor.png'));
   anchorBottomCentre(body, 'deco');
   body.scale.set(0.25);
+  // #757: named, as a Street Spirit's dress() finds them by name (a rim can sit before them).
+  body.label = VENDOR_STAND_IN_LABEL;
   g.addChild(body);
   const label = new PIXI.Text({ text: activeVendor.label, style: worldLabelStyle(12) });
   anchorBottomCentre(label, 'text');
+  label.label = VENDOR_NAME_LABEL;
   label.y = -124;
   g.addChild(label);
   // A click on the vendor is a click on any target: its verb menu, Browse goods walks you over

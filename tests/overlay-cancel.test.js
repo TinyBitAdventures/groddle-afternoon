@@ -162,7 +162,7 @@ describe('G311 players outside overlay-art', () => {
 
   it('a firework under the fx layer stops when the street changes and resolves null', async () => {
     const { cancelAllOverlays, liveOverlayCount } = await art();
-    const { fireworksUnder } = await import('../public/js/features/spirit-loneliness-feature.js?v=d5130e30');
+    const { fireworksUnder } = await import('../public/js/features/spirit-loneliness-feature.js?v=e5996532');
     cancelAllOverlays();
     const sprites = [];
     const PIXI = {

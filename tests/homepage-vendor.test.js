@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { spiritForStreet, spiritSheet } from '../public/js/street-spirits.js?v=0af9baa0';
+import { spiritForStreet, spiritSheet } from '../public/js/street-spirits.js?v=2a97502d';
 import { streetLines } from '../public/landing/street.js?v=82fae819';
 import { dialoguePool } from '../public/js/dialogue.js?v=fcfed1af';
 

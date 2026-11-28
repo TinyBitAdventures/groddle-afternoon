@@ -73,9 +73,10 @@ import {
   spiritForStreet,
   spiritSheet,
   spiritSheets,
+  vendorStandInParts,
   zuttoNear,
   zuttoNextClip,
-} from '../street-spirits.js?v=0af9baa0';
+} from '../street-spirits.js?v=2a97502d';
 import {
   TALK_CLASSES,
   TALK_ORDER,
@@ -103,7 +104,7 @@ import {
 import { pcLabel } from '../pc-label.js?v=81bf3550';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=7e00498b';
 import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
-import { questRoomConverse } from './quest-instances-feature.js?v=7068eee1';
+import { questRoomConverse } from './quest-instances-feature.js?v=a29205d3';
 import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=a50b40dc';
 import { questDoneAt } from '../quests.js?v=f68437db';
 
@@ -337,10 +338,11 @@ function setClip(s, clip) {
 }
 
 /** Hide the stand-in body and put the region's spirit in its place, moving the name above it. */
-function dress(engine, target, variant, look) {
+export function dress(engine, target, variant, look) {
   const { PIXI } = engine;
   const g = target.sprite;
-  const [body, label] = g.children;
+  // #757: by name, never by place: a glow rim drawn before the art loaded sits first.
+  const { body, label } = vendorStandInParts(g);
   const box = spiritCell(variant, look);
   const anchor = spiritAnchor(variant, look);
   const spr = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);

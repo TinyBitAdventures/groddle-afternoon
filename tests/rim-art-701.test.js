@@ -17,7 +17,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { rimArtParts, spriteHasRimArt } from '../public/js/enter-chooser.js?v=297c6d15';
+import { rimArtParts, spriteHasRimArt } from '../public/js/enter-chooser.js?v=6996c6f5';
 
 const ROOT = join(import.meta.dirname, '..');
 const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');

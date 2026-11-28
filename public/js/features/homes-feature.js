@@ -282,7 +282,7 @@ import {
 } from '../magic-rock-home.js?v=c07b2327';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=13473847';
-import { pickFront } from '../pick.js?v=8137f9fc';
+import { pickFront } from '../pick.js?v=c09a14e3';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=f4be1a05';
 import { LANDSCAPE_VIEW_W, landscapeWindow, rowRange, soilTiles } from '../landscape-reach.js?v=2f2d7cb3';
 import { takeFromHouse } from '../ledger-house.js?v=b34f5c89';

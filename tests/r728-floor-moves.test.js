@@ -24,7 +24,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as walk from '../public/js/walk-surface.js?v=76def2f6';
-import * as homes from '../public/js/features/homes-feature.js?v=bc463ef7';
+import * as homes from '../public/js/features/homes-feature.js?v=ab966554';
 import { createHomeDecorState, INTERIOR, interiorWidth, surfaceHeight } from '../public/js/home-decor.js?v=d84c139d';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { normalizeHomeView, ownerStacksFor } from '../public/js/neighbours-mp.js?v=0896a4d7';

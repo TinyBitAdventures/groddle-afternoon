@@ -36,7 +36,7 @@ import { tablesForSkill, timeLead, timeTableHtml } from './skill-times.mjs';
 import { STATUS, andList, article, badge, entrySearch, esc, fmt, inRemake, makeParts, pathOf, plainText, sep, statusLabel, tsHtml } from './parts.mjs';
 import { regionMoreStreets, regionStreetName, streetPage, streetsIndex, streetsWithIt } from './streets.mjs';
 import { storePage } from './stores.mjs';
-import { STREET_SPIRIT_VARIANTS } from '../../public/js/street-spirits.js?v=0af9baa0';
+import { STREET_SPIRIT_VARIANTS } from '../../public/js/street-spirits.js?v=2a97502d';
 import { subwayPage } from './subway.mjs';
 import { LISTS_PATH, listEntry, listPage, listsIndex, streetLists } from './street-lists.mjs';
 import { dropBoilerplate, factsFile, factsPath, pageFacts } from './search-facts.mjs';

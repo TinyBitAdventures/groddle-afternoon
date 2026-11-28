@@ -13,7 +13,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { enterHintPick, reachGlowTargets } from '../public/js/enter-chooser.js?v=297c6d15';
+import { enterHintPick, reachGlowTargets } from '../public/js/enter-chooser.js?v=6996c6f5';
 
 const ROOT = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');

@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox } from '../public/js/overlays.js?v=91dcee74';
 import { OVERLAYS, expandMotionObjects } from '../tools/overlays/build.mjs';
 import { loadFla } from '../tools/overlay-art/xfl-svg.mjs';
-import { SHRINE_SHEETS, shrineClassFor, shrineRegionForHub, shrineSheet, shrineVariantFor } from '../public/js/shrine-variants.js?v=832a5e61';
+import { SHRINE_SHEETS, shrineClassFor, shrineRegionForHub, shrineSheet, shrineVariantFor } from '../public/js/shrine-variants.js?v=150850d3';
 import { checkVariants, variantFiles } from '../tools/shrine-variants/build.mjs';
 import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=5a4cfe2d';
 import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=7e402304';

@@ -24,7 +24,7 @@
  * Masks: one per texture, built the first time a pick needs it (never per frame), one bit per
  * pixel, at most MASK_MAX px a side.
  */
-import { rimArtParts } from './enter-chooser.js?v=297c6d15';
+import { rimArtParts } from './enter-chooser.js?v=6996c6f5';
 
 /** Glitch's minimum_alpha for furniture under the mouse with another stack (LocationRenderer.as 1887-1888). */
 export const SOLID_ALPHA = 200;
