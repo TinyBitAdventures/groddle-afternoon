@@ -231,7 +231,7 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=002e6200';
+import { projectApi } from './street-jobs-feature.js?v=7f778c85';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=a39637c6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
@@ -262,7 +262,7 @@ import {
 } from '../home-styles.js?v=ec5d2f69';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=a67514c8';
-import { oneArmSignpost } from '../street-render.js?v=a175beef';
+import { oneArmSignpost } from '../street-render.js?v=16933720';
 import { ROCK_CATALOG } from '../mining.js?v=7ecaa572';
 import {
   HOUSE_SIGN,
@@ -318,6 +318,7 @@ import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { anchorBottomCentre, standOnFeet } from '../sprite-feet.js?v=849541a8';
 import { autoplayLog } from '../autoplay-log.js?v=55bb4823';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
+import { farLayerTint, starField } from '../sky-clock.js?v=dbd21266';
 import { HOUSE_ART_DIR, HOUSE_FROM_HOME_STYLE, HOUSE_STYLE_IDS, composeHouse, houseFitViewH, houseLabel, houseLot, normalizeHouse } from '../home-house.js?v=3c88c47c';
 import { closeHousePicker, housePickerOpen, openHousePicker, refreshHousePicker } from '../ui/house-picker.js?v=20aaba5c';
 import { YARD_WALL_DX } from '../yard-wander.js?v=d73cf478';
@@ -1134,7 +1135,13 @@ function interiorBackground(engine, opts = {}) {
       lot: { left: x0, right: null },
     });
     root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
+    // #749 at home: the back yard's sky follows the clock, seen from the yard or the room.
+    root.skyGradient = land.skyGradient;
+    root.setSkyLook = land.setSkyLook;
+    root.skyLookNow = land.skyLookNow;
   }
+  // #749 at home: the house with its yard ('yard': the room from houseX on is indoors), or a Tower floor.
+  root.homePlace = opts.yard ? 'yard' : 'room';
   root.addChild(house);
   root.room = drawRoomShell(engine, shell, opts);
   root.shell = shell;
@@ -2172,17 +2179,31 @@ function pickAlt(item, seed) {
   return { ...item, ...item.alts[Math.floor(hash01(seed) * item.alts.length)] };
 }
 
+const hex6 = (c) => (Number(c) >>> 0).toString(16).padStart(6, '0').slice(-6);
+
+/** Paint a 2 x 256 sky canvas with stops [[at 0..1, 0xrrggbb], ...]. */
+function paintSkyCanvas(canvas, stops) {
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 256);
+  for (const [at, c] of stops) grad.addColorStop(at, `#${hex6(c)}`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 2, 256);
+}
+
+/** A style's sky colours (top to bottom, evenly spaced) as gradient stops. */
+const evenStops = (colors) => colors.map((c, i) => [i / Math.max(1, colors.length - 1), c]);
+
 function gradientTexture(PIXI, ...colors) {
   const canvas = document.createElement('canvas');
   canvas.width = 2;
   canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, 0, 256);
-  colors.forEach((c, i) => grad.addColorStop(i / Math.max(1, colors.length - 1), `#${c.toString(16).padStart(6, '0')}`));
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 2, 256);
-  return PIXI.Texture.from(canvas);
+  paintSkyCanvas(canvas, evenStops(colors));
+  const texture = PIXI.Texture.from(canvas);
+  return { texture, canvas };
 }
+
+/** The star field's least size: drawn again wider for a wider view (#749 at home). */
+const HOME_STAR_FIELD = { w: 2048, h: 900 };
 
 /** The recipes' field: its back edge at y 586 on the old 620 px street (tools/home-styles/recipes.mjs). */
 const RECIPE_FIELD_TOP = 586;
@@ -2270,7 +2291,8 @@ export function drawLandscape(engine, root, style, seed, { width, groundY, lift,
   const { fieldTop, rise } = landscapeGeometry(style, groundY);
   const { PIXI } = engine;
   const artist = landscapeArtist(engine, root);
-  const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
+  const skyPaint = gradientTexture(PIXI, ...style.sky);
+  const sky = new PIXI.Sprite(skyPaint.texture);
   sky.zIndex = -100;
   // The profile's diorama (js/home-layout-scene.js) draws these from their colours.
   sky.homeLayoutSky = style.sky;
@@ -2278,12 +2300,15 @@ export function drawLandscape(engine, root, style, seed, { width, groundY, lift,
   // SKY FILL (js/location-view.js stageBandColour): the sky is pinned to the view, so its top colour
   // is the canvas's top edge; the band over a short yard on an upright phone carries it on up.
   root.skyTop = `#${(style.sky[0] >>> 0).toString(16).padStart(6, '0').slice(-6)}`;
+  const daySkyTop = root.skyTop;
 
   const parallax = [];
   const spanFor = (f) => width * f + VIEW_W * (1 - f) + 400;
   // G951: what the camera can show past the street's ends, the drawer open or the street narrower
   // than the view (js/landscape-reach.js); the field, soil and every layer reach it.
   const ground = landscapeWindow(width, 1, VIEW_W);
+  // #749 at home: the style's layers, furthest first, for the clock sky's tint by depth.
+  const farLayers = [];
   if (style.stars) {
     // A night sky: fixed dots, as the Toxic Moon and Midnight Glow headers show.
     const lc = new PIXI.Container();
@@ -2355,6 +2380,7 @@ export function drawLandscape(engine, root, style, seed, { width, groundY, lift,
     lc.parallaxF = layer.f;
     root.addChild(lc);
     parallax.push(lc);
+    farLayers.push(lc);
   });
 
   // The walkable field and the soil cross-section below it, as far as the camera can see (G951).
@@ -2405,14 +2431,66 @@ export function drawLandscape(engine, root, style, seed, { width, groundY, lift,
   }
   root.addChild(near);
 
+  // #749 at home (js/sky-clock.js, ours): the clock's sky, as street-render.js setSkyLook draws it
+  // on a public street. The look's three stops over the style's own gradient, the stars pinned to
+  // the view over it (the sky is as far as it goes), each layer tinted by depth (farLayerTint: the
+  // furthest the most); the field, the house and what stands in the yard take only the world tint.
+  let skyLookKey = 'day';
+  let skyLookNow = null;
+  let skyStars = null;
+  const drawStars = (w, h) => {
+    if (!skyStars) {
+      skyStars = new PIXI.Graphics();
+      skyStars.label = 'sky-stars';
+      skyStars.zIndex = -99.5;
+      root.addChild(skyStars);
+    } else {
+      skyStars.clear();
+    }
+    for (const star of starField(w, h, 7)) skyStars.circle(star.x, star.y, star.r).fill({ color: 0xffffff, alpha: star.alpha });
+    skyStars.fieldW = w;
+    skyStars.fieldH = h;
+  };
+  const setSkyLook = (look) => {
+    const next = look && !look.day ? look : null;
+    const key = next ? next.key : 'day';
+    if (key === skyLookKey) return false;
+    skyLookKey = key;
+    skyLookNow = next;
+    paintSkyCanvas(skyPaint.canvas, next ? [[0, next.stops[0]], [next.at, next.stops[1]], [1, next.stops[2]]] : evenStops(style.sky));
+    skyPaint.texture.source?.update?.();
+    root.skyTop = next ? `#${hex6(next.stops[0])}` : daySkyTop;
+    if (next && next.stars > 0) {
+      if (!skyStars) drawStars(HOME_STAR_FIELD.w, HOME_STAR_FIELD.h);
+      skyStars.visible = true;
+      skyStars.alpha = next.stars;
+    } else if (skyStars) {
+      skyStars.visible = false;
+    }
+    const n = farLayers.length;
+    farLayers.forEach((lc, li) => {
+      lc.tint = next ? farLayerTint(next.art, n > 1 ? (n - 1 - li) / (n - 1) : 1) : 0xffffff;
+    });
+    return true;
+  };
+
   return {
     artist,
+    // #749 at home: the style's sky for the clock (top and bottom of its gradient), and whether it paints its own stars.
+    skyGradient: { top: hex6(style.sky[0]), bottom: hex6(style.sky[style.sky.length - 1]), ownStars: Boolean(style.stars) },
+    setSkyLook,
+    skyLookNow: () => skyLookNow,
     update(camX, camY, vpW, skyH) {
       sky.x = camX;
       sky.y = camY;
       sky.width = vpW;
       sky.height = skyH;
       for (const lc of parallax) lc.x = camX * (1 - lc.parallaxF);
+      if (skyStars?.visible) {
+        if (vpW > skyStars.fieldW || skyH > skyStars.fieldH) drawStars(Math.max(skyStars.fieldW, Math.ceil(vpW)), Math.max(skyStars.fieldH, Math.ceil(skyH)));
+        skyStars.x = camX;
+        skyStars.y = camY;
+      }
     },
   };
 }
@@ -2484,6 +2562,11 @@ function streetBackground(engine, styleKey, houseStyle = 'cottage') {
   root.fitViewH = houseFitViewH(h.chassis, h.config, h.facingRight, { groundY: STREET_GROUND_Y, worldH: STREET_WORLD_H });
   root.platformsScreen = [{ id: 'home-ground', x1: 0, y1: STREET_GROUND_Y, x2: width, y2: STREET_GROUND_Y, pc_perm: -1 }];
   root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
+  // #749 at home: the home street follows the clock's sky (game.js applySkyClock, js/sky-clock.js).
+  root.homePlace = 'street';
+  root.skyGradient = land.skyGradient;
+  root.setSkyLook = land.setSkyLook;
+  root.skyLookNow = land.skyLookNow;
   root.houseDoorX = doorX;
   root.houseSignX = signX;
   root.houseDoorway = houseDoorway(layout, houseStyle);

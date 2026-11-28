@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=d390424c';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=10e0b69b';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -747,7 +747,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=0642d72a';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=99a33148';
 import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
@@ -782,7 +782,7 @@ import {
   signpostBoardAt,
   signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=a175beef';
+} from './js/street-render.js?v=16933720';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -882,7 +882,7 @@ import { MODERN, onUiModeChange, readUiCache, uiState, writeUiCache } from './js
 // ZOOM: the world zoom (a device preference) and Classic's frame scale under it; both load before main().
 import { worldZoom, setWorldZoom, stepWorldZoom, onZoomChange, zoomKeyAction, zoomKeyToast, zoomFixed, setZoomFixed, onZoomFixedChange, phoneZoom } from './js/world-zoom.js?v=38816228';
 import { nightTint, nightTintOn, onNightTintChange, worldTintOpacity } from './js/night-tint.js?v=1dfc9c89';
-import { skyFollowsClock, skyLook } from './js/sky-clock.js?v=6b9184e9';
+import { homePlaceAt, skyFollowsClock, skyLook } from './js/sky-clock.js?v=dbd21266';
 import { streetMapSetting, toggleStreetMap } from './js/ui/street-minimap.js?v=faab9586';
 import './js/classic/classic-zoom.js?v=d1b8d5b0';
 import { mountImaginationHub } from './js/ui/imagination-hub.js?v=6928c5b7';
@@ -3700,18 +3700,32 @@ function updateDametimeChrome(now = dametimeDisplayNow()) {
  * once a game minute (an unchanged minute, street view and setting do nothing). Returns the share
  * of the world tint that stays (1 where the sky keeps its own colours).
  */
-const skyClock = { view: null, minute: NaN, on: null, share: 1 };
+const skyClock = { view: null, minute: NaN, on: null, place: null, share: 1 };
 function applySkyClock(light = daylightState(dametimeDisplayNow())) {
   const view = bgLayer;
   if (!view?.setSkyLook) return 1;
   const minute = Math.floor(light.hour * 60);
   const on = nightTintOn() && skyFollowsClock(currentStreet, { interior: currentStreet ? streetEcologyEntry(currentStreet)?.interior === true : false });
-  if (skyClock.view === view && skyClock.minute === minute && skyClock.on === on) return skyClock.share;
+  // #749 at home: in the house the yard's sky keeps the clock's look wherever it is seen from (no
+  // flash at the door); standing in the room the world tint is the indoor one (eased, setAtmosphere).
+  const place = homePlaceAt(currentStreet?.homePlace, { houseX: view.houseX, x: player?.x });
+  if (skyClock.view === view && skyClock.minute === minute && skyClock.on === on && skyClock.place === place) return skyClock.share;
   const look = on ? skyLook(currentStreet.gradient.top, currentStreet.gradient.bottom, minute / 60) : null;
   view.setSkyLook(look);
-  Object.assign(skyClock, { view, minute, on, share: look ? look.worldTint : 1 });
+  Object.assign(skyClock, { view, minute, on, place, share: look && place !== 'room' ? look.worldTint : 1 });
   if (app?.canvas) app.canvas.dataset.sky = look && !look.day ? look.key : 'own';
   return skyClock.share;
+}
+
+/**
+ * #749 at home: a home scene's place and sky for its street (js/sky-clock.js ownSkyReason): the
+ * home street, the house with its back yard or a Tower floor (js/features/homes-feature.js
+ * `homePlace`), the style's sky as its gradient. Nothing for any other scene.
+ */
+function homeSkyFields(bg) {
+  if (typeof bg?.homePlace !== 'string') return {};
+  const sky = bg.skyGradient;
+  return { homePlace: bg.homePlace, gradient: sky ? { top: sky.top, bottom: sky.bottom } : null, ownStars: sky?.ownStars === true };
 }
 
 /** The atmosphere eases to a new colour and strength over 2 s, as the overlay's CSS transition did. */
@@ -15981,6 +15995,8 @@ const engine = {
       homeRadio: scene.homeRadio || null,
       // G904: kept so resumeScene can put the avatar's tone back after a party.
       avatarFilters: scene.avatarFilters || null,
+      // #749 at home: a visited home street or back yard follows the clock's sky.
+      ...homeSkyFields(scene.background),
     };
     // #323: a scene with its own music_file plays it as its street music (looped, hub music silent:
     // location.js 481-482); the street you go back to brings its own music again.
@@ -15996,6 +16012,8 @@ const engine = {
       player.onGround = true;
     }
     engine.snapCamera();
+    // #749 at home: a visited home street or back yard has the clock's sky from its first frame.
+    applySkyClock();
     const name = document.getElementById('street-name');
     if (name) {
       name.textContent = scene.hubName ? `${currentStreet.label} · ${scene.hubName}` : currentStreet.label;
@@ -27359,6 +27377,8 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
     bounds: { l: 0, r: WORLD_W, t: 0, b: Number(bgLayer.worldH) || AUTHORED_VIEW_H },
     platforms: streetPlatforms,
     signposts: [],
+    // #749 at home: the home street and the back yard follow the clock's sky.
+    ...homeSkyFields(bgLayer),
   };
   // #474: every way in (a trip, an instance's or quest room's way back, Teleport Home, the door,
   // the Tower's elevator, a reload) names the music here, so the last place's never carries in.
@@ -27385,6 +27405,8 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
   camY = cameraTargetY(player?.y || GROUND_Y, activeCameraWorldHeight(), LOCATION_VIEW_H);
   world.x = -Math.round(camTarget);
   world.y = -Math.round(camY);
+  // #749 at home: the clock's sky from the first frame (the avatar placed: yard or room).
+  applySkyClock();
   homeScene?.enter?.();
   // G226: the room's dropped stacks (clearWorldEntities took their sprites).
   refreshDroppedWorldItems();

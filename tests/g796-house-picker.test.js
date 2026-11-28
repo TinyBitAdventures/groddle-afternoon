@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defaultHouseConfig } from '../public/js/home-house.js?v=3c88c47c';
 import { createHomeState, setHomeHouse } from '../public/js/homes.js?v=dca6b2cd';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=78d0151e';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=74b17565';
 import { HOUSE_PICKER_TEXT } from '../public/js/ui/house-picker.js?v=20aaba5c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

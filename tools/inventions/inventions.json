@@ -6664,7 +6664,7 @@
   },
   {
    "id": "day-night-skies",
-   "title": "Day/night skies: an outdoor street's own sky gradient follows Ur's clock (sunset tones at dawn and dusk, dark blue with stars at night, its own sky by day), the far layers tinted by depth",
+   "title": "Day/night skies: an outdoor street's own sky gradient (the home street and back yard too) follows Ur's clock (sunset tones at dawn and dusk, dark blue with stars at night, its own sky by day), the far layers tinted by depth",
    "kind": "visual",
    "status": "kept",
    "where": [
@@ -6683,10 +6683,14 @@
     {
      "file": "public/game.js",
      "symbol": "applySkyClock"
+    },
+    {
+     "file": "public/js/features/homes-feature.js",
+     "symbol": "drawLandscape"
     }
    ],
-   "why": "Glitch drew every location's one top/bottom gradient at every hour (DrawUtil.drawVerticalGradientBG) and had no world tint; the remake's Dametime tint washed the whole street. Ours: each look is derived from the street's own two colours (the dawn, dusk and night mixes of the decision mockups), the far parallax layers take a tint by depth (the furthest the most) so forest streets with little sky still read as night, a seeded star field at night, the world tint halved at dawn and dusk where the sky does that work, changed at most once a game minute. Outdoor streets of the world's regions only: never ownLight places, indoor ecology rows, scenes and homes, the cave, Naraka, quest, party, Seams, Moshi and Vortex hubs, or a sky already dark (average luma under 80). Night tint off turns it off too.",
-   "ruling": "Austin 2026-11-27 (#749, compostghost's idea): build the sky and stars; stray thoughts later",
+   "why": "Glitch drew every location's one top/bottom gradient at every hour (DrawUtil.drawVerticalGradientBG) and had no world tint; the remake's Dametime tint washed the whole street. Ours: each look is derived from the street's own two colours (the dawn, dusk and night mixes of the decision mockups), the far parallax layers take a tint by depth (the furthest the most) so forest streets with little sky still read as night, a seeded star field at night, the world tint halved at dawn and dusk where the sky does that work, changed at most once a game minute. Outdoor streets of the world's regions, and home places: the home street (yours and a visited one) and the back yard follow it from their home style's own sky, the stars and far-layer tint drawn on the home landscape (homes-feature.js drawLandscape); the house rooms and Tower floors stay indoors, and in the house the yard keeps the clock's sky wherever it is seen from while the world tint goes back to the indoor one in the room. Never ownLight places, indoor ecology rows, other scenes, the cave, Naraka, quest, party, Seams, Moshi and Vortex hubs, a home style with its own stars, or a sky already dark (average luma under 80). Night tint off turns it off too.",
+   "ruling": "Austin 2026-11-27 (#749, compostghost's idea): build the sky and stars; stray thoughts later; then yes to the home street (yours and visited ones) and the back yard",
    "noCompare": "A colour shift of each street's own sky gradient and a star field drawn in code, not a picture; Tiny Speck drew no night sky to set beside it.",
    "rows": []
   },

@@ -12,9 +12,14 @@
  *
  * Only outdoor streets of the world's regions (skyFollowsClock): never a place with its own light,
  * an indoor street (the ecology catalog's `interior` rows: apartments, basements, machine rooms),
- * a scene or home (no region hub), the cave, underworld, quest, party and Vortex hubs
+ * a scene (no region hub), the cave, underworld, quest, party and Vortex hubs
  * (NO_SKY_HUBS), or a street whose own sky is already dark (caves, deep water and the streets
  * Tiny Speck painted at night, DARK_SKY_LUMA). NIGHT TINT off turns it off with the tint.
+ *
+ * Homes too (Austin 2026-11-27): the home street, yours or a visited one, and the back yard follow
+ * the clock from their style's own sky (the home scenes carry `homePlace` and that sky as
+ * `gradient`); the house rooms and Tower floors are indoors (HOME_PLACES). A style that paints its
+ * own night (`ownStars`, or a dark sky) keeps it.
  *
  * Pure: colours and numbers only. street-render.js setSkyLook draws a look; game.js asks for one
  * at most once a game minute (applySkyClock).
@@ -35,6 +40,9 @@ export const NO_SKY_HUBS = Object.freeze({
   142: 'Moshi Moshi Oshilatis (inside a Giant)',
   143: 'Vortex of Random',
 });
+
+/** The home scenes' places (js/features/homes-feature.js `homePlace`): whether each is out of doors. */
+export const HOME_PLACES = Object.freeze({ street: true, yard: true, room: false });
 
 /** A sky whose two colours average under this luma (0..255) is already dark: it keeps its own colours. */
 export const DARK_SKY_LUMA = 80;
@@ -68,9 +76,16 @@ export function ownSkyReason(street, { interior = false } = {}) {
   if (!street) return 'no street';
   if (street.ownLight) return 'its own light';
   if (interior) return 'indoors';
-  const hub = String(street.hubId ?? '');
-  if (!/^\d+$/.test(hub)) return 'not a street of a region';
-  if (Object.prototype.hasOwnProperty.call(NO_SKY_HUBS, hub)) return NO_SKY_HUBS[hub];
+  const home = typeof street.homePlace === 'string' ? street.homePlace : null;
+  if (home !== null) {
+    // A home place is outdoors or not by its place, whatever its hub ('home', or a visit's 'scene').
+    if (HOME_PLACES[home] !== true) return 'indoors';
+    if (street.ownStars) return 'a night sky of its own';
+  } else {
+    const hub = String(street.hubId ?? '');
+    if (!/^\d+$/.test(hub)) return 'not a street of a region';
+    if (Object.prototype.hasOwnProperty.call(NO_SKY_HUBS, hub)) return NO_SKY_HUBS[hub];
+  }
   const top = hexInt(street.gradient?.top);
   const bottom = hexInt(street.gradient?.bottom);
   if (top === null || bottom === null) return 'no sky gradient';
@@ -81,6 +96,17 @@ export function ownSkyReason(street, { interior = false } = {}) {
 /** PURE: whether the street's sky follows the clock (ownSkyReason is null) with the tint `on`. */
 export function skyFollowsClock(street, { interior = false, on = true } = {}) {
   return Boolean(on) && ownSkyReason(street, { interior }) === null;
+}
+
+/**
+ * PURE: where the avatar stands in a home scene whose place is `scenePlace` (HOME_PLACES): the
+ * house scene ('yard') is the back yard left of the house's edge `houseX` and the room from there
+ * on; any other place is itself. Null for a scene that is not a home.
+ */
+export function homePlaceAt(scenePlace, { houseX, x } = {}) {
+  if (typeof scenePlace !== 'string') return null;
+  if (scenePlace !== 'yard') return scenePlace;
+  return Number.isFinite(houseX) && Number.isFinite(x) && x < houseX ? 'yard' : 'room';
 }
 
 /**

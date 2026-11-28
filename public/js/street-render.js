@@ -24,7 +24,7 @@ import { signWords } from './deco-sign.js?v=e98e50f9';
 import { loadWorldFont, WORLD_FONT_FAMILY } from './world-text.js?v=6b49f88c';
 import { buildDoorSprite } from './door-view.js?v=ff6f0e9a';
 import { visibleDoors } from './doors.js?v=f815e7c8';
-import { farLayerTint, gradientColourAt, starField } from './sky-clock.js?v=6b9184e9';
+import { farLayerTint, gradientColourAt, starField } from './sky-clock.js?v=dbd21266';
 
 const DECO_BASE = 'assets/decos/groddle/';
 /**

@@ -23,7 +23,7 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iceMaskSprites, iceNubbinReach, iceNubbinWallSpots } from '../public/js/ice-nubbin-walls.js?v=9f0ee47c';
-import { DECO_TWINS } from '../public/js/street-render.js?v=a175beef';
+import { DECO_TWINS } from '../public/js/street-render.js?v=16933720';
 import { ecologyForStreet, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=da5177b2';
 import { fixedPictureBoxes } from './build-barnacle-wall-spots.mjs';
 
