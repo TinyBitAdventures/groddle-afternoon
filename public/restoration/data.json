@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3928,
+  "commits": 3930,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "new",
+    "text": "After a fast load that hid the update's notes, a quiet \"What's new\" link shows once"
+   },
    {
     "date": "2026-11-27",
     "kind": "fix",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-27",
     "kind": "new",
     "text": "The Crafty Bot says \"All done!\" in the activity feed when its queue is finished"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "A Crafty Bot set down at home fetches from the shared floor online"
    }
   ]
  },
- "tests": 1506,
+ "tests": 1507,
  "generatedAt": "2026-11-27"
 }
