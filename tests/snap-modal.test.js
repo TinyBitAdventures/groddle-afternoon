@@ -7,7 +7,9 @@
  *
  * - The page itself: groddle-afternoon-site src/PlayerPages.php snapPage, rendered on a throwaway
  *   MariaDB database by tests/fixtures/snaps/snaps-routes.php (the same run as g1240).
- * - The script: groddle-afternoon-site players/players.js, run here against a small fake page.
+ * - The script: groddle-afternoon-site community/picture-dialog.js (the site's picture pop-up, shared
+ *   with a Support report's pictures since 2026-11-27; it was players/players.js's second part), run
+ *   here against a small fake page. tests/support-picture-dialog.test.js covers its Previous and Next.
  * - The look: style.css .snap-modal (colours from restoration.css's tokens only).
  *
  * Run: node --test tests/snap-modal.test.js (GRODDLE_SITE_DIR for a site worktree; MariaDB as
@@ -19,12 +21,13 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import vm from 'node:vm';
+import { pathToFileURL } from 'node:url';
 import { GAME_DIR, SITE_DIR } from '../tools/repos.mjs';
 import { HAS_PHP, PHP, phpSkip } from './php.js';
 
 const site = (f) => readFileSync(join(SITE_DIR, f), 'utf8');
-const HAS_SITE = existsSync(join(SITE_DIR, 'players/players.js'));
+const HAS_SITE = existsSync(join(SITE_DIR, 'community/picture-dialog.js'));
+const { wirePictureDialog } = HAS_SITE ? await import(pathToFileURL(join(SITE_DIR, 'community/picture-dialog.js')).href) : {};
 
 /* ------------------------------------------------------------------ */
 /* The rendered page                                                    */
@@ -93,8 +96,8 @@ describe('a public Snap\'s page (src/PlayerPages.php snapPage)', { skip: skipDb 
     assert.doesNotMatch(dialog, /—/, 'no em dashes');
   });
 
-  it('loads players.js, keyed by its content', () => {
-    assert.match(html, /<script src="\/wp-content\/themes\/groddle\/players\/players\.js\?v=[0-9a-f]{8}" defer><\/script>/);
+  it('loads the site\'s picture pop-up, keyed by its content', () => {
+    assert.match(html, /<script type="module" src="\/wp-content\/themes\/groddle\/community\/picture-dialog\.js\?v=[0-9a-f]{8}"><\/script>/);
   });
 });
 
@@ -149,13 +152,14 @@ function page() {
   Object.assign(doc, {
     documentElement: html,
     querySelector: (sel) => html.querySelector(sel),
+    querySelectorAll: (sel) => [html.querySelector(sel)].filter(Boolean),
     addEventListener() {},
   });
-  vm.runInNewContext(site('players/players.js'), { document: doc, window: {}, history: {}, location: {}, URLSearchParams, FormData: class {} });
+  wirePictureDialog(doc);
   return { doc, html, link, dialog, close, inner, calls };
 }
 
-describe('players.js opens the Snap\'s larger view (groddle-afternoon-site)', { skip: !HAS_SITE && 'no site repo' }, () => {
+describe('picture-dialog.js opens the Snap\'s larger view (groddle-afternoon-site)', { skip: !HAS_SITE && 'no site repo' }, () => {
   it('a plain left click opens the dialog instead of following the link; the focus moves in; the page stops scrolling', () => {
     const p = page();
     assert.equal(p.link.fire('click'), true, 'the link is not followed');
@@ -209,7 +213,7 @@ describe('players.js opens the Snap\'s larger view (groddle-afternoon-site)', { 
   it('a browser without dialogs leaves the link alone', () => {
     const doc = { querySelector: (sel) => (sel === '[data-snap-open]' ? link : sel === '[data-snap-modal]' ? {} : null), addEventListener() {}, documentElement: {} };
     const link = new El('a');
-    vm.runInNewContext(site('players/players.js'), { document: doc, window: {}, history: {}, location: {}, URLSearchParams, FormData: class {} });
+    wirePictureDialog(doc);
     assert.equal(link.fire('click'), false);
   });
 });

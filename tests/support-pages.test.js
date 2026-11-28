@@ -260,7 +260,7 @@ describe('Support on the website: a player manages their own reports (php, throw
     assert.match(rp, /<input type="hidden" name="_wpnonce" value="[0-9a-f]{10}" \/>/);
     for (const html of [r.list.html, r.thread.html, r.reportPage, r.signedOut.body]) {
       assert.doesNotMatch(pane(html), /\u2014/, 'no em dashes');
-      assert.match(html, /community\.css\?v=community-23/);
+      assert.match(html, /community\.css\?v=community-24/);
       assert.match(html, /\/site\/theme\.js/, 'the theme script sets light or dark before paint');
     }
   });
@@ -436,7 +436,7 @@ describe('Support: the site code (groddle-afternoon-site)', { skip: skipWithoutS
     assert.match(css, /\.csupport-drop\[data-over\] \.csupport-drop-zone \{[^}]*border-color: var\(--accent\)/, 'lit while files are dragged over');
     assert.match(css, /@media \(hover: hover\) \{ \.csupport-drop-zone:hover \{[^}]*border-color: var\(--accent\)/, 'a hover look where there is a mouse (never stuck after a tap)');
     assert.match(css, /@media \(hover: none\) and \(pointer: coarse\) \{\s*\.csupport-drop-mouse \{ display: none; \}/, 'a phone reads Tap to add');
-    assert.match(src('src/CommunityPages.php'), /ASSET_KEY = 'community-23'/);
+    assert.match(src('src/CommunityPages.php'), /ASSET_KEY = 'community-24'/);
   });
 
   it('a report\'s reactions: community.js loads support-reactions.js with its key and shares the boards\' picker; styles are tokens', () => {

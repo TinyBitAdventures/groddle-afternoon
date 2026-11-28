@@ -6815,7 +6815,7 @@
    "where": [
     {
      "file": "tests/snap-modal.test.js",
-     "symbol": "the site repo's src/PlayerPages.php snapModal, players/players.js and style.css .snap-modal (the test reads them)"
+     "symbol": "the site repo's src/PlayerPages.php snapModal, community/picture-dialog.js (the site's picture pop-up, shared with Support since 2026-11-27) and style.css .snap-modal (the test reads them)"
     }
    ],
    "why": "Glitch's snaps lived on glitch.com photo pages with the picture shown inline; it had no pop-up viewer there. Ours: the larger view and its Download button on the remake's Snap page (tests/snap-modal.test.js).",
@@ -6823,6 +6823,21 @@
    "rows": [
     "G1240"
    ]
+  },
+  {
+   "id": "support-report-picture-dialog",
+   "title": "A Support report's pictures on the website open in the same pop-up as a Snap's (fitted to the screen, which picture of how many, who sent it and when, Previous and Next with the arrow keys, Download named report-<id>-picture-<n>.jpg, Close); without JavaScript, or with a middle or Ctrl/Cmd click, a thumbnail opens the picture as before",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "tests/support-picture-dialog.test.js",
+     "symbol": "the site repo's src/SupportPages.php pictureDialog, community/picture-dialog.js, community/community.js and style.css .snap-modal (the test reads them)"
+    }
+   ],
+   "why": "Glitch had no web support pages (its bug reports were a form only) and no pop-up viewer. Ours: the report's pictures in the site's picture pop-up, shared with the Snap page (tests/support-picture-dialog.test.js).",
+   "ruling": "Austin 2026-11-27: the pictures in a Support report need the same open-in-a-dialog treatment as the Snap page instead of opening directly",
+   "rows": []
   }
  ]
 }
