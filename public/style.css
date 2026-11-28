@@ -1595,6 +1595,14 @@ kbd {
 .start-card .start-tip { margin: var(--sp-6) 0 0; padding-top: var(--sp-5); border-top: 1px solid var(--border); color: var(--text-muted); font-size: var(--fs-md); line-height: var(--lh-snug); }
 .start-tip b { color: var(--text-moss); }
 .start-card .start-keyhint { margin: var(--sp-6) 0 0; color: var(--text-muted); font-size: var(--fs-md); }
+/* #745 fast boot fallback (Austin 2026-11-28, ours; js/whats-new.js offerWhatsNewFallback): a quiet
+   "What's new in vX.Y" link under the start card's actions, or in an Activity line, once per version
+   when the loading card's lines were up under 3 s. It opens the What's new window at that version. */
+.start-card .start-news { margin: var(--sp-5) 0 0; font-size: var(--fs-md); line-height: var(--lh-snug); }
+.whats-new-link { margin: 0; padding: 0; border: 0; background: none; box-shadow: none; font: inherit; font-weight: var(--fw-bold); color: var(--accent);
+  cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.whats-new-link:hover { text-decoration-thickness: 2px; }
+.whats-new-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-sm); }
 .start-card .fine { grid-column: 1 / -1; margin: var(--sp-10) 0 0 !important; text-align: center; }
 
 /* Phone and narrow frames: one column, every action full width, the groups one under another. */

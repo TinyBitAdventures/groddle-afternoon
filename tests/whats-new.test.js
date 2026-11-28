@@ -16,11 +16,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   KEEP_RELEASES, MAX_LINE, MAX_LINES, ROLL_UP_MS, SEEN_KEY, SHOW_LINES, WHATS_NEW_ALL_PATH, WHATS_NEW_PATH, compareVersions, nextSeen, startWhatsNew, validateWhatsNew, whatsNewFor,
-} from '../public/js/whats-new.js?v=b7e58496';
+} from '../public/js/whats-new.js?v=988ec58d';
 import {
   ALL_FILE, FILE as RECENT_FILE, checkFile, draftFromBody, draftLines, highlightOf, publishedDay, recentOf, tagsAt, withBackfill, withRelease,
 } from '../tools/release/whats-new.mjs';
-import { WHATS_NEW_MENU, installWhatsNewWindow, releaseDate, versionRows } from '../public/js/ui/whats-new-window.js?v=0d9a7a93';
+import { WHATS_NEW_MENU, installWhatsNewWindow, releaseDate, versionRows } from '../public/js/ui/whats-new-window.js?v=84fae9bc';
 import { menuRowFor } from '../public/js/ui/topbar.js?v=820dd86c';
 import { FakeEl, page } from './social-fake-dom.js';
 
@@ -450,7 +450,7 @@ describe('#745: the What\'s new window, opened only when asked', () => {
   it('a click after the window is installed opens it at once when the game is ready', async () => {
     const { doc, fetch } = gamePage();
     const win = installWhatsNewWindow({ doc, fetch, ready: () => true });
-    const { requestWhatsNew } = await import('../public/js/whats-new.js?v=b7e58496');
+    const { requestWhatsNew } = await import('../public/js/whats-new.js?v=988ec58d');
     requestWhatsNew(doc);
     await tick();
     assert.equal(win.isOpen(), true);

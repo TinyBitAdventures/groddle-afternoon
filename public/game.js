@@ -4,13 +4,13 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=32d192e6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=50a42470';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
 import { createVogOverlay } from './js/vog-overlay.js?v=02f04426';
 import { createPromptStack } from './js/prompt-stack.js?v=c4e1f87d';
-import { createWindowStack } from './js/window-stack.js?v=d8e13764';
+import { createWindowStack } from './js/window-stack.js?v=0c4a6356';
 import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=dbbf1de0';
 import {
   actionDurationFor,
@@ -1147,9 +1147,9 @@ import { createMusicVoice } from './js/music-voice.js?v=75c8cf57';
 import { contextNeedsResume, createAudioResumer } from './js/audio-resume.js?v=440d0096';
 import { backgroundSound, backgroundSoundOn } from './js/background-sound.js?v=d40d26b7';
 import { bubbleMs } from './js/read-time.js?v=3151fb1a';
-import { mountNotifyView } from './js/notify-view.js?v=1ff8a878';
+import { mountNotifyView } from './js/notify-view.js?v=d7c296c6';
 import { PLAY_HERE_STATES } from './js/online-request.js?v=5fa7a635';
-import { mountSocialDrawer } from './js/ui/social-drawer.js?v=0eba1119';
+import { mountSocialDrawer } from './js/ui/social-drawer.js?v=c491afb2';
 import { installPhonePill, mountPhoneLayout, socialPillCount } from './js/ui/phone-layout.js?v=7ebe8992';
 import { bindChatLinks } from './js/chat-links.js?v=b717fac7';
 import { playerNameColour } from './js/name-colours.js?v=9819bb8a';
@@ -1166,7 +1166,7 @@ import { clientKeyAction, createHotkeysSheet, emoteKeyAction, isHotkeySheetRelea
 import { ENCYCLOPEDIA_MENU_LABEL, createEncyclopedia, isEncyclopediaKey } from './js/encyclopedia-links.js?v=b2caa8de';
 import { createEncyclopediaSheet, isHomeScreenApp } from './js/ui/encyclopedia-sheet.js?v=ea3b0ad5';
 import { catchSiteLinks, setSitePageViewer, siteLinkTip } from './js/site-pages.js?v=9b3049cf';
-import { bootStep } from './js/boot-progress.js?v=53ba3156';
+import { bootStep } from './js/boot-progress.js?v=b9b64ddc';
 import { HOME_SCREEN_TIP_CACHE, iosSafari, mountHomeScreenTip, runsStandalone } from './js/home-screen-tip.js?v=f2287991';
 import { ZOOM_HINT_CACHE, ZOOM_HINT_MS, watchZoomHint } from './js/zoom-hint.js?v=75b745c7';
 import { EAT_PICK_TEXT, bestFoodIndex, eatChoices, eatTip } from './js/eat-pick.js?v=8fb763d0';
@@ -1201,8 +1201,9 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=24f4f276';
-import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=0d9a7a93';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=b1bf785f';
+import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=84fae9bc';
+import { noteWhatsNewBootEnd, offerWhatsNewFallback } from './js/whats-new.js?v=988ec58d';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=6283b688';
 import { markLeaving, packPicks, takeCopies } from './js/copy-picks.js?v=b368fd49';
 import { holdKeepsBusy } from './js/instance-holds.js?v=ff3a63a3';
@@ -37706,6 +37707,14 @@ async function main() {
   /** The loading card goes and the game shows; `fade` when the start card comes in behind it. */
   const endBoot = ({ fade = false } = {}) => {
     document.body.classList.remove('is-booting');
+    // #745 (Austin 2026-11-28, ours): the card's What's new lines stop here; a first look at a new
+    // release whose lines were up under 3 s gets a quiet "What's new in vX.Y" link once (js/whats-new.js):
+    // on the start card when it is up, else an Activity line and a short notice.
+    noteWhatsNewBootEnd(document);
+    offerWhatsNewFallback(document, {
+      log: (text, html) => notify.log(text, { html }),
+      notice: (text) => notify.notice(text, { log: false }),
+    });
     // G807 (#345): iPhone and iPad Safari, not the Home Screen app: Add to Home Screen plays full screen.
     mountHomeScreenTip(document, { host: document.body, floating: true, store: { get: () => readUiCache(HOME_SCREEN_TIP_CACHE), set: (v) => writeUiCache(HOME_SCREEN_TIP_CACHE, v) } });
     if (!bootLoader || bootLoader.hidden) return;

@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { NOTICE_MIN_W, noRoomBeside } from '../public/js/notify-view.js?v=1ff8a878';
+import { NOTICE_MIN_W, noRoomBeside } from '../public/js/notify-view.js?v=d7c296c6';
 import { mountPanelShell } from '../public/js/ui/panel-shell.js?v=5efb38c6';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

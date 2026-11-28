@@ -6691,6 +6691,33 @@
    "rows": []
   },
   {
+   "id": "whats-new-fast-boot-link",
+   "title": "What's new after a fast boot: a quiet \"What's new in vX.Y\" link once per version, on the start card or in Activity, when the loading card's lines were up under 3 seconds",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/whats-new.js",
+     "symbol": "offerWhatsNewFallback"
+    },
+    {
+     "file": "public/js/whats-new.js",
+     "symbol": "fallbackVersion"
+    },
+    {
+     "file": "public/js/ui/whats-new-window.js",
+     "symbol": "openVersion"
+    },
+    {
+     "file": "public/js/window-stack.js",
+     "symbol": "WHATS_NEW_SELECTOR"
+    }
+   ],
+   "why": "Glitch had no What's new at all (see whats-new-loading-card). A trace of #745 found the loading card's lines readable for only 3 to 4.5 s, and nothing waits for them. Ours: the card times how long its lines were on a showing card; on a first look at a new release (this browser had loaded an older one) with the lines up under 3 s and See all notes not pressed, a quiet \"What's new in vX.Y\" link shows once for that version (localStorage groddle-whats-new-fallback, per browser as the card's seen version is): under the start card's actions when the start card is up, else one Activity line with the link and a short notice that fades. The link opens the What's new window at that version, over the start card. The card's lines, See all notes and the Menu row are kept.",
+   "ruling": "Austin 2026-11-28 (#745): \"if the loading screen boots faster than 3 seconds we should fall back to show the What's new link somewhere\"",
+   "rows": []
+  },
+  {
    "id": "day-night-skies",
    "title": "Day/night skies: an outdoor street's own sky gradient (the home street and back yard too) follows Ur's clock (sunset tones at dawn and dusk, dark blue with stars at night, its own sky by day), the far layers tinted by depth",
    "kind": "visual",

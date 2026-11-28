@@ -10,8 +10,8 @@ import { installClassicTopbar } from './classic-topbar.js?v=08c9e528';
 import { installClassicGrowl } from './classic-growl.js?v=c57ab7a4';
 import { installClassicPanes } from './classic-panes.js?v=5d3c2a93';
 import { installClassicPack } from './classic-pack.js?v=c4614596';
-import { installClassicHub } from './classic-hub.js?v=bedd6722';
-import { installClassicSkills } from './classic-skills.js?v=a7063c90';
+import { installClassicHub } from './classic-hub.js?v=8e8e314f';
+import { installClassicSkills } from './classic-skills.js?v=5f46a45e';
 
 let installed = null;
 

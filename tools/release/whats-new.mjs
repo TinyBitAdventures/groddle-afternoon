@@ -37,7 +37,7 @@ import { GAME_DIR } from '../repos.mjs';
 import { forNotes, git, lastTag, nextVersion, noteText, since } from './notes.mjs';
 import {
   KEEP_RELEASES, MAX_LINE, MAX_LINES, WHATS_NEW_ALL_PATH, WHATS_NEW_FORMAT, WHATS_NEW_PATH, compareVersions, validateWhatsNew,
-} from '../../public/js/whats-new.js?v=b7e58496';
+} from '../../public/js/whats-new.js?v=988ec58d';
 
 export const FILE = join(GAME_DIR, 'public', WHATS_NEW_PATH);
 export const ALL_FILE = join(GAME_DIR, 'public', WHATS_NEW_ALL_PATH);

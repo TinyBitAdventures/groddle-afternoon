@@ -17,6 +17,15 @@
  *
  * Pure parts (whatsNewFor, validateWhatsNew) are tested in tests/whats-new.test.js; js/boot-progress.js
  * starts it as the card comes up, on both play pages.
+ *
+ * The fast boot fallback (#745, Austin 2026-11-28: "if the loading screen boots faster than 3 seconds
+ * we should fall back to show the What's new link somewhere"). Ours. The card times how long its lines
+ * were up (from the moment they went on a showing card to game.js's noteWhatsNewBootEnd). On a first
+ * look at a new release (firstLookVersion: this browser had loaded an older one) whose lines were up
+ * under FALLBACK_MIN_MS, and the player did not press See all notes, offerWhatsNewFallback shows a
+ * quiet "What's new in vX.Y" link once for that version (FALLBACK_KEY): on the start card when it is
+ * up, else an Activity line with the link and a short notice. The link opens the What's new window at
+ * that version (js/ui/whats-new-window.js). Tested in tests/whats-new-fallback-745.test.js.
  */
 
 /** The file the release writes, from the site root (the play pages' <base>): the newest KEEP_RELEASES releases. */
@@ -37,6 +46,10 @@ export const MAX_LINES = 5;
 export const MAX_LINE = 110;
 /** The short file keeps this many releases (older ones are never rolled up: they are past a week). */
 export const KEEP_RELEASES = 20;
+/** The fallback link shows when the card's lines were up for less than this (Austin 2026-11-28: 3 seconds). */
+export const FALLBACK_MIN_MS = 3000;
+/** The version whose fallback link already showed in this browser: { version }. */
+export const FALLBACK_KEY = 'groddle-whats-new-fallback';
 
 const VERSION = /^v(\d+)\.(\d+)\.(\d+)$/;
 
@@ -49,6 +62,9 @@ export const WHATS_NEW_TEXT = Object.freeze({
   since: (v) => `New since ${shortVersion(v)}`,
   more: 'See all notes',
   queued: 'The notes open once the game is ready.',
+  link: (v) => `What's new in ${shortVersion(v)}`,
+  // Classic's chat column heads the same log "Local Chat" (js/classic/ui-mode.js restyles the drawer).
+  notice: (v, classic = false) => `Updated to ${shortVersion(v)}. What's new is in ${classic ? 'Local Chat' : 'Activity'}.`,
 });
 
 /**
@@ -122,6 +138,26 @@ export function whatsNewFor(data, seen, now = Date.now()) {
   };
 }
 
+/**
+ * PURE: the newest version when this load is the player's first look at it (this browser had loaded an
+ * older version), else ''. A first visit, or the same version again, is not a first look at an update.
+ */
+export function firstLookVersion(data, seen) {
+  const newest = releasesOf(data)[0];
+  const last = seen && typeof seen === 'object' ? String(seen.version || '') : '';
+  return newest && VERSION.test(last) && compareVersions(newest.version, last) > 0 ? newest.version : '';
+}
+
+/**
+ * PURE: the version whose fallback link to show, or ''. `version` is firstLookVersion's, `shownMs` how
+ * long the card's lines were up, `held` true once the player pressed See all notes, `done` the version
+ * whose link already showed (FALLBACK_KEY).
+ */
+export function fallbackVersion({ version = '', shownMs = 0, held = false, done = '' } = {}) {
+  if (!VERSION.test(String(version || '')) || held || String(done || '') === version) return '';
+  return Number(shownMs) < FALLBACK_MIN_MS ? version : '';
+}
+
 /** PURE: what to store after this load: the newest version seen (never backwards) and now. */
 export function nextSeen(data, seen, now = Date.now()) {
   const newest = releasesOf(data)[0];
@@ -182,6 +218,118 @@ function writeSeen(storage, value) {
   }
 }
 
+/** This load's card timing, per document: when the lines went up, when the card went, the fetch. */
+const boots = new WeakMap();
+function bootOf(doc) {
+  let b = boots.get(doc);
+  if (!b) {
+    b = { shownAt: null, endedAt: null, held: false, version: '', loaded: null, offered: false };
+    boots.set(doc, b);
+  }
+  return b;
+}
+const clockNow = () => globalThis.performance?.now?.() ?? Date.now();
+
+/** True while the loading card is on screen (not hidden, not fading out, the page still booting). */
+function cardShowing(doc) {
+  const loader = doc?.getElementById?.('boot-loader');
+  if (!loader || loader.hidden || loader.classList?.contains?.('is-leaving')) return false;
+  return !doc.body?.classList || doc.body.classList.contains('is-booting');
+}
+
+/** game.js: the loading card is going now (its lines stop being readable). */
+export function noteWhatsNewBootEnd(doc = globalThis.document, at = clockNow()) {
+  const b = bootOf(doc);
+  if (b.endedAt == null) b.endedAt = at;
+}
+
+/** How long this load's lines were up on the card, in ms (0 when they never showed). */
+export function whatsNewShownMs(doc = globalThis.document, at = clockNow()) {
+  const b = bootOf(doc);
+  if (b.shownAt == null) return 0;
+  return Math.max(0, (b.endedAt ?? at) - b.shownAt);
+}
+
+function readDone(storage) {
+  try {
+    return String(JSON.parse(storage?.getItem(FALLBACK_KEY) || 'null')?.version || '');
+  } catch {
+    return '';
+  }
+}
+
+/** The quiet link: a button the What's new window answers (data-whats-new-version, installWhatsNewWindow). */
+export function whatsNewLinkHtml(version) {
+  const v = String(version).replace(/[^\w.]/g, '');
+  return `<button type="button" class="whats-new-link" data-whats-new-version="${v}">${WHATS_NEW_TEXT.link(v).replace(/'/g, '&#39;')}</button>`;
+}
+
+/** The start card ("Welcome to a scrap of Ur", #overlay) when it is up or coming in, else null. */
+function startCardOf(doc) {
+  const overlay = doc?.getElementById?.('overlay');
+  if (!overlay || overlay.hidden || overlay.classList?.contains?.('hidden')) return null;
+  return overlay.querySelector?.('.start-main') || null;
+}
+
+/** Puts the link on the start card, under its actions. Returns the line. */
+function mountStartCardLink(doc, main, version) {
+  main.querySelector?.('.start-news')?.remove?.();
+  const line = doc.createElement('p');
+  line.setAttribute('class', 'start-news');
+  const link = doc.createElement('button');
+  link.setAttribute('type', 'button');
+  link.setAttribute('class', 'whats-new-link');
+  link.setAttribute('data-whats-new-version', version);
+  link.textContent = WHATS_NEW_TEXT.link(version);
+  line.append(link);
+  const actions = main.querySelector?.('.start-actions');
+  if (actions && typeof main.insertBefore === 'function') main.insertBefore(line, actions.nextSibling || null);
+  else main.append(line);
+  return line;
+}
+
+/**
+ * game.js, as the loading card goes: once this load's notes are in, shows the fallback link when
+ * fallbackVersion says so (and remembers the version, so it shows once). `log(text, html)` writes the
+ * Activity line, `notice(text)` raises the short notice; both are used only when the start card is
+ * not up. Resolves to where it went ('start', 'activity') or ''. Never throws.
+ */
+export async function offerWhatsNewFallback(doc = globalThis.document, {
+  storage = storageOf(globalThis),
+  log = null,
+  notice = null,
+  now = clockNow,
+} = {}) {
+  try {
+    const b = bootOf(doc);
+    if (b.offered) return '';
+    b.offered = true;
+    await b.loaded;
+    const version = fallbackVersion({ version: b.version, shownMs: whatsNewShownMs(doc, now()), held: b.held, done: readDone(storage) });
+    if (doc?.documentElement?.dataset) doc.documentElement.dataset.whatsNewShownMs = String(Math.round(whatsNewShownMs(doc, now())));
+    if (!version) return '';
+    try {
+      storage?.setItem(FALLBACK_KEY, JSON.stringify({ version }));
+    } catch {
+      /* storage off: the next load is no first look anyway (the seen version is stored, or nothing is) */
+    }
+    const main = startCardOf(doc);
+    let where = '';
+    if (main) {
+      mountStartCardLink(doc, main, version);
+      where = 'start';
+    } else if (typeof log === 'function') {
+      log(WHATS_NEW_TEXT.link(version), whatsNewLinkHtml(version));
+      if (typeof notice === 'function') notice(WHATS_NEW_TEXT.notice(version, doc?.documentElement?.dataset?.ui === 'classic'));
+      where = 'activity';
+    }
+    if (where && doc?.documentElement?.dataset) doc.documentElement.dataset.whatsNewFallback = `${where}:${version}`;
+    return where;
+  } catch {
+    return '';
+  }
+}
+
 /** Puts the lines on the loading card (#boot-loader). Returns the section, or null with no card. */
 export function mountWhatsNew(doc, shown) {
   const card = doc?.getElementById?.('boot-loader')?.querySelector?.('.boot-loader-card');
@@ -203,6 +351,8 @@ export function mountWhatsNew(doc, shown) {
   more.className = 'boot-loader-news-more';
   more.textContent = WHATS_NEW_TEXT.more;
   more.addEventListener('click', () => {
+    // The player asked for the notes: the window opens once the game is ready, so no fallback link.
+    bootOf(doc).held = true;
     requestWhatsNew(doc);
     more.textContent = WHATS_NEW_TEXT.queued;
     more.disabled = true;
@@ -225,10 +375,17 @@ function storageOf(win) {
  * Fetches the notes, shows what is new on the loading card, and remembers this version. Never throws;
  * a failed fetch changes nothing. Resolves to what it showed (or null).
  */
-export async function startWhatsNew(doc = globalThis.document, {
+export function startWhatsNew(doc = globalThis.document, opts = {}) {
+  const run = loadWhatsNew(doc, opts);
+  if (doc && typeof doc === 'object') bootOf(doc).loaded = run;
+  return run;
+}
+
+async function loadWhatsNew(doc, {
   fetch: fetchFn = globalThis.fetch?.bind(globalThis),
   storage = storageOf(globalThis),
   now = () => Date.now(),
+  clock = clockNow,
 } = {}) {
   try {
     if (!doc?.getElementById?.('boot-loader') || typeof fetchFn !== 'function') return null;
@@ -238,7 +395,12 @@ export async function startWhatsNew(doc = globalThis.document, {
     const seen = readSeen(storage);
     const t = now();
     const shown = whatsNewFor(data, seen, t);
+    const b = bootOf(doc);
+    b.version = firstLookVersion(data, seen);
+    // The lines are readable from now only when the card is still up (a fast load may have gone already).
+    const up = cardShowing(doc);
     if (shown) mountWhatsNew(doc, shown);
+    if (shown && up && b.shownAt == null) b.shownAt = clock();
     const next = nextSeen(data, seen, t);
     if (next) writeSeen(storage, next);
     return shown;

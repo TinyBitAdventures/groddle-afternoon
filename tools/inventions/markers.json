@@ -28,6 +28,7 @@
     "no-original: as small page-colour controls; the help line has no original.": "ours-classic-css",
     "ours: == What's new (#745, js/ui/whats-new-window.js; ours: the 2012 client had none) in the same dialog": "whats-new-loading-card",
     "ours: G1246 (ours): a sorted bag's strip shows its sort's icon at": "ours-bag-sort-badge",
+    "ours: link (js/whats-new.js offerWhatsNewFallback, ours): the": "whats-new-fast-boot-link",
     "reimagined: #avatar-panel .avatar-reimagined-tag { background: var(--c-classic-tip); color:": "ours-classic-css",
     "reimagined: #avatar-panel .avatar-tile .avatar-reimagined-tag { border-radius: 0 0 3px 3px;": "ours-classic-css",
     "remake-own: Reactions (js/ui/reaction-strip.js; the remake's own, the client had none): in the chat": "chat-reactions",
@@ -43,6 +44,7 @@
     "no-source: perms (paradiseSourceGeometry). A course with no source street gets": "not-an-invention",
     "ours: * G1009 (ours, inventions feast-day-piles): whether": "feast-day-piles",
     "ours: // #722 (ours): House and Tower beside it, run as /house and": "map-home-shortcuts",
+    "ours: // #745 (Austin 2026-11-28, ours): the card's What's new lines stop here; a first": "whats-new-fast-boot-link",
     "ours: // G1246 (ours, Austin 2026-11-24: Glitch never showed a bag's": "ours-bag-sort-badge",
     "ours: // Only ours (important): Pixi's own inline size stays, under": "not-an-invention",
     "ours: // menu of ours ([data-ctx]) or a plain HUD button; text fields,": "right-click-menus",
@@ -1522,6 +1524,7 @@
   },
   "public/js/ui/whats-new-window.js": {
     "glitch-had-none: to automatically open that for folks\"). Ours: Glitch had nothing like": "whats-new-loading-card",
+    "ours: start card too (js/window-stack.js isTopWindow). Ours.": "whats-new-fast-boot-link",
     "ours: want to automatically open that for folks\"). Ours: Glitch had nothing like": "whats-new-loading-card"
   },
   "public/js/vendor-finder.js": {
@@ -1549,12 +1552,14 @@
   },
   "public/js/whats-new.js": {
     "glitch-had-none: the progress bar, while the game loads. Ours: Glitch had nothing": "whats-new-loading-card",
+    "ours: back to show the What's new link somewhere\"). Ours. The card times how long its": "whats-new-fast-boot-link",
     "ours: under the progress bar, while the game loads. Ours: Glitch had": "whats-new-loading-card"
   },
   "public/js/whos-here.js": {
     "ours: * The online line is ours (Glitch's tip named only the street): the count,": "whos-here-online-link"
   },
   "public/js/window-stack.js": {
+    "ours: * #745 (ours): the What's new window opens from the start": "whats-new-fast-boot-link",
     "ours: over the game (TSFrontController.as 4353-4400). Ours.": "home-screen-page-viewer",
     "remake-own: and the screens, whatever opened after it. The remake's own card (the": "ours-window-stack",
     "remake-own: copy of the bug icon is on top of them). The remake's own window: the client had no such": "ours-window-stack"
@@ -1606,6 +1611,7 @@
     "ours: is zoomed out to 50%. Press Cmd+0 to reset it.\" Ours: Glitch was a": "zoomed-out-browser-hint"
   },
   "public/style.css": {
+    "ours: #745 fast boot fallback (Austin 2026-11-28, ours; js/whats-new.js offerWhatsNewFallback): a": "whats-new-fast-boot-link",
     "ours: G1245 Vine Radio (#661, ours; js/features/vine-radio-feature.js): Choose": "ours-vine-radio",
     "ours: G1246 (ours, Austin 2026-11-24): a sorted bag's badge, its": "ours-bag-sort-badge",
     "reimagined: .avatar-reimagined-tag": "ours-style-css",

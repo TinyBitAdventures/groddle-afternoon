@@ -355,6 +355,10 @@
 :root[data-ui="classic"] .wn-window .wn-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 :root[data-ui="classic"] .wn-window .wn-close:hover { box-shadow: inset 0 0 6px var(--c-classic-close-hover); }
 :root[data-ui="classic"] .wn-window button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
+/* The fast boot fallback's "What's new in vX.Y" link (js/whats-new.js offerWhatsNewFallback, ours): the 2012
+   client's blue text link, on the start card and in the chat column's Activity line. */
+:root[data-ui="classic"] .whats-new-link { color: var(--c-classic-link); font-weight: 700; }
+:root[data-ui="classic"] .whats-new-link:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--c-classic-focus); }
 
 /* == The top bar (classic-spec spec §2-§6; js/classic/classic-topbar.js). The modern bar's own
    elements (js/ui/topbar.js) moved and painted: every id, slug target, click and key stays.

@@ -7,8 +7,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { isZoneDialog } from '../public/js/notify-view.js?v=1ff8a878';
-import { REPORT_WINDOW_SELECTOR } from '../public/js/window-stack.js?v=d8e13764';
+import { isZoneDialog } from '../public/js/notify-view.js?v=d7c296c6';
+import { REPORT_WINDOW_SELECTOR } from '../public/js/window-stack.js?v=0c4a6356';
 import { REPORT_LEAVE_OUT } from '../public/js/features/bug-report-feature.js?v=4af2f508';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');

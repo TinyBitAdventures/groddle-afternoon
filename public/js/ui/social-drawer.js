@@ -107,7 +107,7 @@
  * socialChats (the list's ids in order), socialUnread (id:n,... for every tab and conversation with
  * news, chats:n the Chats total); window.groddleSocial.
  */
-import { colorizeAmounts } from '../notify-view.js?v=1ff8a878';
+import { colorizeAmounts } from '../notify-view.js?v=d7c296c6';
 import { bindContextTrigger, MORE_KEYS_LABEL } from './context-menu.js?v=0266831a';
 import { IM_VERB_ID } from '../player-im.js?v=2c6339e8';
 import { selectionCovers } from './context-guard.js?v=0f71ac17';

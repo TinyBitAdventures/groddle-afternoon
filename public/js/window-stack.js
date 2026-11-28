@@ -57,9 +57,14 @@ export const REPORT_WINDOW_SELECTOR = '#bug-report-panel';
  * pages sat in their own browser window over the game (TSFrontController.as 4353-4400). Ours.
  */
 export const PAGE_VIEWER_SELECTOR = '#ency-sheet';
-/** Over the screens: the start card, the report window and the site page viewer. */
+/**
+ * #745 (ours): the What's new window opens from the start card's "What's new in vX.Y" link
+ * (js/whats-new.js offerWhatsNewFallback), so it goes over the start card, as the report window does.
+ */
+export const WHATS_NEW_SELECTOR = '#whats-new-shade';
+/** Over the screens: the start card, the report window, the site page viewer and the What's new window. */
 export function isTopWindow(el) {
-  return Boolean(el?.matches?.(START_CARD_SELECTOR) || el?.matches?.(REPORT_WINDOW_SELECTOR) || el?.matches?.(PAGE_VIEWER_SELECTOR));
+  return Boolean(el?.matches?.(START_CARD_SELECTOR) || el?.matches?.(REPORT_WINDOW_SELECTOR) || el?.matches?.(PAGE_VIEWER_SELECTOR) || el?.matches?.(WHATS_NEW_SELECTOR));
 }
 /** Not windows: the docked prompt stack, the player menu, the pack's item card, the hotkey sheet. */
 export const NOT_WINDOW_SELECTOR = '.prompt-stack, #player-menu, #pack-popover, .hotkeys-shade, .boot-loader';

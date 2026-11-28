@@ -20,10 +20,14 @@
  * Its look (Modern) is WHATS_NEW_WINDOW_STYLE below, injected on first open; Classic restyles it as
  * a 2012 dialog in public/css/classic.css; phones get their safe areas in public/style.css (PHONEPANELS).
  * QA: <html data-whats-new> is "queued" while a loading-card request waits, "open" while it is up.
+ *
+ * The fast boot fallback's link (#745, Austin 2026-11-28; js/whats-new.js offerWhatsNewFallback), on the
+ * start card or in an Activity line, is any [data-whats-new-version] button: a press opens the window at
+ * that version (openVersion), over the start card too (js/window-stack.js isTopWindow). Ours.
  */
 import {
   WHATS_NEW_ALL_PATH, WHATS_NEW_PATH, WHATS_NEW_REQUEST_EVENT, releasesOf, shortVersion, takeWhatsNewRequest, whatsNewRequested,
-} from '../whats-new.js?v=b7e58496';
+} from '../whats-new.js?v=988ec58d';
 import { focusBack } from './focus-return.js?v=da190597';
 
 /** The Menu row (js/ui/topbar.js MENU_ROWS places it in World, after Encyclopedia). */
@@ -363,6 +367,19 @@ export function createWhatsNewWindow(doc = globalThis.document, { fetch: fetchFn
       const next = at < 0 ? null : list[at - Math.sign(dir)];
       return next ? api.showVersion(next.version) : false;
     },
+    /** Opens on one version (the fallback link's); the newest when the window doesn't have it. */
+    async openVersion(version) {
+      await api.open();
+      if (!version || shown === version) return shown === version;
+      if (!knownReleases().some((r) => r.version === version) && !cache.has(WHATS_NEW_ALL_PATH)) {
+        try {
+          await load(WHATS_NEW_ALL_PATH);
+        } catch {
+          allFailed = true;
+        }
+      }
+      return api.showVersion(version);
+    },
     async showLatest() {
       setView('latest');
       parts.title.focus?.({ preventScroll: true });
@@ -414,5 +431,12 @@ export function installWhatsNewWindow({ doc = globalThis.document, fetch: fetchF
   };
   doc.addEventListener?.(WHATS_NEW_REQUEST_EVENT, serve);
   serve();
+  // #745 fallback: the quiet "What's new in vX.Y" link (start card or Activity line) opens it at that version.
+  (doc.body || doc).addEventListener?.('click', (e) => {
+    const link = e.target?.closest?.('[data-whats-new-version]');
+    if (!link) return;
+    e.preventDefault?.();
+    notes.openVersion(link.getAttribute('data-whats-new-version'));
+  });
   return notes;
 }

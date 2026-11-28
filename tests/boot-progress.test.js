@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { BOOT_STEPS, BOOT_TEXT, bootStep, bootStepText, countsAsCode, startBootProgress } from '../public/js/boot-progress.js?v=53ba3156';
+import { BOOT_STEPS, BOOT_TEXT, bootStep, bootStepText, countsAsCode, startBootProgress } from '../public/js/boot-progress.js?v=b9b64ddc';
 import { FakeEl } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..');
