@@ -26,7 +26,7 @@ import { slothSpotFromRow } from '../public/js/sloth-trees.js?v=775bef07';
 import { SLOTH_ART_DIR, SLOTH_KNOCKER_ART, SLOTH_SHEETS } from '../public/js/sloth-art.js?v=a2768e2f';
 import { itemZ } from '../public/js/item-bands.js?v=ec366be3';
 import { SOLID_ALPHA, pickTarget, targetPad, spriteWorldHitBox } from '../public/js/pick.js?v=a43f94f8';
-import { slothGeometry } from '../public/js/features/resource-nodes-feature.js?v=6ec0d8c0';
+import { slothGeometry } from '../public/js/features/resource-nodes-feature.js?v=b8fc0749';
 
 const ecology = JSON.parse(readFileSync(new URL('../public/assets/content/street-ecology.json', import.meta.url), 'utf8'));
 

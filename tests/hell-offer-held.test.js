@@ -6,9 +6,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=b41ee67c';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=513a0a31';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=19e4c55f';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 

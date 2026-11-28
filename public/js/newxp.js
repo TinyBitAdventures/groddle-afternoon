@@ -738,6 +738,24 @@ export function normalizeNewxpSave(seed = {}) {
     step: typeof s.step === 'string' && STEP_RE.test(s.step) ? s.step : '',
     stepAt: Number.isFinite(s.stepAt) ? s.stepAt : 0,
     cloud: Number.isInteger(s.cloud) && s.cloud >= 0 && s.cloud < CLOUD_COUNT ? s.cloud : 0,
+    replay: normalizeReplay(s.replay),
+  };
+}
+
+/**
+ * A try of Back to Gentle Island under way (js/newxp-replay.js), or null: the record's status before
+ * it (`was`: the try ends back on it when left) and the spot it was taken from (`from`: where Leave
+ * puts the player back).
+ */
+function normalizeReplay(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const from = raw.from && typeof raw.from === 'object' && typeof raw.from.tsid === 'string' && raw.from.tsid
+    ? { tsid: raw.from.tsid.replace(/[^A-Za-z0-9_:-]/g, '').slice(0, 80), x: Number.isFinite(raw.from.x) ? raw.from.x : null, y: Number.isFinite(raw.from.y) ? raw.from.y : null }
+    : null;
+  return {
+    was: ['skipped', 'off'].includes(raw.was) ? raw.was : 'skipped',
+    from,
+    at: Number.isFinite(raw.at) ? raw.at : 0,
   };
 }
 

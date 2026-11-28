@@ -10,8 +10,8 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it, mock } from 'node:test';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=1640f3d3';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=7c7ee524';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=f871f3fd';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=86da0fc9';
 import { LOAD_TIMEOUT_MS, RETRY_WAITS_MS } from '../public/js/load-retry.js?v=24823577';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 

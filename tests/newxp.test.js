@@ -66,7 +66,7 @@ import {
   training2MeterFull,
   tutorialPhysics,
   vogPages,
-} from '../public/js/newxp.js?v=abbf0ed6';
+} from '../public/js/newxp.js?v=eedf8fe3';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const street = (tsid) => JSON.parse(readFileSync(join(ROOT, 'assets/streets', `${tsid}.json`), 'utf8'));
@@ -487,8 +487,9 @@ describe('newxp save', () => {
 
   it('offers no skip in multiplayer, at the start or on the pill (Austin 2026-10-26)', () => {
     const src = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
-    assert.match(src, /if \(skip\) skip\.hidden = engineRef\?\.mode === 'multiplayer';/);
-    assert.match(src, /\[data-nx-skip\]'\)\.addEventListener\('click', \(\) => \{\n    if \(engineRef\?\.mode === 'multiplayer'\) return;/);
+    // Back to Gentle Island (js/newxp-replay.js, ours 2026-11-28): the same button is Leave during that quest, online too.
+    assert.match(src, /skip\.hidden = engineRef\?\.mode === 'multiplayer' && !save\.replay;/);
+    assert.match(src, /\[data-nx-skip\]'\)\.addEventListener\('click', \(\) => \{\n(?:.*\n){0,5}    if \(engineRef\?\.mode === 'multiplayer'\) return;\n    if \(typeof confirm === 'function' && !auto && !confirm\('Skip the rest/);
   });
 });
 

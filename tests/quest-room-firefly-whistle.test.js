@@ -40,8 +40,8 @@ import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seams
 import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js?v=481a55f9';
 import * as kit from '../public/js/quest-rooms/kit.js?v=44218fc3';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=cec1b5e9';
-import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=6ec0d8c0';
+import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js?v=36e610b5';
+import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js?v=b8fc0749';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS');
@@ -186,7 +186,7 @@ describe('Fireflex 3000 Lab layout', () => {
 
 describe('Firefly Whistle offer and room wiring', () => {
   before(async () => {
-    const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js?v=d30c3e0f');
+    const { loadContentCatalogsFromDir } = await import('../public/js/content-catalogs.js?v=b6a173ae');
     loadContentCatalogsFromDir(join(root, 'public/assets/content'));
   });
 

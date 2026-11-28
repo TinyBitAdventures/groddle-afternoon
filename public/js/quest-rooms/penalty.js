@@ -32,7 +32,7 @@
  */
 
 import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js?v=54430bb9';
-import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
+import { getQuestCatalog } from '../content-catalogs.js?v=b6a173ae';
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
 import { onLoaded, textureFromUrl } from '../textures.js?v=29f80b6a';
 import { ensureItem } from '../inventory.js?v=3be7988a';

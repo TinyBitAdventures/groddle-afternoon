@@ -12,15 +12,15 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js?v=54430bb9';
 import { powdersFeature } from '../public/js/features/powders-feature.js?v=661b5ae1';
-import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=e6e9b378';
+import { HEADSPACE_SCENE, itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js?v=ed0aba78';
 import { ROOK_WOODS_STREET_ID } from '../public/js/rook-woods.js?v=73edf194';
-import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=3091f7a0';
+import { INSTANCES as GWENDOLYN_INSTANCES, ROOM_ID as GWENDOLYN_ROOM } from '../public/js/quest-rooms/gwendolyn.js?v=4f7e0960';
 import { questSceneTsid } from '../public/js/quest-instance.js?v=39e4ca2e';
 import { GAME_CHEAT_BLOCKS, SPINACH_TEXT, gameCheatBlock } from '../public/js/item-verbs.js?v=ecade42e';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=e32f35f5';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { raceSceneTsid } from '../public/js/races.js?v=ab22a079';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(root, '../glitch-GameServerJS');

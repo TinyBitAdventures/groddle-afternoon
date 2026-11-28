@@ -7,10 +7,10 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { applyRewards, roundTo5 } from '../public/js/quests.js?v=f574d2e1';
+import { applyRewards, roundTo5 } from '../public/js/quests.js?v=15aab2e3';
 import { scaleRewards } from '../public/js/imagination-effects.js?v=70169933';
-import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=d30c3e0f';
-import { createAchievementState, unlockAchievement } from '../public/js/achievements.js?v=184f3714';
+import { loadContentCatalogsFromDir, getAchievementCatalog } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { createAchievementState, unlockAchievement } from '../public/js/achievements.js?v=4af6091c';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

@@ -6993,6 +6993,32 @@
    "why": "Austin 2026-11-28: a friend must not be able to spam their friends with online and offline notices by going on and off quickly. Glitch had no such notice at all (glitch-client NCMsgHandler.as do_BUDDY_ONLINE and ContactList.as buddyUpdate only moved the contact between Online and Offline; GSJS player.js onLogin/onLogout sent buddy_online/buddy_offline every time, with no debounce), so the toasts and their limit are both ours. Ours: the realtime server (groddle-afternoon-server buddies.go) waits 30 s (buddyGrace, was 15 s) before a dropped game counts as offline, so a reload, Play here or a phone's dropped connection says nothing and the dot waits too; it says a buddy is online at most once each 5 minutes (buddyAnnounceEvery) per player, and went offline only to close an online it said or after a stay of 5 minutes or more; a block, an un-block and Appear offline flapping follow the same rule; every other change goes out quiet, which moves the dot and shows no toast or activity line.",
    "ruling": "Austin 2026-11-28 (in chat): friends must not be able to spam online and offline notices by going on and off quickly",
    "rows": []
+  },
+  {
+   "id": "ours-back-to-gentle-island",
+   "title": "Back to Gentle Island: a quest that lets a player who skipped the tutorial play it later, once",
+   "kind": "content",
+   "status": "proposed",
+   "where": [
+    {
+     "file": "public/js/newxp-replay.js",
+     "symbol": "REPLAY_QUEST"
+    },
+    {
+     "file": "public/js/features/newxp-feature.js",
+     "symbol": "startReplay"
+    },
+    {
+     "file": "public/js/features/newxp-feature.js",
+     "symbol": "leaveReplay"
+    },
+    {
+     "file": "public/js/content-catalogs.js",
+     "symbol": "withReplayQuest"
+    }
+   ],
+   "why": "Austin 2026-11-28: players who skipped the tutorial should be able to complete it, as a quest, once. Glitch had no skip a player could choose (players/player.js onCreate 1193-1218: skip_entire_intro and skip_newux were testing flags) and never ran the tutorial twice (inc_newxp.js newxpComplete sets has_done_intro); a finished player back on Gentle Island only heard newxpReturnToGentleIsland. Ours: the Magic Rock offers Back to Gentle Island to a save whose tutorial record is skipped (solo's Skip to Ur and Skip tutorial; multiplayer has no skip), it starts the island from its first step (the rock's skill pick for a save that knows no first skill) with the tutorial's holds, gives only what the player never got (bags quest given finished when two bags are held, no second Greeter Twig, home only when none, On to the Big Time only if never done, cards only if not owned), completes once (record done and quest not repeatable), and Leave puts the player back where they took it with the quest back in the log (Try it). Our words, in the rock's voice.",
+   "rows": []
   }
  ]
 }

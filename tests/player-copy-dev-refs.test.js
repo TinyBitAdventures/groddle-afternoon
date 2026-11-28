@@ -36,7 +36,7 @@ import { STORE_CATALOG } from '../public/js/store-catalog.js?v=c6ebb2bd';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 import { HOTKEYS_FOOTER, HOTKEYS_TITLE, hotkeySections } from '../public/js/client-hotkeys.js?v=401d994d';
-import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=e4e6bc40';
+import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=81ca6fe8';
 
 /**
  * Strings the AST scan finds that no player reads, each with why. Keep this

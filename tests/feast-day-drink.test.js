@@ -42,7 +42,7 @@ const { FEAST_PILE_CLASS } = await import('../public/js/feast-day.js?v=4609da69'
 const { TABLE_STREET } = await import('../public/js/pot-luck-feast.js?v=971888be');
 const { feastDayFeature } = await import('../public/js/features/feast-day-feature.js?v=b236c7ed');
 const inventory = await import('../public/js/inventory.js?v=3be7988a');
-const { stockUseVerb } = await import('../public/js/stock-use.js?v=79e103c1');
+const { stockUseVerb } = await import('../public/js/stock-use.js?v=a73b245b');
 
 describe('#723 a drink pile at the feast offers Drink, and drinking it works', () => {
   const targets = [];

@@ -26,18 +26,18 @@ import {
   shakePouch,
 } from '../public/js/elemental-pouch.js?v=42702eda';
 import { bagsFeature } from '../public/js/features/bags-feature.js?v=426f342b';
-import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=bd6a156d';
-import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=24218d1e';
-import { FEATURES } from '../public/js/features/index.js?v=3e229f79';
+import { runMoreVerb } from '../public/js/features/item-verbs-more-feature.js?v=e502f2e7';
+import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js?v=eca372f2';
+import { FEATURES } from '../public/js/features/index.js?v=e3f90bae';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { STORE_CATALOG } from '../public/js/store-catalog.js?v=c6ebb2bd';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=7a07f478';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js?v=1bdfd77c';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
-import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=e4e6bc40';
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=d30c3e0f';
-import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
-import { acceptOffer, pendingQuestOffers, syncItemRequirements, turnInQuest } from '../public/js/quest-offers.js?v=cec1b5e9';
+import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js?v=81ca6fe8';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
+import { acceptOffer, pendingQuestOffers, syncItemRequirements, turnInQuest } from '../public/js/quest-offers.js?v=36e610b5';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = decodeURIComponent(new URL('../../glitch-GameServerJS', import.meta.url).pathname);

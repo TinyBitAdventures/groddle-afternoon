@@ -9,8 +9,8 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=d30c3e0f';
-import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
 import {
   acceptOffer,
   routeQuestEvent,
@@ -28,7 +28,7 @@ import {
   PURPLE_JOURNEY_STREETS,
   COLD_COMFORT,
   COLD_COMFORT_LEAVE_TEXT,
-} from '../public/js/quest-offers.js?v=cec1b5e9';
+} from '../public/js/quest-offers.js?v=36e610b5';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { createPlot, performPlotVerb } from '../public/js/patches.js?v=54430bb9';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
@@ -39,7 +39,7 @@ import {
   SLATHER_VERB,
   SLATHER_COPY,
 } from '../public/js/features/quest-verbs-feature.js?v=701799b8';
-import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=e1da24cc';
+import { onOwnYard } from '../public/js/features/quest-offers-feature.js?v=cb6fe38a';
 import {
   cubimalFor,
   giveCubimalVerb,

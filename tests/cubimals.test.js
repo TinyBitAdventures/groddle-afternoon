@@ -31,8 +31,8 @@ import {
   applyAchievementProgress,
   createAchievementState,
   getAchievementProgress,
-} from '../public/js/achievements.js?v=184f3714';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+} from '../public/js/achievements.js?v=4af6091c';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

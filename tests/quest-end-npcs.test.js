@@ -17,11 +17,11 @@ import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
-import { classifyQuests, heldForNpcTurnIn } from '../public/js/quest-offers.js?v=cec1b5e9';
+import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { classifyQuests, heldForNpcTurnIn } from '../public/js/quest-offers.js?v=36e610b5';
 import { vendorStreetsFor } from '../public/js/vendor-npcs.js?v=90b0c123';
 import { findRoute, routeGraph, ROUTE_SOURCES } from '../public/js/map-routes.js?v=e9f5e3da';
-import { MERCHANT_ROUTE_SOURCE, routeHeldQuests } from '../public/js/features/vendor-npcs-feature.js?v=f3700110';
+import { MERCHANT_ROUTE_SOURCE, routeHeldQuests } from '../public/js/features/vendor-npcs-feature.js?v=03c0f3cb';
 
 const PUBLIC = join(import.meta.dirname, '..', 'public');
 const json = (p) => JSON.parse(readFileSync(join(PUBLIC, p), 'utf8'));

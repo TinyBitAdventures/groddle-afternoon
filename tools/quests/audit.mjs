@@ -37,8 +37,8 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog, getSkillCatalog, getAchievementCatalog } from '../../public/js/content-catalogs.js?v=d30c3e0f';
-import { createQuestState, cleanQuestMarkup, listQuestLog } from '../../public/js/quests.js?v=f574d2e1';
+import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog, getSkillCatalog, getAchievementCatalog } from '../../public/js/content-catalogs.js?v=b6a173ae';
+import { createQuestState, cleanQuestMarkup, listQuestLog } from '../../public/js/quests.js?v=15aab2e3';
 import {
   COUNTER_ROUTES,
   classifyQuests,
@@ -52,10 +52,10 @@ import {
   npcQuestOffers,
   setQuestHeldCheck,
   REMAKE_QUEST_NPCS,
-} from '../../public/js/quest-offers.js?v=cec1b5e9';
+} from '../../public/js/quest-offers.js?v=36e610b5';
 import { MULTIPLAYER_QUESTS } from '../../public/js/quests-mp.js?v=e697cec3';
 import { QUEST_ROOMS } from '../../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { placeIndex, questHold } from '../../public/js/quest-reach.js?v=e599c56f';
+import { placeIndex, questHold } from '../../public/js/quest-reach.js?v=4ac59b68';
 import { SUBWAY_STREETS, closedStreets, initializeStreetJobs, normalizeStreetJobState } from '../../public/js/street-jobs.js?v=17f103d0';
 import { routeGraph } from '../../public/js/map-routes.js?v=e9f5e3da';
 import { TELEPORTERS } from '../../public/js/hidden-floors.js?v=023336cb';

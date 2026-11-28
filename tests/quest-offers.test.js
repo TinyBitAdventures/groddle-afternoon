@@ -13,7 +13,7 @@ import {
   resetContentCatalogs,
   getQuestCatalog,
   getContentMeta,
-} from '../public/js/content-catalogs.js?v=d30c3e0f';
+} from '../public/js/content-catalogs.js?v=b6a173ae';
 import {
   createQuestState,
   assignQuest,
@@ -23,7 +23,7 @@ import {
   applyQuestRewards,
   questRewardSummary,
   listQuestLog,
-} from '../public/js/quests.js?v=f574d2e1';
+} from '../public/js/quests.js?v=15aab2e3';
 import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
 import {
   OFFER_INTERVAL_MS,
@@ -53,7 +53,7 @@ import {
   tickQuestTimers,
   restartTimedQuest,
   questTimerStatus,
-} from '../public/js/quest-offers.js?v=cec1b5e9';
+} from '../public/js/quest-offers.js?v=36e610b5';
 import { XP_FOR_LEVEL } from '../public/js/progression.js?v=05ff0260';
 
 const CONTENT = join(dirname(fileURLToPath(import.meta.url)), '../public/assets/content');
@@ -75,10 +75,12 @@ function xpAt(level, fraction = 0.5) {
 describe('rebuilt quest catalog', () => {
   it('keeps meta counts in step and adds the previously unparsed quests', () => {
     const cat = getQuestCatalog();
-    // G1245: plus our own quest (Tunes for Crabs, js/vine-radio.js withOursQuests), not in quests.json.
-    assert.equal(Object.keys(cat).length, getContentMeta().counts.quests.output + 1);
+    // G1245: plus our own quests (Tunes for Crabs, js/vine-radio.js withOursQuests; Back to Gentle
+    // Island, js/newxp-replay.js withReplayQuest), not in quests.json.
+    assert.equal(Object.keys(cat).length, getContentMeta().counts.quests.output + 2);
     assert.equal(getContentMeta().counts.quests.output, 445);
     assert.equal(cat.vine_radio_crab_tunes?.ours, true);
+    assert.equal(cat.newxp_back_to_gentle_island?.ours, true);
     for (const id of ['le_miserable', 'orld_ugs_esara', 'build_a_tower', 'get_first_tool']) assert.ok(cat[id], id);
   });
 
@@ -109,7 +111,7 @@ describe('rebuilt quest catalog', () => {
 });
 
 describe('classifyQuests', () => {
-  it('splits 445 quests (and our one) into solo, custom story, and excluded with reasons', () => {
+  it('splits 445 quests (and our two) into solo, custom story, and excluded with reasons', () => {
     const c = classifyQuests();
     // Rebuilt quest rooms (public/js/quest-rooms/catalog.js) move from
     // instance_unbuilt to solo as each room lands.
@@ -125,8 +127,8 @@ describe('classifyQuests', () => {
     // players (G451, Austin 2026-11-07; tests/g451-peter-out-peat.test.js).
     // Chasing Hubba Dubba Hugs, never offered and nothing sets its flags (orld_ugs_esara.js 18-50; rules-b 2026-11-12).
     const judgedOut = ['manor_mystery', 'bogspecialization_harvest_full_peat_bog_in_time_period', 'orld_ugs_esara'].length;
-    // G1245: our own Tunes for Crabs (a crab offers it) is solo too.
-    const ours = ['vine_radio_crab_tunes'].length;
+    // G1245: our own Tunes for Crabs (a crab offers it) is solo too, and Back to Gentle Island (2026-11-28).
+    const ours = ['vine_radio_crab_tunes', 'newxp_back_to_gentle_island'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests - judgedOut + ours);
     assert.equal(c.custom.length, 21); // + 4 Gentle Island tutorial quests (newxp-feature.js); ezcooking_1 is a room now
     assert.equal(c.excluded.length, 294 - (built - wasCustom) - featureQuests + judgedOut);

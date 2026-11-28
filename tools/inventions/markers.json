@@ -523,6 +523,7 @@
   },
   "public/js/features/newxp-feature.js": {
     "no-source: hubName: 'Tutorial', // remake label (G310: no source names the newxp levels'": "ours-newxp",
+    "ours: Gentle Island: a skipped tutorial played later (ours)": "ours-back-to-gentle-island",
     "remake-own: '').trim().slice(0, TUTORIAL_NAME_MAX)); // the remake's own word filter": "word-filter"
   },
   "public/js/features/party-spaces-feature.js": {
@@ -992,6 +993,10 @@
     "ours: New Year's Day so every time zone sees them (ours).": "new-ur-party",
     "ours: on a New Ur midnight, in place of NewDayView's (ours).": "new-ur-countdown"
   },
+  "public/js/newxp-replay.js": {
+    "glitch-had-none: * Glitch had nothing like it. Every new player went through the": "ours-back-to-gentle-island",
+    "ours: * (ours, Austin 2026-11-28: \"For folks which skipped the": "ours-back-to-gentle-island"
+  },
   "public/js/newxp.js": {
     "remake-own: * remake's own (G310,": "ours-newxp"
   },
@@ -1164,6 +1169,7 @@
   "public/js/quest-offers.js": {
     "ours: #83: the offer's line when accepting moves you (ours: the source's offer text was the only hint).": "ours-quest-offers",
     "ours: // G1245 (ours): a world crab offers Tunes for Crabs, the Vine": "ours-vine-radio",
+    "ours: // def.ours: our own quest that moves you runs it in its own": "ours-back-to-gentle-island",
     "ours: G571: the nudge for a ready offered quest (ours).": "ours-quest-offers",
     "stand-in: // social stand-ins (emotional-bear.js with local companions;": "ours-quest-offers"
   },

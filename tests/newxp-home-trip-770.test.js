@@ -13,10 +13,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GENTLE_ISLAND, HOME_TRIP_REFUSED, ISLAND_STEPS, homeTripOpen } from '../public/js/newxp.js?v=abbf0ed6';
-import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=7ce0602a';
+import { GENTLE_ISLAND, HOME_TRIP_REFUSED, ISLAND_STEPS, homeTripOpen } from '../public/js/newxp.js?v=eedf8fe3';
+import { __newxpTest, newxpFeature } from '../public/js/features/newxp-feature.js?v=ea0fd9da';
 import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
-import { FEATURES } from '../public/js/features/index.js?v=3e229f79';
+import { FEATURES } from '../public/js/features/index.js?v=e3f90bae';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

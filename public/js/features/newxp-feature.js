@@ -139,7 +139,7 @@ import {
   TUTORIAL_NAME_MAX,
   homeTripOpen,
   HOME_TRIP_REFUSED,
-} from '../newxp.js?v=abbf0ed6';
+} from '../newxp.js?v=eedf8fe3';
 import { countWords } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js?v=4d75aec0';
@@ -147,16 +147,27 @@ import { loadRoadsFor, reachableStreets } from '../street-graph.js?v=16013e6e';
 import { soundForQuoin } from '../sound-moments.js?v=3e66996f';
 import { IMAGINATION_UPGRADES } from '../imagination.js?v=1bdfd77c';
 import { EZ_COOKIN_TSID, EZ_FOOD, practiceScreen } from '../practice-streets.js?v=557238c1';
-import { assignQuest, completeQuest } from '../quests.js?v=f574d2e1';
-import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js?v=cec1b5e9';
-import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
+import { assignQuest, completeQuest } from '../quests.js?v=15aab2e3';
+import { acceptOffer, enqueueQuestOffer, ensureQuestOfferState, genericBagsOwned, questAwardPayload, turnInQuest } from '../quest-offers.js?v=36e610b5';
+import {
+  REPLAY_DONE_COUNTER,
+  REPLAY_GATE,
+  REPLAY_QUEST_ID,
+  REPLAY_TEXT,
+  replayEligible,
+  replayGrants,
+  replayOwnedCards,
+  replaySkill,
+  replayStage,
+} from '../newxp-replay.js?v=157997fb';
+import { getQuestCatalog } from '../content-catalogs.js?v=b6a173ae';
 import { locationEventsApi } from './location-events-feature.js?v=1c5b6340';
 import * as kit from '../quest-rooms/kit.js?v=44218fc3';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl, whenLoaded } from '../textures.js?v=29f80b6a';
 import { upgradeSource } from '../sprite-hires.js?v=6a4569c4';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=243cef7d';
-import { HOME_MACHINE } from '../home-ticket.js?v=df702ad8';
+import { HOME_MACHINE } from '../home-ticket.js?v=c0db4904';
 import { createAnimalState } from '../animals.js?v=692aa092';
 import {
   AK_ANIMALS,
@@ -385,6 +396,11 @@ function ensureUi() {
   };
   for (const node of [ui.bubble, ui.say, ui.vog, ui.instr, ui.card, ui.pill, ui.fade]) host.appendChild(node);
   ui.pill.querySelector('[data-nx-skip]').addEventListener('click', () => {
+    // Back to Gentle Island: the card's button is Leave (solo and online), which ends the try.
+    if (save.replay) {
+      askLeaveReplay(engineRef);
+      return;
+    }
     if (engineRef?.mode === 'multiplayer') return;
     if (typeof confirm === 'function' && !auto && !confirm('Skip the rest of the tutorial and head into Ur?')) return;
     skipTutorial(engineRef);
@@ -762,10 +778,15 @@ function hud(parts = {}) {
 
 function showPill(on) {
   ensureUi();
+  if (!ui) return;
   ui.pill.hidden = !on;
   // Multiplayer: no way out of the tutorial (players/player.js onCreate 1238-1239; Austin 2026-10-26).
   const skip = ui.pill.querySelector('[data-nx-skip]');
-  if (skip) skip.hidden = engineRef?.mode === 'multiplayer';
+  // Back to Gentle Island can always be left (js/newxp-replay.js), online too.
+  if (skip) {
+    skip.hidden = engineRef?.mode === 'multiplayer' && !save.replay;
+    skip.textContent = save.replay ? REPLAY_TEXT.leave : 'Skip tutorial';
+  }
   const label = ui.pill.querySelector('[data-nx-label]');
   if (label) label.textContent = `Tutorial · ${({ clouds: 'Welcome', training1: 'Training', training2: 'Training', house: 'Home Street', skill: 'Practice', island: 'Gentle Island' })[save.stage] || ''}`;
 }
@@ -2726,6 +2747,21 @@ async function islandRockScript(engine, t, rock) {
   try {
     setStep('island_rock');
     await sleep(t, 2000);
+    // Back to Gentle Island (js/newxp-replay.js): a player who already holds bags, or did the bag
+    // quest on an earlier try, skips it: no 978 currants, no bags, the quest given finished.
+    const plan = save.replay ? replayPlan(engine) : null;
+    if (plan && plan.bagQuest !== 'run') {
+      await talk(t, rock, REPLAY_TEXT.rockBagsHeld, { buttons: ['Great'] });
+      setFlag('currants_revealed');
+      islandHud(engine);
+      if (plan.bagQuest === 'given_finished') giveFinished(engine, 'buy_two_bags');
+      save.island = 'bags_done';
+      engine.save();
+      engine.updateHud();
+      engine.setData('newxpLast', `replay:bags_${plan.bagQuest}`);
+      setStep('bags_held');
+      return;
+    }
     const skill = firstSkill(save.skill) || FIRST_SKILLS[0];
     await talk(t, rock, LINES.islandHello, { choices: [{ label: 'Yes, I need some bags', value: 'give-quest' }], vars: { skill: skill.name } });
     await vog(t, LINES.watchThis);
@@ -3098,6 +3134,8 @@ async function rescueStranded(engine) {
 async function finishTutorial(engine, t) {
   islandBusy = true;
   try {
+    // Back to Gentle Island: what this player already has, read before On to the Big Time turns in.
+    const plan = save.replay ? replayPlan(engine) : null;
     const qs = engine.questState;
     if (!qs.active.leave_gentle_island) acceptOffer(qs, 'leave_gentle_island', questCtx(engine));
     const quest = qs.active.leave_gentle_island;
@@ -3113,18 +3151,22 @@ async function finishTutorial(engine, t) {
       }
     }
     alive(t);
-    // onComplete_custom: the Greeter Twig, a relic of the Island.
-    await sleep(t, 2000);
-    await vog(t, LINES.relic);
-    addItem(engine.inv, 'greeter_twig', 1);
-    engine.refreshPack();
-    await vog(t, LINES.greeterTwig);
+    // onComplete_custom: the Greeter Twig, a relic of the Island (on Back to Gentle Island, only
+    // to a player who holds none and never finished On to the Big Time).
+    if (!plan || plan.twig) {
+      await sleep(t, 2000);
+      await vog(t, LINES.relic);
+      addItem(engine.inv, 'greeter_twig', 1);
+      engine.refreshPack();
+      await vog(t, LINES.greeterTwig);
+    }
     await vog(t, LINES.explore);
     save.status = 'done';
     save.stage = 'done';
     save.doneAt = Date.now();
     engine.save();
     teardown(engine);
+    replayDone(engine);
   } catch (err) {
     if (!(err instanceof Cancel)) console.warn('newxp finish', err);
   } finally {
@@ -3141,7 +3183,9 @@ async function finishTutorial(engine, t) {
 function leaveFlagTick(engine, now) {
   const qs = engine.questState;
   if (!qs || leaveFinishing || islandBusy) return;
-  if (qs.completed?.includes('leave_gentle_island')) {
+  // Back to Gentle Island for a player who finished On to the Big Time before skipping: the try
+  // still ends with the 15 s (finishTutorial pays nothing twice).
+  if (qs.completed?.includes('leave_gentle_island') && !(save.replay && active())) {
     leaveSince = 0;
     return;
   }
@@ -3182,6 +3226,7 @@ function leaveFlagTick(engine, now) {
 /** On to the Big Time outside the tutorial's run (a later session, the tutorial state gone): turn in and the relic. */
 async function finishLeaveQuest(engine) {
   const qs = engine.questState;
+  const plan = active() && save.replay ? replayPlan(engine) : null;
   if (!qs.active.leave_gentle_island) acceptOffer(qs, 'leave_gentle_island', questCtx(engine));
   const quest = qs.active.leave_gentle_island;
   if (!quest) return;
@@ -3191,14 +3236,18 @@ async function finishLeaveQuest(engine) {
   if (!result.ok) return;
   engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
   engine.pushActivity(`Quest complete: ${result.def.title}`);
-  // leave_gentle_island.js onComplete_custom 59-75: the Greeter Twig, a relic of the Island.
-  addItem(engine.inv, 'greeter_twig', 1);
-  engine.pushActivity(LINES.relic.replace(/<[^>]+>/g, ''));
+  // leave_gentle_island.js onComplete_custom 59-75: the Greeter Twig, a relic of the Island
+  // (Back to Gentle Island: only to a player who holds none).
+  if (!plan || plan.twig) {
+    addItem(engine.inv, 'greeter_twig', 1);
+    engine.pushActivity(LINES.relic.replace(/<[^>]+>/g, ''));
+  }
   if (active()) {
     save.status = 'done';
     save.stage = 'done';
     save.doneAt = Date.now();
     teardown(engine);
+    replayDone(engine);
   }
   engine.refreshPack();
   engine.updateHud();
@@ -3864,6 +3913,116 @@ function startTutorial(engine, stage = 'clouds') {
 }
 
 /* ------------------------------------------------------------------ */
+/* Back to Gentle Island: a skipped tutorial played later (ours)          */
+/* ------------------------------------------------------------------ */
+
+/** What this try hands out, from what the player already has (js/newxp-replay.js replayGrants). */
+function replayPlan(engine) {
+  return replayGrants({
+    bags: genericBagsOwned(engine.inv, { countItem }),
+    currantsPaid: hasFlag('island_currants'),
+    bagQuestDone: questDone(engine, 'buy_two_bags'),
+    leaveDone: questDone(engine, 'leave_gentle_island'),
+    homeOwned: Boolean(engine.homeOwned?.()),
+    twigs: countItem(engine.inv, 'greeter_twig'),
+  });
+}
+
+/**
+ * Taking Back to Gentle Island (its offer, or Try it in the log): the tutorial runs again from
+ * the island's first step (or the rock's skill pick for a save that knows no first skill),
+ * with every hold of the tutorial in force (active()), remembering where the player was.
+ */
+function startReplay(engine) {
+  const p = P();
+  const tsid = String(engine.streetTsid || '');
+  const from = tsid && !isNewxpSceneTsid(tsid) && !engine.homeContext?.().inHome
+    ? { tsid, x: Number.isFinite(p?.x) ? Math.round(p.x) : null, y: Number.isFinite(p?.y) ? Math.round(p.y) : null }
+    : null;
+  const was = save.status === 'off' ? 'off' : 'skipped';
+  const skills = engine.learnedSkills || [];
+  const stage = replayStage(skills);
+  save = startNewxp(save, stage);
+  save.replay = { was, from, at: Date.now() };
+  // The island from its first step; its one-time flags (finds, quoins, the rock's currants) stay.
+  save.island = 'arrive';
+  save.exit = null;
+  save.leftAt = 0;
+  save.doneAt = 0;
+  // The hands deal only the tutorial cards this player does not own yet.
+  save.upgrades = replayOwnedCards(engine.pc?.imaginationUpgrades);
+  if (!save.skill) save.skill = replaySkill(save, skills);
+  engine.stopFollowing?.();
+  engine.closeMap?.();
+  engine.setData('newxpReplay', `start:${stage}`);
+  engine.save();
+  beginStage(engine, stage);
+}
+
+/** The tutorial ended during the try: the quest turns in on its flag (quest-offers-feature). */
+function replayDone(engine) {
+  if (!save.replay) return;
+  save.replay = null;
+  engine.save();
+  engine.setData('newxpReplay', 'done');
+  engine.achievement?.(REPLAY_DONE_COUNTER, 1);
+}
+
+/** The quest back in the log, not started, with Try it (quest-offers.js putOffOffer's state). */
+function putBackReplayQuest(qs, now = Date.now()) {
+  if (!qs) return;
+  if (qs.active) delete qs.active[REPLAY_QUEST_ID];
+  const offers = ensureQuestOfferState(qs);
+  delete offers.offered[REPLAY_QUEST_ID];
+  offers.declined[REPLAY_QUEST_ID] = now;
+}
+
+function askLeaveReplay(engine) {
+  if (!save.replay || !active()) return;
+  if (typeof confirm === 'function' && !auto && !confirm(REPLAY_TEXT.leaveConfirm)) return;
+  leaveReplay(engine).catch((err) => console.warn('newxp leave replay', err));
+}
+
+/**
+ * Leave: the try ends, the record goes back to what it was (skipped), the quest goes back in the
+ * log with Try it, and the player goes back to the spot they took it from. What they found or
+ * earned on the way is kept; the island's flags keep it from coming twice.
+ */
+async function leaveReplay(engine) {
+  if (!save.replay || !active()) return false;
+  const back = save.replay.from;
+  save.status = save.replay.was || 'skipped';
+  save.replay = null;
+  const qs = engine.questState;
+  // On to the Big Time is the rock's to offer again next time: left in the log, its 15 s on a
+  // street would end the tutorial away from it.
+  if (qs?.active) delete qs.active.leave_gentle_island;
+  putBackReplayQuest(qs);
+  engine.save();
+  teardown(engine);
+  engine.setData('newxpReplay', 'left');
+  if (back?.tsid && engine.streetExists?.(back.tsid) !== false) {
+    await engine.enter(back.tsid, { ...(back.x != null ? { spawnX: back.x } : {}), ...(back.y != null ? { spawnY: back.y } : {}), quiet: true, bypassFeatureGates: true });
+  } else if (GENTLE_ISLAND_TSIDS.includes(engine.streetTsid) || engine.homeContext?.().inHome) {
+    await engine.enter(DEFAULT_START, { quiet: true, bypassFeatureGates: true });
+  }
+  engine.toast(REPLAY_TEXT.left, 5000);
+  engine.pushActivity(REPLAY_TEXT.left);
+  engine.updateHud?.();
+  return true;
+}
+
+/** A quest in the log with no try under way (a reload between the two, a save edited): back to Try it. */
+function reconcileReplay(engine) {
+  const qs = engine.questState;
+  if (!qs?.active?.[REPLAY_QUEST_ID] || (active() && save.replay)) return false;
+  putBackReplayQuest(qs);
+  if (!active()) save.replay = null;
+  engine.save();
+  return true;
+}
+
+/* ------------------------------------------------------------------ */
 /* Start card (brand-new saves only)                                     */
 /* ------------------------------------------------------------------ */
 
@@ -4065,6 +4224,7 @@ export const newxpFeature = {
     if (!engine.started) return;
     if (!resumeChecked) {
       resumeChecked = true;
+      reconcileReplay(engine);
       if (pendingStage) {
         const stage = pendingStage;
         pendingStage = null;
@@ -4258,6 +4418,40 @@ export const newxpFeature = {
     return islandHomeReturn(save, back);
   },
 
+  /** Back to Gentle Island's offer gate (quest-instances-feature customPrereq asks): a skipper who has not done it. */
+  questCustomGate(value, questId, engine) {
+    if (value !== REPLAY_GATE) return null;
+    return replayEligible(save, engine?.questState);
+  },
+
+  /**
+   * Taking Back to Gentle Island (quest-offers-feature acceptCard): not from a home, a scene or a
+   * private instance (the try puts you back where you took it); otherwise accepted and begun.
+   */
+  questStartGate(classTsid, gate, engine) {
+    if (classTsid !== REPLAY_QUEST_ID) return null;
+    const away = engine.homeContext?.().inHome || engine.inScene?.() || engine.transientInstance?.() || engine.heldInstance?.();
+    if (away || active() || !replayEligible(save, engine.questState)) {
+      gate.refuse(REPLAY_TEXT.notHere);
+      return true;
+    }
+    gate.go();
+    if (engine.questState?.active?.[REPLAY_QUEST_ID]) startReplay(engine);
+    return true;
+  },
+
+  /** Back to Gentle Island's log card: Leave Gentle Island while the try runs. */
+  questLogActions(classTsid, engine) {
+    if (classTsid !== REPLAY_QUEST_ID || !save.replay || !active() || typeof document === 'undefined') return [];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'content-action-btn';
+    b.dataset.newxpLeave = '1';
+    b.textContent = REPLAY_TEXT.leaveLog;
+    b.addEventListener('click', () => askLeaveReplay(engine));
+    return [b];
+  },
+
   mapCards(engine) {
     if (!run?.data?.mapHint || !islandLive(engine) || typeof document === 'undefined') return [];
     return [el('div', { class: 'nx-map-card', 'data-newxp-map': 'progress-way' }, ISLAND_LINES.mapperyActivity)];
@@ -4408,4 +4602,10 @@ export const __newxpTest = {
   leaveFlagTick,
   resetLeave() { leaveSince = 0; leaveFinishing = false; },
   get leaveFinishing() { return leaveFinishing; },
+  // Back to Gentle Island (js/newxp-replay.js).
+  replayPlan,
+  startReplay,
+  leaveReplay,
+  reconcileReplay,
+  finishLeaveQuest,
 };

@@ -16,8 +16,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
-import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=d30c3e0f';
-import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=cec1b5e9';
+import { getQuestCatalog, loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { QUEST_MOVES_NOTE, questMoveNote, questOfferCard } from '../public/js/quest-offers.js?v=36e610b5';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -34,7 +34,8 @@ before(async () => {
 function sourceStarts() {
   const out = {};
   for (const [id, def] of Object.entries(getQuestCatalog())) {
-    if (!def.needsStart) continue;
+    // Our own quests (def.ours) have no GSJS file.
+    if (!def.needsStart || def.ours) continue;
     const ctx = {};
     vm.runInNewContext(readFileSync(join(GS_QUESTS, `${id}.js`), 'utf8'), ctx, { timeout: 2000 });
     const body = String(ctx.onStarted).split('\n').filter((line) => !/^\s*\/\//.test(line)).join('\n');
@@ -48,7 +49,7 @@ describe('#83 quests that move you on accept', () => {
     const starts = sourceStarts();
     assert.equal(Object.keys(starts).length, 62);
     const fromSource = Object.entries(starts).filter(([, s]) => s.instance || s.delayed || s.teleport).map(([id]) => id).sort();
-    const inData = Object.values(getQuestCatalog()).filter((def) => def.movesOnStart).map((def) => def.classTsid).sort();
+    const inData = Object.values(getQuestCatalog()).filter((def) => def.movesOnStart && !def.ours).map((def) => def.classTsid).sort();
     assert.deepEqual(inData, fromSource);
     assert.equal(inData.length, 47);
     const counts = { instance: 0, delayed: 0, teleport: 0 };

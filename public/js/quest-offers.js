@@ -71,7 +71,7 @@
  */
 
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=90b0c123';
-import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=d30c3e0f';
+import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=b6a173ae';
 import { levelInfoForXp } from './progression.js?v=05ff0260';
 import { brokenToolCopies } from './tools.js?v=4156bba8';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=e697cec3';
@@ -82,7 +82,7 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   eventToCounter,
-} from './quests.js?v=f574d2e1';
+} from './quests.js?v=15aab2e3';
 
 /** Original: only one offer every 5 minutes (quests_offer delay = 60 * 5). */
 export const OFFER_INTERVAL_MS = 5 * 60 * 1000;
@@ -628,7 +628,8 @@ export const QUEST_MOVES_NOTE = 'Accepting takes you somewhere new.';
  * a start it cannot carry says nothing.
  */
 export function questMoveNote(def) {
-  return (def?.movesOnStart || def?.movesOnAccept) && (def.instanceRoom || def.custom) ? QUEST_MOVES_NOTE : '';
+  // def.ours: our own quest that moves you runs it in its own module (Back to Gentle Island, js/newxp-replay.js).
+  return (def?.movesOnStart || def?.movesOnAccept) && (def.instanceRoom || def.custom || def.ours) ? QUEST_MOVES_NOTE : '';
 }
 
 function offerCard(row, waitMs = 0) {
@@ -1175,6 +1176,7 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'cubimals_freed:{a}' },
   { event: 'musicblocks_played:{a}' },
   { event: 'crab_tunes_heard', note: 'G1245 (ours): a crab heard a tune from you (features/crabs-feature.js onListen); Tunes for Crabs counts it' },
+  { event: 'gentle_island_finished', note: 'ours (Austin 2026-11-28): the tutorial ended during Back to Gentle Island (features/newxp-feature.js replayDone); the quest counts it' },
   { event: 'feats:contributed' },
   { event: 'players_hugged' },
   { event: 'players_high_fived' },

@@ -18,9 +18,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
-import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=cec1b5e9';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=36e610b5';
 import { RECIPE_CATALOG, craftRecipe, loadRecipeCatalogFromFile } from '../public/js/making.js?v=d3571803';
 import { stationForRecipe } from '../public/js/make-tools.js?v=86877c3e';
 

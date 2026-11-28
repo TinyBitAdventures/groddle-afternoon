@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
-import { GENTLE_ISLAND, ISLAND_ARRIVAL } from '../public/js/newxp.js?v=abbf0ed6';
+import { GENTLE_ISLAND, ISLAND_ARRIVAL } from '../public/js/newxp.js?v=eedf8fe3';
 import { loadStreetDataFromFs } from '../public/js/street-loader.js?v=23555e53';
 import { isStandable, platformYAt, platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
 

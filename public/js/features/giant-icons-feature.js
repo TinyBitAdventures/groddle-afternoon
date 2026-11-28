@@ -61,7 +61,7 @@ import { priceText } from '../price.js?v=35cd2331';
 import { addItem, countItem, ensureItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
-import { emblemCostFor } from '../shrines.js?v=4ff3e019';
+import { emblemCostFor } from '../shrines.js?v=be0b0a16';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { landingY } from '../walk-surface.js?v=76def2f6';
 import {
@@ -110,7 +110,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=4f4ade68';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=6ae20bdc';
-import { homesFeature } from './homes-feature.js?v=7c7ee524';
+import { homesFeature } from './homes-feature.js?v=86da0fc9';
 import { standOnFeet } from '../sprite-feet.js?v=18e517a6';
 
 export const ICONS_FEATURE_ID = 'giant-icons';

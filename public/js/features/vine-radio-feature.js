@@ -36,7 +36,7 @@ import { textureFromUrl } from '../textures.js?v=29f80b6a';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { SIDE_SHEET_IDS, bindTabs, selectTab } from '../ui/panel-shell.js?v=5efb38c6';
 import { homeStreetName, possessive, visitSceneTsid } from '../neighbours-mp.js?v=de82fd7d';
-import { visitorHomeScene } from './homes-feature.js?v=7c7ee524';
+import { visitorHomeScene } from './homes-feature.js?v=86da0fc9';
 import {
   PREVIEW_MS,
   RADIO_ART,

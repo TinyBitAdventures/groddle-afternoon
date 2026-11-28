@@ -233,14 +233,14 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=243cef7d';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=1e277f22';
 import { fadeInNewNear } from '../poof-fade.js?v=eeae10ff';
-import { projectApi } from './street-jobs-feature.js?v=c64a7987';
+import { projectApi } from './street-jobs-feature.js?v=e06912e8';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=bb722397';
-import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=bb7386f7';
+import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=a256355b';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
 import { renderHomeLocation } from '../home-shot-render.js?v=fc91430c';
 import { maxTextureSizeOf, sharpDeco, wantsHiresDecos } from '../deco-hires.js?v=34f36d77';
 import { SHARP_DECOS } from '../deco-sharp-list.js?v=7d615f20';
-import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=6ec0d8c0';
+import { resourceNodeStill, resourceNodesFeature } from './resource-nodes-feature.js?v=b8fc0749';
 import { patchesFeature, plotStill } from './patches-feature.js?v=b8149171';
 import { GROWN_TREE_LABELS, createPlot, growTree, plotLabel } from '../patches.js?v=54430bb9';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=6daa23a7';
@@ -283,7 +283,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=11f070be';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=df702ad8';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=c0db4904';
 import { pickFront } from '../pick.js?v=a43f94f8';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=f4be1a05';
 import { LANDSCAPE_VIEW_W, landscapeWindow, rowRange, soilTiles } from '../landscape-reach.js?v=2f2d7cb3';

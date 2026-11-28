@@ -5,7 +5,7 @@
 import { fetchRetry } from './js/load-retry.js?v=24823577';
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=d046197c';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=100f3193';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=3e229f79';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=e3f90bae';
 import { VENDOR_STAND_IN_LABEL, VENDOR_NAME_LABEL } from './js/street-spirits.js?v=8ff6ed59';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, rimsTraceParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=b37c63e0';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
@@ -35,12 +35,12 @@ import {
   cleanQuestMarkup,
   questDoneAt,
   paidRewardBits,
-} from './js/quests.js?v=f574d2e1';
+} from './js/quests.js?v=15aab2e3';
 // Quest copy is Flash htmlText: <b>/<i>/<br> drawn as formatting, the rest dropped, never innerHTML.
 import { locationLinkTarget, questRequirementText, renderQuestText, withQuestMarkup } from './js/quest-text.js?v=92213536';
 // G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
-import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=addcbc4a';
-import { FIRST_SKILL_QUEST_ID, acceptOffer, claimFirstSkillQuest, dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=cec1b5e9';
+import { dropSpiritRepeatOffers, SPIRIT_REPEAT_QUESTS } from './js/spirit-reminisce.js?v=76b4154a';
+import { FIRST_SKILL_QUEST_ID, acceptOffer, claimFirstSkillQuest, dropBootStarterQuests, questMoveNote, routesCounter, worldVerbQuestEvents, gardenPlotEvents, makingUnitQuestEvents, shrineDonationQuestEvents } from './js/quest-offers.js?v=36e610b5';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -141,7 +141,7 @@ import {
   qualificationVerb,
   requestLegalizeQualification,
   travelToGregarious,
-} from './js/legalize-it.js?v=b976dcb4';
+} from './js/legalize-it.js?v=64654863';
 import { HALL, HALL_DECOS, HALL_EXTRA_CHAIRS, HALL_OFFICE, HALL_QUESTIONS } from './js/bureaucratic-hall.js?v=29db1c45';
 import { STATION_X, stationArrival, stationScreen, surfaceStation } from './js/subway.js?v=ea6921ff';
 import { ALLEY, SHADY, drawAlley, inEnteredBox } from './js/quest-rooms/back-alley-set.js?v=42abd454';
@@ -450,7 +450,7 @@ import {
   resetAchievementCounter,
   purchaseAchievementUpdates,
   getAchievementProgress,
-} from './js/achievements.js?v=184f3714';
+} from './js/achievements.js?v=4af6091c';
 import {
   applyStreetVisit,
   topUpCompletists,
@@ -487,10 +487,10 @@ import {
   grantSkillWithPrereqs,
   canLearnSkill,
   listLearnedSkills,
-} from './js/skills.js?v=9f77da71';
-import { skillTitle, skillTreeCounts, skillTreeEntry, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=e4e6bc40';
+} from './js/skills.js?v=76dfcf84';
+import { skillTitle, skillTreeCounts, skillTreeEntry, spendEmblemForSkill, studyPillName } from './js/skill-tree.js?v=81ca6fe8';
 import { CARD_ART_LAYERS } from './js/imagination-data.js?v=4a85e7fe';
-import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=95118de5';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js?v=e1d891c3';
 import {
   createBuffState,
   applyBuff,
@@ -511,7 +511,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=838b7598';
+} from './js/buffs.js?v=fc742885';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js?v=e311b45c';
 import {
   loadContentCatalogs,
@@ -520,7 +520,7 @@ import {
   getAchievementCatalog,
   getSkillCatalog,
   getBuffCatalog,
-} from './js/content-catalogs.js?v=d30c3e0f';
+} from './js/content-catalogs.js?v=b6a173ae';
 import {
   createInventory,
   useItem,
@@ -539,7 +539,7 @@ import {
   isToolItem,
 } from './js/inventory.js?v=3be7988a';
 import { createStuckAsker } from './js/stuck-prompt.js?v=9108f8ac';
-import { stockUseVerb } from './js/stock-use.js?v=79e103c1';
+import { stockUseVerb } from './js/stock-use.js?v=a73b245b';
 import { TROPHY_FIND_TEXT, trophyOfBadge } from './js/home-trophies.js?v=649b111e';
 import { HELD_AT_ONCE, HELD_AT_ONCE_TEXT } from './js/collection-trophies.js?v=e45565a7';
 import { PACK_COPY, bagSortIcon, bagSortText, isBagClass, isElementClass, layoutHeld, ownBagLabel, unitRankAt } from './js/pack-slots.js?v=38e4aea5';
@@ -571,7 +571,7 @@ import {
   inspectPlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=0bd0e294';
+} from './js/player-save.js?v=e68db82d';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -587,7 +587,7 @@ import {
   isHomePlaceTsid,
   setHomeHouse,
 } from './js/homes.js?v=4f4ade68';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=df702ad8';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=c0db4904';
 import { pcLabel, setPcLabelSource } from './js/pc-label.js?v=d54da634';
 import {
   MAIL_COMPANIONS,
@@ -1003,7 +1003,7 @@ import {
   formatSpeedUpTime,
   learnFasterOpen,
   learnFasterSummary,
-} from './js/shrines.js?v=4ff3e019';
+} from './js/shrines.js?v=be0b0a16';
 import { shrineSheet, shrineVariantFor } from './js/shrine-variants.js?v=adf2ba15';
 import { giantDisplayName } from './js/giant-names.js?v=0e295891';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=b1bafb71';
@@ -1204,7 +1204,7 @@ import { filterText } from './js/word-filter.js?v=9a7a7ebb'; // the remake's own
 import { mountStartStreet } from './js/start-street.js?v=7d8ce49c'; // #349: the start card names the save's street
 import { arrangeMapCards, fitMapExtras } from './js/map-extras.js?v=16e261b1'; // the Map's Shortcuts
 // The interface skin (js/classic/ui-mode.js) sets <html data-ui> as it loads: before main(), so before the boot cover lifts.
-import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=da590f6e';
+import { installInterfaceSettings } from './js/classic/classic-prefs.js?v=ceed2f41';
 import { installWhatsNewWindow } from './js/ui/whats-new-window.js?v=84fae9bc';
 import { noteWhatsNewBootEnd, offerWhatsNewFallback } from './js/whats-new.js?v=988ec58d';
 import { standOnFeet, anchorBottomCentre } from './js/sprite-feet.js?v=18e517a6';

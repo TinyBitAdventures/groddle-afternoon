@@ -28,7 +28,7 @@ import {
   purchaseQualification,
   requestLegalizeQualification,
   travelToGregarious,
-} from '../public/js/legalize-it.js?v=b976dcb4';
+} from '../public/js/legalize-it.js?v=64654863';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

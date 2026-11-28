@@ -6,12 +6,15 @@
  * The skill catalog also gets Better Learning I to V (better-learning.js,
  * register G62): 2011 skills the late inc_data_skills.js no longer has.
  * The quest catalog also gets our own quests (G1245: Tunes for Crabs, the Vine
- * Radio's, js/vine-radio.js withOursQuests); quests.json keeps Tiny Speck's only.
+ * Radio's, js/vine-radio.js withOursQuests; Back to Gentle Island, a skipped
+ * tutorial played later, js/newxp-replay.js withReplayQuest); quests.json keeps
+ * Tiny Speck's only.
  */
 
 import { fetchRetry } from './load-retry.js?v=24823577';
 import { withBetterLearning } from './better-learning.js?v=044ff9ff';
 import { withOursQuests } from './vine-radio.js?v=5436aa09';
+import { withReplayQuest } from './newxp-replay.js?v=157997fb';
 
 const CACHE = {
   quests: null,
@@ -34,7 +37,7 @@ export async function loadContentCatalogs(fetchImpl = globalThis.fetch && fetchR
     if (!res.ok) throw new Error(`Failed to load content/${name}.json: ${res.status}`);
     return res.json();
   };
-  CACHE.quests = withOursQuests(await load('quests'));
+  CACHE.quests = withReplayQuest(withOursQuests(await load('quests')));
   CACHE.achievements = await load('achievements');
   CACHE.skills = withBetterLearning(await load('skills'));
   CACHE.buffs = await load('buffs');
@@ -54,7 +57,7 @@ export async function loadContentCatalogs(fetchImpl = globalThis.fetch && fetchR
 export async function loadContentCatalogsFromDir(dir) {
   const { readFile } = await import('node:fs/promises');
   const { join } = await import('node:path');
-  CACHE.quests = withOursQuests(JSON.parse(await readFile(join(dir, 'quests.json'), 'utf8')));
+  CACHE.quests = withReplayQuest(withOursQuests(JSON.parse(await readFile(join(dir, 'quests.json'), 'utf8'))));
   CACHE.achievements = JSON.parse(await readFile(join(dir, 'achievements.json'), 'utf8'));
   CACHE.skills = withBetterLearning(JSON.parse(await readFile(join(dir, 'skills.json'), 'utf8')));
   CACHE.buffs = JSON.parse(await readFile(join(dir, 'buffs.json'), 'utf8'));

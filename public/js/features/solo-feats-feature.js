@@ -143,7 +143,7 @@ import {
 } from '../feat-owed.js?v=ac100a70';
 import { gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { GIANTS } from '../shrines.js?v=4ff3e019';
+import { GIANTS } from '../shrines.js?v=be0b0a16';
 import {
   MP_DONATIONS,
   MP_TEXT,

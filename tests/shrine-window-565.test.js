@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GIANTS } from '../public/js/shrines.js?v=4ff3e019';
+import { GIANTS } from '../public/js/shrines.js?v=be0b0a16';
 import { buildEncyclopediaIndex, encyclopediaPage } from '../public/js/encyclopedia-links.js?v=1dde87cc';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

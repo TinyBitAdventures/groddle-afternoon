@@ -10,7 +10,7 @@
  *   questRewardSummary(rewards, { multiplier }) award-screen lines without applying anything
  */
 
-import { getQuestCatalog } from './content-catalogs.js?v=d30c3e0f';
+import { getQuestCatalog } from './content-catalogs.js?v=b6a173ae';
 import { questRewardModifier } from './imagination-effects.js?v=70169933';
 import { gainMetabolic } from './metabolics.js?v=48f784bf';
 import { giantDisplayName } from './giant-names.js?v=0e295891';

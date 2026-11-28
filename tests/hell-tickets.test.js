@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=d30c3e0f';
-import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
-import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=cec1b5e9';
+import { loadContentCatalogsFromDir, resetContentCatalogs, getQuestCatalog } from '../public/js/content-catalogs.js?v=b6a173ae';
+import { createQuestState } from '../public/js/quests.js?v=15aab2e3';
+import { classifyQuests, eventCounters, isEventEmitted, questRoutingReport, requirementRoute } from '../public/js/quest-offers.js?v=36e610b5';
 import { HELL_LOCATION, HELL_QUESTS, createHellState, croak } from '../public/js/hell.js?v=0dba5774';
 import { PANKA_TSID, HELL_BAR_TSID } from '../public/js/hell-bar.js?v=be0cf101';
 import {
@@ -27,12 +27,12 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js?v=33bd7064';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=b41ee67c';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=513a0a31';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=19e4c55f';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=b3f60a84';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=e1da24cc';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=cb6fe38a';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=17c6ef48';
-import { FEATURES } from '../public/js/features/index.js?v=3e229f79';
+import { FEATURES } from '../public/js/features/index.js?v=e3f90bae';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = join(spike, 'public/assets/content');
