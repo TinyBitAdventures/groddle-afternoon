@@ -5898,13 +5898,13 @@
   },
   {
    "id": "shared-quarter-lots",
-   "title": "Marylpole Mount Quarter, 1100 block: a shared street of free player lots, each showing its owner's home-street house and leading to their home street",
+   "title": "Marylpole Mount Quarter, 1100 and 1200 blocks: shared streets of free player lots, each showing its owner's home-street house and leading to their home street",
    "kind": "behaviour",
    "status": "kept",
    "where": [
     {
      "file": "public/js/quarter.js",
-     "symbol": "QUARTER, judgeClaim, quarterStreet"
+     "symbol": "QUARTER_BLOCKS, QUARTER, judgeClaim, quarterStreet"
     },
     {
      "file": "public/js/features/quarter-feature.js",
@@ -5916,10 +5916,38 @@
     },
     {
      "file": "public/assets/streets/GQRMM1100BLOCK1.json"
+    },
+    {
+     "file": "public/assets/streets/GQRMM1200BLOCK1.json"
     }
    ],
-   "why": "Players missed Glitch's pre-2012 quarter houses (G1186). No quarter street survives (made at run time, deleted in 2012), so the block is laid on Whipping Cross Crossing's CC0 lot street. Kept Glitch's: the '<Name> Quarter, <x><y>00 block' and '<x><y>## <Name> Quarter' names (groups/quarter.js), the QUARTER signpost (SignpostView.as), one house per player and none with an owner (pols_canBuy), the familiar's For Sale words, the For Sale sign. Ours: a lot is free (no currants, no papers), a front is the owner's G796 house leading to their home street through the G328 visit (no second house, no interior), giving a lot up puts it back on sale (Glitch sold back at 80%), the parent street and block number, solo shows only your own lot, and the claim and refusal lines where Glitch had none.",
-   "ruling": "Austin 2026-11-23 (G1186): option A, a new shared street of house lots, one meadow block of 10 to 12 lots; free, one lot per player, front to the home street, one quarter for everyone, solo own lot only (the note's defaults)",
+   "why": "Players missed Glitch's pre-2012 quarter houses (G1186). No quarter street survives (made at run time, deleted in 2012), so the 1100 block is laid on Whipping Cross Crossing's CC0 lot street and the 1200 block (2026-11-27) on Herring Bone Hatch's, its nine meadow houses with the first again for the tenth. Kept Glitch's: the '<Name> Quarter, <x><y>00 block' and '<x><y>## <Name> Quarter' names (groups/quarter.js), the QUARTER signpost (SignpostView.as), one house per player and none with an owner (pols_canBuy), the familiar's For Sale words, the For Sale sign. Ours: a lot is free (no currants, no papers), a front is the owner's G796 house leading to their home street through the G328 visit (no second house, no interior), giving a lot up puts it back on sale (Glitch sold back at 80%), the parent street and block numbers, the QUARTER signpost's blocks as a menu (the client's grid dialog), solo shows only your own lot, and the claim and refusal lines where Glitch had none.",
+   "ruling": "Austin 2026-11-23 (G1186): option A, a new shared street of house lots, one meadow block of 10 to 12 lots; free, one lot per player, front to the home street, one quarter for everyone, solo own lot only (the note's defaults); Austin 2026-11-27: open a second block (1200), one lot per player across blocks, no block opens by itself when one fills",
+   "rows": [
+    "G1186"
+   ]
+  },
+  {
+   "id": "home-quarter-arm",
+   "title": "The home street's signpost has an arm to its owner's Quarter lot, on the top row pointing right, opposite Back to Ur",
+   "kind": "UI",
+   "status": "kept",
+   "where": [
+    {
+     "file": "public/js/features/home-street-mp-feature.js",
+     "symbol": "drawQuarterArm"
+    },
+    {
+     "file": "public/js/features/quarter-feature.js",
+     "symbol": "addQuarterArm, tickSoloArm, quarterGo"
+    },
+    {
+     "file": "public/js/quarter.js",
+     "symbol": "homeArm, lotArrival"
+    }
+   ],
+   "why": "Glitch's 2012 home streets replaced the quarters (locations/home.js: five neighbour arms, no house elsewhere), so no home street ever pointed at a quarter house. Ours: when the street's owner holds a Quarter lot, Tiny Speck's signpost arm on the post's top row pointing right, opposite Back to Ur, with the lot's name ('1105 Marylpole Mount Quarter', generate_pol_label); it takes the owner or a visitor to that block, standing at the lot. The five friends' arms stay as they were; its number key comes after theirs. Online on the friends' signpost; solo for your own lot, beside Back to Ur.",
+   "ruling": "Austin 2026-11-27: add a signpost arm from a player's home street to their quarter lot, keep all five friends' arms",
    "rows": [
     "G1186"
    ]

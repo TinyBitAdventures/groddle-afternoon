@@ -440,6 +440,10 @@
     "stand-in: * West's pit (js/cave-pit.js, G527): our own stand-in for its lost": "teleporter-stand-ins"
   },
   "public/js/features/home-street-mp-feature.js": {
+    "invented: street's quarter arm (ours, Austin 2026-11-27; inventions home-quarter-arm): when": "home-quarter-arm",
+    "ours: * Ours (Austin 2026-11-27): when the owner holds a lot": "home-quarter-arm",
+    "ours: * The home street's quarter arm (ours, Austin 2026-11-27; inventions": "home-quarter-arm",
+    "ours: // The owner's quarter lot (ours, Austin 2026-11-27): the top row's other arm,": "home-quarter-arm",
     "ours: home). The posted note comes back to the pack (ours: a pack item keeps no note).": "ours-home-street"
   },
   "public/js/features/homes-feature.js": {
@@ -550,6 +554,9 @@
     "stand-in: // moveAvatar stand-in: ease the avatar to the trigger's centre (a": "not-an-invention"
   },
   "public/js/features/quarter-feature.js": {
+    "invented: street's quarter arm (ours, Austin 2026-11-27; inventions home-quarter-arm): an arm": "home-quarter-arm",
+    "ours: * The home street's quarter arm (ours, Austin 2026-11-27; inventions": "home-quarter-arm",
+    "ours: * The home street's quarter arm (ours, home-street-mp-feature): to the block of": "home-quarter-arm",
     "remake-own: lots (register G1186; rules, sources and the remake's choices": "shared-quarter-lots"
   },
   "public/js/features/quest-instances-feature.js": {
@@ -1112,10 +1119,15 @@
   "public/js/quarter.js": {
     "glitch-had-none: * Glitch's words, and the remake's where Glitch had none.": "shared-quarter-lots",
     "invented: * The remake's own (inventions:": "shared-quarter-lots",
+    "invented: * right, opposite Back to Ur (inventions:": "home-quarter-arm",
     "made-up: - Solo: your own lot and the For Sale houses, no made-up": "shared-quarter-lots",
     "ours: 'Someone else has just claimed that lot.', // ours": "shared-quarter-lots",
     "ours: 'The Quarter can not be reached right now.', // ours": "shared-quarter-lots",
+    "ours: (name, label) => `${name}'s lot, ${label}`, // ours": "home-quarter-arm",
+    "ours: * The home street's quarter arm (ours, Austin 2026-11-27): for the owner's lot ({": "home-quarter-arm",
+    "ours: // The home street's quarter arm (ours): its verb and tip, the arm's words being the": "home-quarter-arm",
     "ours: a moment, the Quarter is still answering.', // ours": "shared-quarter-lots",
+    "ours: armVerb: (label) => `Go to ${label}`, // ours": "home-quarter-arm",
     "ours: claimVerb: 'Claim this lot', // ours (Glitch: \"Purchase location for N": "shared-quarter-lots",
     "ours: for sale! It is free, one lot per player.', // ours": "shared-quarter-lots",
     "ours: gave up ${label}. It is for sale again.`, // ours": "shared-quarter-lots",

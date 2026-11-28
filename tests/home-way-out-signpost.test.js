@@ -18,7 +18,7 @@ import { join } from 'node:path';
 import { getVerbsFor } from '../public/content.js?v=da2b8879';
 import { SIGN_FIRST_ARM_Y, SIGN_POST_W, SIGN_SCALE } from '../public/js/street-render.js?v=c463d2c6';
 import { WAY_OUT_ARM, WAY_OUT_HIT, wayOutTarget } from '../public/js/features/homes-feature.js?v=5049e51c';
-import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=1259acd0';
+import { FRIENDS_HIT_H } from '../public/js/features/home-street-mp-feature.js?v=9dd32d91';
 import {
   SIGNPOST_POST_HALF,
   createCultivationState,
@@ -230,8 +230,9 @@ describe('online: a visitor\'s way out and the owner\'s', () => {
 
   it('the owner\'s street online: the same post, the friends\' arms hung on it', () => {
     const own = read('js/features/home-street-mp-feature.js');
-    assert.match(own, /if \(own\.neighbors\) drawSignpost\(signpostX\(layout\), STREET_GROUND_Y, own\.neighbors, \{ owner: true \}\);/);
-    assert.match(own, /drawSignpost\(signpostX\(layout\), STREET_GROUND_Y, signpostArms\(visit\.data\.signpost\)\.filter\(Boolean\), \{ owner: false \}\);/);
+    // The owner's quarter lot rides along for the top row's other arm (tests/quarter-home-arm.test.js).
+    assert.match(own, /if \(own\.neighbors\) drawSignpost\(signpostX\(layout\), STREET_GROUND_Y, own\.neighbors, \{ owner: true, held: own\.quarter, ownerName: myName\(\) \}\);/);
+    assert.match(own, /drawSignpost\(signpostX\(layout\), STREET_GROUND_Y, signpostArms\(visit\.data\.signpost\)\.filter\(Boolean\), \{ owner: false, held: normalizeHeld\(visit\.data\.quarter\), ownerName: visit\.name \|\| '' \}\);/);
     assert.match(read('js/features/homes-feature.js'), /classId: 'home_return_marker',/);
   });
 });

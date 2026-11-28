@@ -10,6 +10,9 @@
  *   finished the tutorial); the fifth friend sets signpost:num_neighbors to
  *   5, the Good Neighbour badge. Anyone on the street (you, or a visitor)
  *   goes to an arm's home through the visit flow (neighbours-mp-feature).
+ *   Ours (Austin 2026-11-27): when the owner holds a lot in the Quarter, its
+ *   name on the post's top row pointing right, opposite Back to Ur; it takes
+ *   anyone there to that block, standing at the lot (drawQuarterArm).
  * - Note Poles (items/note_pole.js): recipe 303 joins the Construction Tool
  *   in multiplayer only; place one on your home street or in your house,
  *   post a note on it, customize its pole, sign and size, pick it up.
@@ -47,7 +50,7 @@
  * never runs any of it, and the recipe is added only in multiplayer.
  *
  * QA: window.groddleHomeStreet in multiplayer; canvas data hsSignpost
- * (names on the arms), hsPoles (count:withNotes), hsTags (pieces on sale
+ * (names on the arms), hsQuarterArm (the quarter arm's words, '' for none), hsPoles (count:withNotes), hsTags (pieces on sale
  * here), hsPiles, hsRestores (shared restoration ids here), hsLast.
  */
 
@@ -64,6 +67,8 @@ import { PROTO_DEPLETED_ART } from '../home-proto-art.js?v=9309e9f3';
 import { NOTE_POLE_CONTAINERS, NOTE_POLE_PARTS, NOTE_POLE_SIGN_Y } from '../note-pole-art.js?v=fbda2f8a';
 import { textureFromUrl } from '../textures.js?v=b8e38103';
 import { addSignBoard, signArmWidth, signLabel } from '../street-render.js?v=c463d2c6';
+import { addQuarterArm } from './quarter-feature.js?v=88a82f25';
+import { QUARTER_TEXT, normalizeHeld } from '../quarter.js?v=e278522a';
 import { openNotePicker, openNoteView } from '../note-view.js?v=c512b345';
 import { homeStreetName, insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=0896a4d7';
 import { BACK_YARD_GROUND_Y, SIGN_PROMPT_LIFT, STREET_GROUND_Y, homesFeature, visitorHomeState } from './homes-feature.js?v=5049e51c';
@@ -231,7 +236,7 @@ function createSession(engine, client) {
   const site = createSite();
   const slice = normalizeHomeStreetSlice(savedSlice);
   /** My own home: the post's arms, my pieces on sale, my piles, the restorations I sent tokens for. */
-  const own = { neighbors: null, listed: new Map(), piles: [], tokens: new Map(), loading: false, loadedAt: 0, towers: [] };
+  const own = { neighbors: null, quarter: null, listed: new Map(), piles: [], tokens: new Map(), loading: false, loadedAt: 0, towers: [] };
   // G795: how often the site was asked for my floor's token since it started (towerFloorOwn).
   const towerAsked = new Map();
   /** G778: worn-out cultivations still waiting for their token: wire id -> times asked. */
@@ -255,6 +260,7 @@ function createSession(engine, client) {
 
   function publish() {
     engine.setData?.('hsSignpost', (where() === 'visit' ? visit?.data?.signpost || [] : own.neighbors || []).map((n) => n.name).join(','));
+    engine.setData?.('hsQuarterArm', drawn.signpost?.quarter?.label || '');
     const poles = currentPoles();
     engine.setData?.('hsPoles', `${poles.length}:${poles.filter((p) => p.note).length}`);
     engine.setData?.('hsTags', [...drawn.sales.values()].filter((s) => s.listing).map((s) => `${s.uid}=${s.listing.price}`).join(','));
@@ -332,7 +338,7 @@ function createSession(engine, client) {
    * home street's one signpost. GATESIGN2: homes-feature makeHomeSignpost draws the post (and its
    * top arm, Back to Ur) at this same x on your street and on a visit; these arms hang below it.
    */
-  function drawSignpost(x, groundY, neighbors, { owner }) {
+  function drawSignpost(x, groundY, neighbors, { owner, held = null, ownerName = '' }) {
     const { PIXI } = engine;
     if (!PIXI || !engine.entityLayer) return;
     drop(drawn.signpost);
@@ -368,6 +374,8 @@ function createSession(engine, client) {
       // own sign; a click or tap on it (or its number at the post, under Back to Ur's 1) goes to that home.
       addSignBoard(PIXI, box, arm, { width: w, left, key: i + 2, arm: board, label, verbId: `sign_go_${n.position}`, tip: T.goVerb(n.name) });
     });
+    // The owner's quarter lot (ours, Austin 2026-11-27): the top row's other arm, pointing right.
+    const quarter = drawQuarterArm(PIXI, box, holder, held, arms.length + 2, ownerName);
     // The post under the arms (and between them): its menu, with Edit your signpost for the owner. It
     // stops under the top arm (Back to Ur, homes-feature's target).
     box.addChild(hitBox(PIXI, -70, -FRIENDS_HIT_H + 2, 140, FRIENDS_HIT_H));
@@ -378,7 +386,22 @@ function createSession(engine, client) {
     engine.entityLayer.addChild(box);
     const subtitle = arms.length ? arms.map((n) => n.name).join(', ') : T.noArms;
     // arms: the street map's tip lists them (street-minimap sceneSignMarks).
-    drawn.signpost = { target: addTarget({ classId: CLASS_SIGNPOST, label: T.signpost, subtitle, sprite: box, state: { owner, arms: arms.map((n) => n.name) } }), neighbors: arms, owner };
+    drawn.signpost = { target: addTarget({ classId: CLASS_SIGNPOST, label: T.signpost, subtitle, sprite: box, state: { owner, arms: arms.map((n) => n.name) } }), neighbors: arms, owner, quarter };
+  }
+
+  /**
+   * The home street's quarter arm (ours, Austin 2026-11-27; inventions home-quarter-arm): when the
+   * street's owner holds a lot in the Quarter (the site's `quarter`, src/Quarter.php held), an arm
+   * on the post's top row pointing right, opposite Back to Ur, with the lot's name ("1105 Marylpole
+   * Mount Quarter", generate_pol_label), Tiny Speck's arm as every other. The friends' five arms
+   * hang below as before (locations/home.js addNeighbor). Its number comes after the friends'.
+   * Taking it goes to that block, standing at the lot (quarter-feature quarterGo), for the owner
+   * and a visitor alike. Null when there is no lot.
+   */
+  function drawQuarterArm(PIXI, box, holder, held, key, ownerName) {
+    const arm = addQuarterArm(PIXI, box, holder, held, { key, verbId: 'sign_quarter' });
+    if (!arm) return null;
+    return { ...arm, tip: ownerName ? QUARTER_TEXT.armTip(ownerName, arm.label) : arm.label };
   }
 
   /** note_pole.as: the pole, the sign and (posted) the note, from the pole's base. */
@@ -531,7 +554,7 @@ function createSession(engine, client) {
     if (w === 'street') {
       const st = homesFeature._state?.();
       const layout = homeStreetLayout(st?.cult);
-      if (own.neighbors) drawSignpost(signpostX(layout), STREET_GROUND_Y, own.neighbors, { owner: true });
+      if (own.neighbors) drawSignpost(signpostX(layout), STREET_GROUND_Y, own.neighbors, { owner: true, held: own.quarter, ownerName: myName() });
     }
     drawPoles();
     if (w === 'house') {
@@ -564,6 +587,8 @@ function createSession(engine, client) {
     try {
       const [street, sales] = await Promise.all([site.street(me()), site.sales()]);
       own.neighbors = signpostArms(street?.signpost).filter(Boolean);
+      // The quarter arm: my lot on any block (src/HomeStreet.php `quarter`), else none.
+      own.quarter = normalizeHeld(street?.quarter);
       own.listed = normalizeListings(sales?.listed);
       own.piles = normalizePiles(sales?.piles);
       own.loadedAt = Date.now();
@@ -763,7 +788,7 @@ function createSession(engine, client) {
     drawn.protos = new Map();
     if (visit.room === 'street') {
       const layout = homeStreetLayout(visit.state.cult);
-      drawSignpost(signpostX(layout), STREET_GROUND_Y, signpostArms(visit.data.signpost).filter(Boolean), { owner: false });
+      drawSignpost(signpostX(layout), STREET_GROUND_Y, signpostArms(visit.data.signpost).filter(Boolean), { owner: false, held: normalizeHeld(visit.data.quarter), ownerName: visit.name || '' });
     }
     drawPoles();
     if (visit.room === 'interior') {
@@ -840,6 +865,8 @@ function createSession(engine, client) {
       // which outlives the trip home (left() runs on a street clear, before the home's tsid is set).
       const here = w === 'visit' ? visit.owner : 0;
       const out = arms.map((n) => ({ id: `sign_go_${n.position}`, label: T.goVerb(n.name), tooltip: homeStreetName(n.name), enabled: n.id !== here, reason: '' }));
+      const q = drawn.signpost?.quarter;
+      if (q) out.push({ id: 'sign_quarter', label: QUARTER_TEXT.armVerb(q.label), tooltip: q.tip, enabled: true, reason: '' });
       if (w === 'street') out.push({ id: 'sign_edit', label: T.editVerb, tooltip: T.editTip, enabled: true, reason: '' });
       return out;
     }
@@ -865,6 +892,11 @@ function createSession(engine, client) {
     if (verbId.startsWith('sign_go_')) {
       const n = (drawn.signpost?.neighbors || []).find((a) => `sign_go_${a.position}` === verbId);
       if (n) engine.query?.('visitHome', n.id, n.name, engine);
+      return true;
+    }
+    if (verbId === 'sign_quarter') {
+      const q = drawn.signpost?.quarter;
+      if (q && engine.query?.('quarterGo', q.held, engine) == null) notice(QUARTER_TEXT.off, 2600);
       return true;
     }
     if (verbId === 'sign_edit') return openSignpost(), true;
