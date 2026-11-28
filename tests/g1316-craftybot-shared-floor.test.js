@@ -34,8 +34,8 @@ import {
   setCraftybotSpecs,
   setJobTotal,
   setPaused,
-} from '../public/js/craftybot.js?v=625916ac';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=a25f3ab9';
+} from '../public/js/craftybot.js?v=4efdfd85';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=5a5df938';
 import { homesFeature } from '../public/js/features/homes-feature.js?v=efa4690f';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
@@ -219,7 +219,7 @@ describe('the rules: a fetch the server answers later', () => {
   });
 
   it('a Fuel Cell on the shared floor: Add More walks there and the cell fills the tank when it comes', async () => {
-    const { autoRefuel } = await import('../public/js/craftybot.js?v=625916ac');
+    const { autoRefuel } = await import('../public/js/craftybot.js?v=4efdfd85');
     const stacks = [{ id: 'f', cls: 'fuel_cell', count: 2, x: 230, shared: true }];
     const asks = [];
     const world = sharedWorld(stacks, asks);
@@ -311,6 +311,108 @@ describe('a later job is never left behind a finished one (re-review of G1316, 2
     noticeSourceChange(bot);
     assert.ok(runUntil(bot, world, 61_500, () => apple(bot) === 1, { maxMs: 120_000, stepMs: 200 }), 'the Apple');
     assert.equal(bot.queue.find((r) => r.item === 'orange').crafted, 0, 'the paused Orange waits');
+  });
+});
+
+describe('a replan never makes a job\'s units twice (third review of G1316, 2026-11-27)', () => {
+  const RECIPE = { apple: 3, plum: 1, orange: 3, lemon: 4 }; // Cherries each (catalog_craftytasking.js)
+
+  /** A floor of Cherries and the machine that keeps count of every Cherry and every made unit. */
+  function ledgerWorld(cherries) {
+    const stacks = [{ id: 'c0', cls: 'cherry', count: cherries, x: 1700 }, { id: 'm', cls: 'fruit_changing_machine', count: 1, x: 1708 }];
+    const given = {};
+    let n = 0;
+    const world = {
+      inLocation: true,
+      count: (cls) => stacks.filter((x) => String(cls).split('|').includes(x.cls)).reduce((a, x) => a + x.count, 0),
+      find: (cls) => stacks.find((x) => String(cls).split('|').includes(x.cls) && x.count > 0) || null,
+      take: (id, cls, k) => { const x = stacks.find((y) => y.id === id); if (!x) return 0; const t = Math.min(k, x.count); x.count -= t; return t; },
+      wear: () => ({ broke: false }),
+      drop: (cls, k, x) => stacks.push({ id: `d${(n += 1)}`, cls, count: k, x: x ?? 1700 }),
+      give: (cls, k) => { given[cls] = (given[cls] || 0) + k; },
+      imagination: () => {}, say: () => {}, sound: () => {}, stopSound() {}, fuelCell: () => null,
+    };
+    return { world, stacks, given, added: { cherry: cherries }, addCherries(k) { stacks.push({ id: `c${(n += 1)}`, cls: 'cherry', count: k, x: 1600 }); this.added.cherry += k; } };
+  }
+
+  /** Every Cherry is on the floor, held by a job, or inside a made unit; and no job has made more than its total. */
+  function audit(bot, L, label) {
+    for (const row of bot.queue) {
+      const made = row.crafted + (row.holder?.general?.[row.item]?.count || 0);
+      assert.ok(made <= row.count, `${label}: ${row.item} made ${made} of ${row.count}`);
+    }
+    let held = 0;
+    const units = { ...L.given };
+    for (const row of bot.queue) {
+      held += row.holder?.general?.cherry?.count || 0;
+      for (const h of ['general', 'complete']) for (const [c, v] of Object.entries(row.holder?.[h] || {})) if (RECIPE[c]) units[c] = (units[c] || 0) + v.count;
+    }
+    const floor = L.world.count('cherry');
+    for (const st of L.stacks) if (RECIPE[st.cls]) units[st.cls] = (units[st.cls] || 0) + st.count;
+    const inUnits = Object.entries(units).reduce((a, [c, k]) => a + k * RECIPE[c], 0);
+    assert.equal(floor + held + inUnits, L.added.cherry, `${label}: Cherries floor ${floor} + held ${held} + in ${JSON.stringify(units)} vs ${L.added.cherry} put down`);
+  }
+
+  it('the reviewer\'s repro: Apple paused between its craft and its finish, the Plum made, then a Kick: one Apple', () => {
+    const L = ledgerWorld(4);
+    const bot = createBot(createCraftybotState(), 1708, 'interior', 0);
+    let t = 1500;
+    advanceCraftybot(bot, t, L.world);
+    setJobTotal(bot, L.world, 'apple', 1);
+    setJobTotal(bot, L.world, 'plum', 1);
+    t = runUntil(bot, L.world, t, () => Boolean(bot.queue[0].holder.general?.apple?.count), { stepMs: 50 });
+    assert.ok(t, 'the Apple is made, not yet finished');
+    setPaused(bot, L.world, 'apple', true);
+    runUntil(bot, L.world, t, () => false, { maxMs: 40_000 });
+    L.addCherries(6);
+    noticeSourceChange(bot);
+    runUntil(bot, L.world, t + 40_000, () => false, { maxMs: 60_000 });
+    assert.equal(bot.queue[1].crafted, 1, 'the Plum');
+    kick(bot, L.world);
+    runUntil(bot, L.world, t + 100_000, () => false, { maxMs: 60_000 });
+    assert.equal(bot.queue[0].crafted, 1, 'one Apple, not two');
+    assert.equal(bot.queue[0].holder.complete.apple.count, 1, 'Collect 1');
+    assert.equal(L.world.count('cherry'), 6, 'no Cherries used for an Apple already made');
+    audit(bot, L, 'repro');
+  });
+
+  it('property: pause, resume, Kick, reload, new stacks, Collect and raised totals never make more than a job\'s total, and use exactly the recipe for what is made', () => {
+    let seed = 753;
+    const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+    const pick = (a) => a[Math.floor(rnd() * a.length)];
+    for (let run = 0; run < 80; run += 1) {
+      const L = ledgerWorld(Math.floor(rnd() * 12));
+      let bot = createBot(createCraftybotState(), 1708, 'interior', 0);
+      let t = 1500;
+      advanceCraftybot(bot, t, L.world);
+      const jobs = [...new Set([pick(Object.keys(RECIPE)), pick(Object.keys(RECIPE)), pick(Object.keys(RECIPE))])];
+      for (const j of jobs) setJobTotal(bot, L.world, j, 1 + Math.floor(rnd() * 3));
+      const log = [];
+      for (let step = 0; step < 25; step += 1) {
+        const op = pick(['advance', 'advance', 'advance', 'pause', 'pauseMid', 'resume', 'kick', 'reload', 'stack', 'collect', 'raise']);
+        const row = bot.queue.length ? pick(bot.queue) : null;
+        log.push(op + (row ? `:${row.item}` : ''));
+        if (op === 'advance') {
+          const until = t + 500 + Math.floor(rnd() * 15_000);
+          for (; t < until; t += 250) advanceCraftybot(bot, t, L.world);
+        } else if (op === 'pauseMid') {
+          // Run on until a job holds what it made but has not finished it, and pause it there.
+          const mid = () => bot.queue.find((r) => r.holder?.general?.[r.item]?.count > 0);
+          for (const until = t + 30_000; t < until && !mid(); t += 50) advanceCraftybot(bot, t, L.world);
+          if (mid()) setPaused(bot, L.world, mid().item, true);
+        } else if (op === 'pause' && row) setPaused(bot, L.world, row.item, true);
+        else if (op === 'resume' && row) setPaused(bot, L.world, row.item, false);
+        else if (op === 'kick') kick(bot, L.world);
+        else if (op === 'reload') bot = normalizeCraftybotState(serializeCraftybotState(bot));
+        else if (op === 'stack') { L.addCherries(1 + Math.floor(rnd() * 6)); noticeSourceChange(bot); }
+        else if (op === 'collect' && row && row.crafted > 0) collectJob(bot, L.world, row.item, row.crafted);
+        else if (op === 'raise' && row) setJobTotal(bot, L.world, row.item, row.count + 1);
+        audit(bot, L, `run ${run} [${log.join(' ')}]`);
+      }
+      kick(bot, L.world);
+      for (const end = t + 200_000; t < end; t += 500) advanceCraftybot(bot, t, L.world);
+      audit(bot, L, `run ${run} end [${log.join(' ')}]`);
+    }
   });
 });
 

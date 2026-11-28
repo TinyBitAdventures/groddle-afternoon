@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homeMachinesFeature, homeShotMachineSprite } from '../public/js/features/home-machines-feature.js?v=fd0b1195';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=a25f3ab9';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=5a5df938';
 import { MACHINE_ART_SHEETS } from '../public/js/machine-art-sheets.js?v=0fd6183b';
 import { INTERIOR } from '../public/js/home-decor.js?v=d84c139d';
 

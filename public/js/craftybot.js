@@ -865,6 +865,7 @@ function queueExecute(bot, world) {
   if (bot.active >= bot.queue.length) bot.active = 0;
   for (let k = 0; k < bot.queue.length; k += 1) {
     const row = bot.queue[bot.active];
+    if (row && !row.paused && !row.locked && !row.halted && row.iterator !== bot.iterator) settleMade(bot, world, bot.active);
     if (row && runnable(bot, bot.active) && row.iterator !== bot.iterator) {
       row.iterator = bot.iterator;
       return craftItemFromQueue(bot, world, bot.active);
@@ -1321,6 +1322,13 @@ function doCraftComplete(bot, world, i) {
     craftDone(bot, world, true);
     return;
   }
+  completeMade(bot, world, bot.active, cls, count);
+  craftDone(bot, world, true);
+}
+
+/** craft_complete's bookkeeping: `count` made items of the job move to its Collect holder. */
+function completeMade(bot, world, qi, cls, count) {
+  const row = bot.queue[qi];
   bot.crystalHp = Math.max(bot.crystalHp - count, 0);
   if (bot.crystalHp <= 0) {
     bot.crystals = Math.max(0, bot.crystals - 1);
@@ -1328,15 +1336,35 @@ function doCraftComplete(bot, world, i) {
     bot.stats.crystalsBurnt += 1;
     world.say?.(CRAFTYBOT_COPY.crystalBurnt);
   }
-  unhold(bot, bot.active, cls, count);
-  hold(bot, bot.active, cls, count, 'complete');
+  unhold(bot, qi, cls, count);
+  hold(bot, qi, cls, count, 'complete');
   const wasDone = queueDone(bot);
   row.crafted += count;
   bot.stats.crafted += count;
   world.crafted?.(cls, count);
   // #753 (ours): the last job of the queue just finished: one word, never one per job.
   if (!wasDone && queueDone(bot)) world.queueDone?.();
-  craftDone(bot, world, true);
+}
+
+/**
+ * G1316 third review: a job stopped between its craft and its craft_complete (paused, then another job
+ * run, then a Kick or a load) holds what it made in its working holder. A restart replans from the floor
+ * (craftItemFromQueue) and would make those units again: so before a job (re)starts, what it already made
+ * counts as made (up to what is left to make; any more goes down where the bot stands, as craftDropItems
+ * puts down what a job held).
+ */
+function settleMade(bot, world, qi) {
+  const row = bot.queue[qi];
+  const made = holding(bot, qi, row?.item);
+  if (!row || made <= 0) return;
+  const k = Math.min(made, Math.max(0, row.count - row.crafted));
+  if (k > 0) completeMade(bot, world, qi, row.item, k);
+  const extra = holding(bot, qi, row.item);
+  if (extra > 0) {
+    unhold(bot, qi, row.item, extra);
+    bot.dropped[row.item] = (bot.dropped[row.item] || 0) + extra;
+    world.drop(row.item, extra, bot.x);
+  }
 }
 
 /** Every job in the queue has made its total (#753). */

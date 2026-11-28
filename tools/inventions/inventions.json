@@ -6856,9 +6856,13 @@
     {
      "file": "public/js/craftybot.js",
      "symbol": "normalizeCraftybotState rescan"
+    },
+    {
+     "file": "public/js/craftybot.js",
+     "symbol": "settleMade"
     }
    ],
-   "why": "Glitch's queueExecute (npc_crafty_bot.js 2704-2722) stopped at a job that could not run, and every rescan and the Kick start at job 0 (queueSetActive(0)), so a finished job waiting for Collect kept every job behind it waiting for good; and a job's steps were replanned only in craftDone and on a new stack, so a Kick ran a stale plan. Ours: a scan passes such a job to the next one it has not run yet, once round the queue; a job starting replans from the floor as it is; a load of an idle bot with work to do looks over its queue again.",
+   "why": "Glitch's queueExecute (npc_crafty_bot.js 2704-2722) stopped at a job that could not run, and every rescan and the Kick start at job 0 (queueSetActive(0)), so a finished job waiting for Collect kept every job behind it waiting for good; and a job's steps were replanned only in craftDone and on a new stack, so a Kick ran a stale plan. Ours: a scan passes such a job to the next one it has not run yet, once round the queue; a job starting replans from the floor as it is; a load of an idle bot with work to do looks over its queue again. Before a job (re)starts, what it already made but had not finished (stopped between its craft and its craft_complete) counts as made, so a replan never makes those units, or uses their ingredients, again.",
    "rows": [
     "G1316"
    ]
