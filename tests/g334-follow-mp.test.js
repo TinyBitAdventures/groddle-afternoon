@@ -31,11 +31,11 @@ import {
 } from '../public/js/follow-mp.js?v=dfe94dc1';
 import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=b83f8f33';
 import { COMPANION_FOLLOW_TRAIL_DISTANCE } from '../public/js/local-companions.js?v=188f756c';
-import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=9e1855e7';
+import { loadContentCatalogsFromDir, getQuestCatalog, getAchievementCatalog } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=e697cec3';
-import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=0130bd22';
+import { questsMpFeature } from '../public/js/features/quests-mp-feature.js?v=cad741ea';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

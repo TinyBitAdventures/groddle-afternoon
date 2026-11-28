@@ -288,7 +288,7 @@ const want = new Set(rows.flatMap((r) => [r.path.split('/').pop(), r.hires.split
 const results = JSON.parse(readFileSync(RESULTS, 'utf8'));
 if (CHECK) {
   const same = existsSync(OUT_JS) && readFileSync(OUT_JS, 'utf8') === js;
-  const { HIRES_SPRITES } = await import('../../public/js/sprite-hires.js?v=dd070ce8');
+  const { HIRES_SPRITES } = await import('../../public/js/sprite-hires.js?v=6a4569c4');
   const bad = checkPairs(results, SOURCE, rows.map((r) => r.path), PUB, HIRES_SPRITES);
   for (const r of rows) if (results[r.path] && results[r.path].hires !== r.hires) bad.push(`${r.path}: results name ${results[r.path].hires}`);
   for (const f of existsSync(OUT_DIR) ? readdirSync(OUT_DIR) : []) if (!want.has(f)) bad.push(`${REL_DIR}/${f}: not built here`);

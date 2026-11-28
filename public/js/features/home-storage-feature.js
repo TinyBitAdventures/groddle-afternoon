@@ -41,20 +41,21 @@
  * open one), hstLast.
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { priceText } from '../price.js?v=35cd2331';
 import { announceCharacterChanged, characterHeaders, characterOf, isCharacterChanged } from '../character-guard.js?v=510034a7';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=3be7988a';
 import { displayRefusal, furnitureDef, furnitureSize, isFurniture, pieceArt } from '../home-decor.js?v=3a84d959';
 import { pieceLabel } from '../furniture-upgrades.js?v=f563b304';
-import { textureFromUrl } from '../textures.js?v=b8e38103';
+import { textureFromUrl } from '../textures.js?v=8bb43102';
 import { ownBagLabel, stackMaxOf, isBagClass } from '../pack-slots.js?v=38e4aea5';
 import { ELEMENT_CLASSES, NO_BAG_CLASSES, NO_SLOT_CLASSES } from '../pack-slots-data.js?v=800f664c';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, pickToolCopies, receiveToolCopy, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
 import { draggedStack, takeDragged } from '../drag-stack.js?v=c7008276';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { insideQuery, possessive, readVisitScene } from '../neighbours-mp.js?v=de82fd7d';
-import { homesFeature } from './homes-feature.js?v=70324a94';
+import { homesFeature } from './homes-feature.js?v=d1109a81';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import {
   SDB_PRICE_MAX,
@@ -93,7 +94,7 @@ import {
   storageWindowKind,
 } from '../ui/storage-windows.js?v=f7f5ddc5';
 import { sdbHoverLabel } from '../enter-chooser.js?v=b37c63e0';
-import { anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const HOME_STORAGE_ID = 'home-storage';
@@ -360,7 +361,7 @@ function createSite() {
   const nonceUrl = boot.nonceUrl || new URL('wp-admin/admin-ajax.php?action=rest-nonce', document.baseURI).href;
   async function refresh() {
     try {
-      const res = await fetch(nonceUrl, { credentials: 'same-origin', cache: 'no-store' });
+      const res = await fetchRetry(nonceUrl, { credentials: 'same-origin', cache: 'no-store' });
       const text = String(await res.text()).trim();
       if (res.ok && /^[0-9a-f]{10}$/.test(text)) {
         nonce = text;
@@ -378,7 +379,7 @@ function createSite() {
       if (body !== undefined) headers['Content-Type'] = 'application/json';
       let res;
       try {
-        res = await fetch(api + path, { method, credentials: 'same-origin', cache: 'no-store', headers, body: body === undefined ? undefined : JSON.stringify(body) });
+        res = await fetchRetry(api + path, { method, credentials: 'same-origin', cache: 'no-store', headers, body: body === undefined ? undefined : JSON.stringify(body) });
       } catch {
         throw Object.assign(new Error(T.offline), { status: 0 });
       }

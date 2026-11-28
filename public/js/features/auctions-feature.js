@@ -44,6 +44,7 @@
  * window.groddleAuctions in multiplayer.
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { priceText } from '../price.js?v=35cd2331';
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
@@ -190,7 +191,7 @@ function createSession(engine) {
 
   function loadTable() {
     if (table || tableLoading) return tableLoading;
-    tableLoading = fetch(TABLE_URL, { cache: 'force-cache' })
+    tableLoading = fetchRetry(TABLE_URL, { cache: 'force-cache' })
       .then((r) => (r.ok ? r.json() : null))
       .then((t) => { table = t && t.items ? t : { items: {}, untradeable: {} }; if (open) render(); })
       .catch(() => { tableLoading = null; });

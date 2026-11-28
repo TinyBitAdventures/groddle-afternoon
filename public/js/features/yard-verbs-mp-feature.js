@@ -78,18 +78,19 @@
  * yardApplied (acts applied to my home), yardSent (acts the site took).
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { performPlotVerb, plotArtPath, plotLabel, plotStatusLabel, plotVerbs } from '../patches.js?v=54430bb9';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { trantStatusLabel } from '../trants.js?v=cf0fe1a3';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
-import { animalStatusLabel } from '../animals.js?v=34acff20';
-import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=122d6f45';
+import { animalStatusLabel } from '../animals.js?v=45c59ce8';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=61295953';
 import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=de82fd7d';
 import { saveStore } from '../save-store.js?v=1ccb1d6b';
-import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=70324a94';
-import { holdYardAnimal } from './animal-husbandry-feature.js?v=13341c7d';
-import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=5f56c16f';
+import { BACK_YARD_GROUND_Y, STREET_GROUND_Y, homesFeature, wearHomeCultivation } from './homes-feature.js?v=d1109a81';
+import { holdYardAnimal } from './animal-husbandry-feature.js?v=40afac23';
+import { patchesFeature, treeFrameUrl } from './patches-feature.js?v=d54ec53e';
 import {
   BACK_YARD_PREFIX,
   BACK_YARD_STREET,
@@ -112,18 +113,18 @@ import {
   visitorRewardDelta,
   visitorRewardSnapshot,
   visitorTreeState,
-} from '../yard-verbs-mp.js?v=4a75c2f0';
+} from '../yard-verbs-mp.js?v=142db74e';
 import { yardFixtureRows, yardFixtureVerbs, yardFixturesKey } from '../yard-fixtures-mp.js?v=dd022fe8';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { followYardPath, holdYardWalk, stickForClass } from '../yard-wander.js?v=28c28eba';
-import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=969d7db1';
+import { followYardPath, holdYardWalk, stickForClass } from '../yard-wander.js?v=b0c06361';
+import { showsChickenIdle, yardChickenPose } from '../chicken-idle-art.js?v=28551227';
 import { chickenWaitPose } from '../chicken-idles.js?v=eef0279b';
 import { countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { ROCK_CATALOG, rockStatusLabel, tickMineRock } from '../mining.js?v=7ecaa572';
 import { getResourceNodeDef, regrowDelayMs } from '../resource-nodes.js?v=c2eb46b1';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { rockReady } from '../street-objects.js?v=a3cc4ce5';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=5922a1ed';
+import { rockReady } from '../street-objects.js?v=93531424';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=d03dc235';
 import {
   ROCK_RESPAWN_MS,
   STOCK_NODE_VERBS,
@@ -132,8 +133,8 @@ import {
   normalizeStockView,
   visitorNode,
   visitorRock,
-} from '../yard-stock-mp.js?v=38af0730';
-import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+} from '../yard-stock-mp.js?v=2df73f7e';
+import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
 import { offlineLine } from '../online-request.js?v=5fa7a635';
 
 export { YARD_VERBS_MP_ID };
@@ -153,7 +154,7 @@ function createSite() {
   const nonceUrl = boot.nonceUrl || new URL('wp-admin/admin-ajax.php?action=rest-nonce', document.baseURI).href;
   async function refresh() {
     try {
-      const res = await fetch(nonceUrl, { credentials: 'same-origin', cache: 'no-store' });
+      const res = await fetchRetry(nonceUrl, { credentials: 'same-origin', cache: 'no-store' });
       const text = String(await res.text()).trim();
       if (res.ok && /^[0-9a-f]{10}$/.test(text)) {
         nonce = text;
@@ -167,7 +168,7 @@ function createSite() {
       const headers = nonce ? { 'X-WP-Nonce': nonce } : {};
       let res;
       try {
-        res = await fetch(api + path, { credentials: 'same-origin', cache: 'no-store', headers });
+        res = await fetchRetry(api + path, { credentials: 'same-origin', cache: 'no-store', headers });
       } catch {
         throw Object.assign(new Error(T.offline), { status: 0 });
       }

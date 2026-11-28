@@ -36,12 +36,12 @@ import {
 } from '../public/js/cubimals.js?v=b83d6145';
 import { addItem, countItem, createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { bindToolInventory, copyTags, createToolConditionState } from '../public/js/tools.js?v=4156bba8';
-import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=bb7a59f6';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { FEATURES } from '../public/js/features/index.js?v=3c85d4c4';
-import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=a5f82feb';
+import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js?v=184f3714';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { FEATURES } from '../public/js/features/index.js?v=cb7a3782';
+import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js?v=79067be9';
 import { holdKeepsBusy } from '../public/js/instance-holds.js?v=ff3a63a3';
-import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js?v=6a4569c4';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

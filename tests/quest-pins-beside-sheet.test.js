@@ -20,9 +20,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { getQuestProgress } from '../public/js/quests.js?v=d9b316eb';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=9e1855e7';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { getQuestProgress } from '../public/js/quests.js?v=f574d2e1';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { questStep } from '../public/js/ui/quest-sheet.js?v=7409d5d8';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '../public');

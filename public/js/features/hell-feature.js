@@ -62,8 +62,8 @@ import {
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { energyMax, forceMetabolic, moodMax } from '../metabolics.js?v=48f784bf';
 import { countItem, removeItem } from '../inventory.js?v=3be7988a';
-import { frameTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
-import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { frameTexture, sourceFromUrl } from '../textures.js?v=8bb43102';
+import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
 
 const GRAPE_SCALE = 0.8;
 const GRAVE_GIANTS = new Set(HELL_SPRITES.graveside.giants);

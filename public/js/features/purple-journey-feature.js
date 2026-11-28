@@ -41,11 +41,11 @@
 import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=3be7988a';
 import { shiftMetabolic } from '../metabolics.js?v=48f784bf';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES, quoinTouches } from '../quoins.js?v=4d75aec0';
-import { frameTexture, holdSource, releaseTexture, sourceFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, holdSource, releaseTexture, sourceFromUrl } from '../textures.js?v=8bb43102';
 import { createOnscreenSharp, ktx2Loader, maxTextureSizeOf, rendererCompressedFormats, sharpAllowed, textureBytes } from '../onscreen-sharp.js?v=75b8a30d';
-import { playPoofIn } from '../overlay-art.js?v=e50bacca';
-import { STREET_INDEX } from '../street-loader.js?v=10376267';
-import { getAchievementCatalog } from '../content-catalogs.js?v=c9b84764';
+import { playPoofIn } from '../overlay-art.js?v=d32dce0e';
+import { STREET_INDEX } from '../street-loader.js?v=23555e53';
+import { getAchievementCatalog } from '../content-catalogs.js?v=d30c3e0f';
 import { POTION_ART } from '../potion-art.js?v=9d731b38';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=ecade42e';
 import {
@@ -66,8 +66,8 @@ import {
   purpleTimeline,
   scionWords,
 } from '../purple-journey.js?v=5e078ed8';
-import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=8758d1e2';
-import { homesFeature } from './homes-feature.js?v=70324a94';
+import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=d296eb47';
+import { homesFeature } from './homes-feature.js?v=d1109a81';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
 /** The scene's own TSID (the template is LNVV4OTMAUG2PQV). */

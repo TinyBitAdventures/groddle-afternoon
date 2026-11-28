@@ -86,7 +86,7 @@ import {
   useScript,
 } from '../teleportation.js?v=cbbc673f';
 import { energyMax, forceMetabolic, loseEnergy, topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
+import { HOME_STREET_TSID } from '../homes.js?v=4f4ade68';
 import { readVisitScene } from '../neighbours-mp.js?v=de82fd7d';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';

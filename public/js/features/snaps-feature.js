@@ -63,7 +63,7 @@ import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { worldCanvasFont } from '../world-text.js?v=6b49f88c';
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=3be7988a';
-import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=10376267';
+import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js?v=23555e53';
 import {
   CAMERA_CLASS, CAPTION_MAX, FORGET_RECHARGE_SEC, RECHARGE_BUFF, SNAP_COPY as T, SNAP_MAX_BYTES, TRAVEL,
   SNAPSHOTTERY, albumSnaps, base64Bytes, canSnap, cleanCaption, isSnapDownload, isSnapUrl, jpegBase64, savedActions, snapAuthor, snapDate, snapPlace,
@@ -71,7 +71,7 @@ import {
 } from '../snaps.js?v=b5be8bff';
 import { VINTAGE_TEXT, applyFilter, filterComponents, filtersFor } from '../snap-filters.js?v=32315cf1';
 import { HOME_SHOT_COPY, homeShotState } from '../home-shot.js?v=8198618a';
-import { renderHomeLocation } from '../home-shot-render.js?v=794770c1';
+import { renderHomeLocation } from '../home-shot-render.js?v=5702eba5';
 
 export const SNAPS_FEATURE_ID = 'snaps';
 const VERB = 'take_picture';

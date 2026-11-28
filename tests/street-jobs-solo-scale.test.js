@@ -11,7 +11,7 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { SKILLS_WAIVED, SOLO_CURVE, SOLO_PANEL_LINE, applySoloScale, hopsFromStart, soloAmountsLine, soloSkill, soloTerms } from '../public/js/street-jobs-solo.js?v=40d84989';
+import { SKILLS_WAIVED, SOLO_CURVE, SOLO_PANEL_LINE, applySoloScale, hopsFromStart, soloAmountsLine, soloSkill, soloTerms } from '../public/js/street-jobs-solo.js?v=e6d237d8';
 import {
   SOLO_DIVISOR,
   dropChancePercent,
@@ -25,10 +25,10 @@ import {
   settlePhase,
   soloNeed,
   workCheck,
-} from '../public/js/street-jobs.js?v=76471e42';
+} from '../public/js/street-jobs.js?v=17f103d0';
 import { projectTable } from '../tools/build-realtime-projects.mjs';
-import { PROJECTS_TEXT } from '../public/js/projects-tracker.js?v=78916eff';
-import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=6ae6e44c';
+import { PROJECTS_TEXT } from '../public/js/projects-tracker.js?v=c5f34e96';
+import { streetJobsFeature, projectApi } from '../public/js/features/street-jobs-feature.js?v=8f8c3622';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 

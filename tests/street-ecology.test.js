@@ -13,14 +13,14 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
   STREET_ECOLOGY_URL,
-} from '../public/js/street-ecology.js?v=38ad6f13';
+} from '../public/js/street-ecology.js?v=63b5b2c0';
 import {
   platformsScreen,
   platformYAt,
   streetWidth,
   worldToScreen,
 } from '../public/js/street-model.js?v=a9a05f9d';
-import { giantForStreet } from '../public/js/shrines.js?v=48318bec';
+import { giantForStreet } from '../public/js/shrines.js?v=4ff3e019';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(__dirname, '../public');

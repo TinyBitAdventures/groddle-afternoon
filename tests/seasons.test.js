@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=6a4569c4';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=60e2474b';
 import {
   CANDY_DAILY_MAX,
@@ -283,7 +283,7 @@ describe('Egg Hunt and Pi Day', () => {
   it('is the source mechanic: Egg Plants pet with lgt_egg_plant_pet, five equally likely eggs, all year', async () => {
     const { SKILL_PACKAGES } = await import('../public/js/skill-packages-data.js?v=cb4e9ab3');
     const { DROP_TABLES } = await import('../public/js/drop-tables-data.js?v=c51a6400');
-    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=5fce9ad0');
+    const { packageForEvent } = await import('../public/js/features/drops-feature.js?v=0ff27571');
     assert.equal(packageForEvent(`${EGG_HUNT.pet.trant}:pet`, {}), EGG_HUNT.pet.package);
     const pkg = SKILL_PACKAGES[EGG_HUNT.pet.package];
     assert.deepEqual(Object.values(pkg.skills).map((s) => [s.drop_class_id, s.drop_chance]), [[EGG_HUNT.pet.table, 10], [EGG_HUNT.pet.table, 15], [EGG_HUNT.pet.table, 20], [EGG_HUNT.pet.table, 30]]);
@@ -317,7 +317,7 @@ describe('Egg Hunt and Pi Day', () => {
   });
 
   it('counts each egg into the collection however it arrives, then gives the trophy for them (seasons-feature)', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=5bba7182');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=e4a8737e');
     const { createInventory, addItem, countItem, removeItem } = await import('../public/js/inventory.js?v=3be7988a');
     const unlocked = [];
     const counted = {};
@@ -391,7 +391,7 @@ describe('supply paths', () => {
 
 describe('a ?season= preview leaves the save alone (G342)', () => {
   it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
-    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=5bba7182');
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js?v=e4a8737e');
     const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=3be7988a');
     const inv = createInventory();
     addItem(inv, 'pumpkin_carved_1', 2);

@@ -23,8 +23,8 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iceMaskSprites, iceNubbinReach, iceNubbinWallSpots } from '../public/js/ice-nubbin-walls.js?v=9f0ee47c';
-import { DECO_TWINS } from '../public/js/street-render.js?v=4966c68b';
-import { ecologyForStreet, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=38ad6f13';
+import { DECO_TWINS } from '../public/js/street-render.js?v=124facce';
+import { ecologyForStreet, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=63b5b2c0';
 import { fixedPictureBoxes } from './build-barnacle-wall-spots.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

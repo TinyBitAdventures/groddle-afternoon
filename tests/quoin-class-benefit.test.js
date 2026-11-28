@@ -23,8 +23,8 @@ import {
 } from '../public/js/quoins.js?v=4d75aec0';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=48f784bf';
 import { applyDropResult, createDropResult } from '../public/js/drop-tables.js?v=1ed0b596';
-import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=09184e60';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=838b7598';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
 import { applyVerbReward } from '../public/js/verb-rewards.js?v=42171963';
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -54,11 +54,12 @@
  *   craftybotPanel, craftybotLast, craftybotAutoplay.
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=3be7988a';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=4156bba8';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=dc595568';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=d3571803';
 import { listDroppedStacks } from '../world-items.js?v=93313aad';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=70324a94';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=d1109a81';
 import { cabinetTake, isCabinetClass } from '../home-storage.js?v=17bf7f79';
 import {
   CRAFTYBOT,
@@ -96,12 +97,12 @@ import {
   setLocked,
   setPaused,
 } from '../craftybot.js?v=6f09b162';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=d32dce0e';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { countFromField, typedCount } from '../ui/count-chooser.js?v=75f69512';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 import { ownGroundRows, ownGroundState, pruneOwnGround } from '../ground-stacks.js?v=22792362';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
@@ -196,7 +197,7 @@ function itemName(cls, n = 1) {
 
 function loadSpecs() {
   if (specsPromise) return specsPromise;
-  specsPromise = fetch(SPECS_URL)
+  specsPromise = fetchRetry(SPECS_URL)
     .then((r) => (r.ok ? r.json() : null))
     .then((json) => {
       setCraftybotSpecs(json?.specs || {});

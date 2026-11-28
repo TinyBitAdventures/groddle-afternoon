@@ -12,7 +12,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
-import { HALL_REFUSALS, HALL_TEXT, MP_TEXT, hallClaimNote, hallRefusalText, refusalFor } from '../public/js/street-jobs-mp.js?v=1ccfc0c0';
+import { HALL_REFUSALS, HALL_TEXT, MP_TEXT, hallClaimNote, hallRefusalText, refusalFor } from '../public/js/street-jobs-mp.js?v=eee3ff15';
 
 const root = join(import.meta.dirname, '..');
 const feature = readFileSync(join(root, 'public/js/features/street-jobs-feature.js'), 'utf8');

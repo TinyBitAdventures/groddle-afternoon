@@ -3,6 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
+import { fetchRetry } from './load-retry.js?v=24823577';
 import { avatarHeadReach, groundBeneath, isItemSolid, isStandable, platformYAt, worldToScreen } from './street-model.js?v=a9a05f9d';
 import { behindFloor } from './reach.js?v=456da8a8';
 import { MAILBOX_SHEETS, measuredMailboxes, measuredStones } from './street-furniture.js?v=071203fc';
@@ -597,7 +598,7 @@ export function getStreetEcologyCatalog() {
   return catalog;
 }
 
-export async function loadStreetEcologyCatalog(fetchImpl = globalThis.fetch) {
+export async function loadStreetEcologyCatalog(fetchImpl = globalThis.fetch && fetchRetry) {
   if (!fetchImpl) return catalog;
   try {
     const response = await fetchImpl(STREET_ECOLOGY_URL);

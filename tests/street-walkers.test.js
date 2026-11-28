@@ -22,12 +22,12 @@ import {
   kittyWalkAt,
   pathTime,
   walkerSpan,
-} from '../public/js/street-creatures.js?v=cc6d21bf';
+} from '../public/js/street-creatures.js?v=7223cc8f';
 import { KITTY_MOTION, KITTY_PAUSE_CHOICES, KITTY_PET } from '../public/js/heli-kitties.js?v=e4af4096';
 import { CRAB_WALK } from '../public/js/crabs.js?v=eb0bdc39';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=57fecfcb';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=0537418b';
-import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=b3dc0ad5';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=2235c767';
+import { heliKittiesFeature } from '../public/js/features/heli-kitties-feature.js?v=fdc5c520';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 // A floor from 0 to 1600 at y 800, a gap, then another from 1700 to 3000.

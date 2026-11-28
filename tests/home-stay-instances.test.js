@@ -16,7 +16,7 @@ import {
   homeStayAfterArrival,
   imagineHome,
   isHomePlaceTsid,
-} from '../public/js/homes.js?v=dca6b2cd';
+} from '../public/js/homes.js?v=4f4ade68';
 
 const root = join(import.meta.dirname, '..');
 const game = readFileSync(join(root, 'public/game.js'), 'utf8');

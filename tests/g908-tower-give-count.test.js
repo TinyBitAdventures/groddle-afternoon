@@ -7,7 +7,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { contributeItems } from '../public/js/home-tower.js?v=a7fc0cce';
+import { contributeItems } from '../public/js/home-tower.js?v=bb722397';
 
 const root = join(import.meta.dirname, '..');
 const src = readFileSync(join(root, 'public/js/features/home-tower-feature.js'), 'utf8');

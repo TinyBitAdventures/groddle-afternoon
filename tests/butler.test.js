@@ -73,15 +73,15 @@ import {
 } from '../public/js/butler.js?v=bea39213';
 import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js?v=071203fc';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js?v=13f35acd';
-import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=ff81a0f2';
+import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js?v=660b26ac';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=ff81a0f2';
-import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=10173d43';
-import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js?v=a709fbf2';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=660b26ac';
+import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js?v=b6fdfca3';
+import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js?v=83559708';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js?v=9e1855e7';
-import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js?v=cec1b5e9';
+import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
 import { LONG_READ_MAX_MS, READ_MAX_MS, bubbleMs, longReadMs } from '../public/js/read-time.js?v=3151fb1a';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

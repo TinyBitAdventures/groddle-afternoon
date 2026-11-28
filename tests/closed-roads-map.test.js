@@ -9,9 +9,9 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { closedRoadText, closedStreets, initializeStreetJobs, normalizeStreetJobState, roadClosure } from '../public/js/street-jobs.js?v=76471e42';
-import { findRoute } from '../public/js/map-routes.js?v=52140ba2';
-import { streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
+import { closedRoadText, closedStreets, initializeStreetJobs, normalizeStreetJobState, roadClosure } from '../public/js/street-jobs.js?v=17f103d0';
+import { findRoute } from '../public/js/map-routes.js?v=e9f5e3da';
+import { streetGraph } from '../public/js/street-graph.js?v=16013e6e';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

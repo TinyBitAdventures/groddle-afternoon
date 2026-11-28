@@ -60,9 +60,9 @@
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
 import { bindCountField, countKeyValue, countStepMarkup, openCountField } from '../ui/count-chooser.js?v=75f69512';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { donationValueFor } from '../shrines.js?v=48318bec';
+import { donationValueFor } from '../shrines.js?v=4ff3e019';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=cf0fe1a3';
 import {
@@ -108,8 +108,8 @@ import {
 import { shrinePrimeBonus } from '../imagination-effects.js?v=70169933';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { forceMetabolic, gainMetabolic, loseEnergy, loseMood, topUpMetabolic } from '../metabolics.js?v=48f784bf';
-import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=e50bacca';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
+import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=d32dce0e';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=c788d4ab';
 import {
   MP_ROOK,
   MP_ROOK_TEXT,
@@ -128,12 +128,12 @@ import {
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { copyChargesLeft, copyFromLedger, keepsCopies, spendCopyCharge, verbCopy } from '../copy-charges.js?v=357d4cbb';
 import { migrateClassValue } from '../tools.js?v=4156bba8';
-import { playPotionBottle } from '../potion-bottle-fx.js?v=72e0c4f8';
+import { playPotionBottle } from '../potion-bottle-fx.js?v=af5cc6d3';
 import { feedZone, placeRookBadge, unionBox } from '../rook-badge-place.js?v=e2bcbbaa';
 import { ROOK_STARS, stepStunStars, stunStarsState } from '../rook-stun-stars.js?v=62d5c3cb';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
 import { publicStreet } from '../shared-street.js?v=dce5694b';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { offlineLine, sharedOffline } from '../online-request.js?v=5fa7a635';
 

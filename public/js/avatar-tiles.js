@@ -22,7 +22,7 @@
  * from memory. While a tile's look changes (a new hair colour), it keeps its
  * last picture until the new one is ready.
  */
-import { drawListFor, paintItems, prepareLook } from './avatar-compositor.js?v=1d3df23e';
+import { drawListFor, paintItems, prepareLook } from './avatar-compositor.js?v=2b3cd2b7';
 import { drawListBounds } from './avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from './avatar-looks.js?v=5a28384d';
 

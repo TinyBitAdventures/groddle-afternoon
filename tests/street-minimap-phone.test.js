@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { PHONE_MAP_TEXT, phoneMapLinkAllowed, phoneMapWidth, phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=5f14140c';
+import { PHONE_MAP_TEXT, phoneMapLinkAllowed, phoneMapWidth, phoneSignRows } from '../public/js/features/street-minimap-feature.js?v=43b74e07';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

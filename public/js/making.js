@@ -8,6 +8,7 @@
  * Skipped source recipes and reasons: assets/content/recipes-skipped.json.
  */
 
+import { fetchRetry } from './load-retry.js?v=24823577';
 import {
   addItem,
   removeItem,
@@ -719,7 +720,7 @@ export function isRecipeCatalogReady() {
  * Browser: fetch assets/content/recipes.json
  * @param {typeof fetch} [fetchImpl]
  */
-export async function loadRecipeCatalog(fetchImpl = globalThis.fetch) {
+export async function loadRecipeCatalog(fetchImpl = globalThis.fetch && fetchRetry) {
   if (!fetchImpl) {
     ensureMakingItems();
     return RECIPE_CATALOG;

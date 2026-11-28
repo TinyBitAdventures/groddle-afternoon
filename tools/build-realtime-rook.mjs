@@ -36,12 +36,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=23555e53';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
-import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=38ad6f13';
+import { ecologyForStreet, planStreetPlacements, populationForStreet, setStreetEcologyCatalog, streetReservedSpots } from '../public/js/street-ecology.js?v=63b5b2c0';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=3be7988a';
-import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=dc595568';
-import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=48318bec';
+import { loadRecipeCatalogFromFile } from '../public/js/making.js?v=d3571803';
+import { SHRINE_ITEM_BASE_COSTS, donationValueFor, giantForStreet } from '../public/js/shrines.js?v=4ff3e019';
 import { ITEM_BASE_COSTS } from '../public/js/store-catalog.js?v=c6ebb2bd';
 import { TOOL_CONDITION_CATALOG } from '../public/js/tools.js?v=4156bba8';
 import { placementRequests } from './build-realtime-objects.mjs';
@@ -49,7 +49,7 @@ import { streetIsRookable } from '../public/js/rook-attack.js?v=5e62a79f';
 import { rebuiltRoomEcology } from '../public/js/rebuilt-rooms.js?v=5ef5618f';
 import { winterStreetEcology } from '../public/js/winter-walk-streets.js?v=c921bf92';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
-import { upgradeEcologyEntry } from '../public/js/street-jobs.js?v=76471e42';
+import { upgradeEcologyEntry } from '../public/js/street-jobs.js?v=17f103d0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

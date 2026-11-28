@@ -30,7 +30,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { askedUrl, frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=b8e38103';
+import { askedUrl, frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=8bb43102';
 import {
   COSTUME_CELL,
   DRESS_COUNTER,

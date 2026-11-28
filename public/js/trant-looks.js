@@ -14,11 +14,12 @@
  * Not yet drawn: health on the leaves (Glitch's fol_N at health +/- jitter); every look is the
  * health-10 tree, holding the fruit its health allows.
  */
+import { fetchRetry } from './load-retry.js?v=24823577';
 import { fruitCapacityAt } from './trants.js?v=cf0fe1a3';
 import { TRANT_FRUIT_PIECES } from './trant-fruit-pieces.js?v=b1fbc950';
-import { hiresSpriteUrl } from './sprite-hires.js?v=dd070ce8';
-import { setTextureFoot } from './sprite-feet.js?v=6283b688';
-import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=b8e38103';
+import { hiresSpriteUrl } from './sprite-hires.js?v=6a4569c4';
+import { setTextureFoot } from './sprite-feet.js?v=1c6452d9';
+import { isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js?v=8bb43102';
 
 export const TRANT_FRAMES = 'assets/sprites/trants/frames';
 export const TRANT_FRAME_VERSION = 'all-species-cell-3';
@@ -102,7 +103,7 @@ const bitmaps = new Map();
 
 function bitmap(url) {
   if (!bitmaps.has(url)) {
-    const p = fetch(url)
+    const p = fetchRetry(url)
       .then((res) => {
         if (!res.ok) throw new Error(`${url}: ${res.status}`);
         return res.blob();

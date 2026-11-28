@@ -37,9 +37,9 @@
  * neighbourChore, neighbourLetters, furnitureLast.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
 import { nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=670c3a7f';
+import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js?v=7224f78a';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { canUseTool, useToolCondition } from '../tools.js?v=4156bba8';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
@@ -122,15 +122,15 @@ import {
   recordVisit,
   visitorLetter,
 } from '../neighbours.js?v=13f35acd';
-import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=fe6e52ce';
+import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=d54ec8ac';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView, openReportView } from '../note-view.js?v=c512b345';
 import { BOARD_MP_TEXT, boardByline } from '../boards-mp.js?v=ba766683';
-import { textureFromUrl } from '../textures.js?v=b8e38103';
-import { butlerApi } from './butler-feature.js?v=ff81a0f2';
-import { neighboursMpApi } from './neighbours-mp-feature.js?v=5ade779e';
+import { textureFromUrl } from '../textures.js?v=8bb43102';
+import { butlerApi } from './butler-feature.js?v=660b26ac';
+import { neighboursMpApi } from './neighbours-mp-feature.js?v=f9119639';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=d50d0d05';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';

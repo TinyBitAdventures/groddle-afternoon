@@ -29,7 +29,7 @@
  * secretCount, secretOverlay, secretGrowl, secretDemo, secretBox.
  */
 
-import { emblemCostFor } from '../shrines.js?v=48318bec';
+import { emblemCostFor } from '../shrines.js?v=4ff3e019';
 import {
   ELEVEN_BADGE,
   SECRET_MARKER_SIZE,
@@ -49,7 +49,7 @@ import {
   streetKeyFor,
   triggerSecretSpot,
 } from '../secret-spots.js?v=59a37384';
-import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
+import { playSheetOverlay } from '../overlay-art.js?v=d32dce0e';
 
 export const SECRET_SPOTS_FEATURE_ID = 'secret-spots';
 const MARKER_Z = 4;

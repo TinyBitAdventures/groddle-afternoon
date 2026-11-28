@@ -22,8 +22,8 @@ import { JUJU_TEXT, jujuLine } from '../public/js/juju-bandits.js?v=c350ebba';
 import { FOX_RANGER_TEXT, fillName } from '../public/js/foxes.js?v=c0ce235f';
 import { RUBE_TEXT } from '../public/js/rube.js?v=0b98cc11';
 import { imgBubbleText } from '../public/js/magic-rock-home.js?v=11f070be';
-import { rockTicketBeats } from '../public/js/home-ticket.js?v=8eb5a034';
-import { cleanQuestMarkup } from '../public/js/quests.js?v=d9b316eb';
+import { rockTicketBeats } from '../public/js/home-ticket.js?v=df702ad8';
+import { cleanQuestMarkup } from '../public/js/quests.js?v=f574d2e1';
 import { questTextPlain } from '../public/js/quest-text.js?v=92213536';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');

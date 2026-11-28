@@ -39,9 +39,9 @@ import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATAL
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { SEASONAL_SEEDS, seedInSeason, seedSeasonLine, seedSeasons, setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=fefa7bcd';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js?v=fefa7bcd';
-import { setSeasonalRecipeCheck } from '../making.js?v=dc595568';
+import { setSeasonalRecipeCheck } from '../making.js?v=d3571803';
 import { getToolCondition, copyForVerb, copyTag, migrateClassTag, setCopyTag, takeToolCopy } from '../tools.js?v=4156bba8';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 
 /*
  * Each lit pumpkin's phrases are its own (pumpkin_lit_*.js this.phrases, 380-391, at most 3), kept
@@ -78,12 +78,12 @@ function takePumpkin(engine, cls, copy) {
 }
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
 import { isStandable } from '../street-model.js?v=a9a05f9d';
-import { isBatterflyHabitat } from '../animal-husbandry.js?v=afa70209';
-import { emblemCostFor } from '../shrines.js?v=48318bec';
+import { isBatterflyHabitat } from '../animal-husbandry.js?v=536b42a7';
+import { emblemCostFor } from '../shrines.js?v=4ff3e019';
 import { rollDropTable } from '../drop-tables.js?v=1ed0b596';
 import { openNoteView, noteViewOpen } from '../note-view.js?v=c512b345';
-import { payDrop } from './drops-feature.js?v=5fce9ad0';
-import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=5922a1ed';
+import { payDrop } from './drops-feature.js?v=0ff27571';
+import { fireflyJarCounts, setFireflyJar } from './resource-nodes-feature.js?v=d03dc235';
 import { SEASON_DATA } from '../seasons-data.js?v=b5174bc9';
 import { forceMetabolic, shiftMetabolic, topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import {
@@ -139,8 +139,8 @@ import {
   yetiMailDue,
   yetiQuote,
 } from '../seasons.js?v=5d8f545a';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { playOverlay } from '../overlays.js?v=91dcee74';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
+import { playOverlay } from '../overlays.js?v=c788d4ab';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { MAIL_POST_SENDER } from '../mailbox.js?v=d50d0d05';
 import { filterText } from '../word-filter.js?v=9a7a7ebb';

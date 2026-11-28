@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildStreetView } from '../public/js/street-render.js?v=4966c68b';
+import { buildStreetView } from '../public/js/street-render.js?v=124facce';
 import {
   NO_SKY_HUBS,
   farLayerTint,
@@ -23,7 +23,7 @@ import {
   skyPhaseWeights,
   starField,
 } from '../public/js/sky-clock.js?v=dbd21266';
-import { ecologyForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=38ad6f13';
+import { ecologyForStreet, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=63b5b2c0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel) => readFileSync(join(here, '..', rel), 'utf8');

@@ -44,7 +44,7 @@
  * of the G2 walls' own cyan seams land on seams the video shows (-2203, 484).
  */
 
-import { textureFromUrl } from '../textures.js?v=b8e38103';
+import { textureFromUrl } from '../textures.js?v=8bb43102';
 import { FIREFLY_LAB_FILES } from './firefly-lab-art.js?v=481a55f9';
 
 /**

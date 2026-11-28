@@ -14,11 +14,11 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
-import { pendingQuestOffers } from '../public/js/quest-offers.js?v=9e1855e7';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
+import { pendingQuestOffers } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { MP_RACE_QUESTS, MULTIPLAYER_QUESTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=e697cec3';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=7ced7fa2';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=e1da24cc';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
 import { HELL_LOCATION } from '../public/js/hell.js?v=0dba5774';
 import { HOG_MP_COURSE } from '../public/js/hog-haul-mp.js?v=67f873fe';
@@ -170,7 +170,7 @@ describe('the dead do not race', () => {
   });
 
   it('a race_match that reaches a dead page is left at once (races-feature)', async () => {
-    const { racesFeature } = await import('../public/js/features/races-feature.js?v=9ccefff9');
+    const { racesFeature } = await import('../public/js/features/races-feature.js?v=34a829ae');
     const client = fakeClient(7);
     const toasts = [];
     const engine = {
@@ -262,7 +262,7 @@ describe('a Game of Crowns reload asks the server, and the dead stay out (crowns
   });
 
   it('solo still gives a ticket back on a street change', async () => {
-    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=2c5a57a3');
+    const { crownsFeature } = await import('../public/js/features/crowns-feature.js?v=e55d1b47');
     const engine = { mode: 'solo', inv: {}, query: () => null, toast() {}, updateHud() {}, param: () => null, instanceHold: null, setData() {} };
     crownsFeature.restore({ pendingTicket: CROWNS_TICKET }, engine);
     crownsFeature.onStreetEnter({ tsid: 'GA5' }, engine);

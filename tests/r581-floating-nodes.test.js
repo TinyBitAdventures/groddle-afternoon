@@ -16,11 +16,11 @@ import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=10376267';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown } from '../public/js/street-loader.js?v=23555e53';
 import { platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
 import {
   ROCK_SEAT_MAX_PX, ROCK_SHAPE_WIDTHS, footOverAir, planStreetPlacements, seatOnFloor, setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=38ad6f13';
+} from '../public/js/street-ecology.js?v=63b5b2c0';
 import { census, streetRows } from '../tools/node-floor-census.mjs';
 import { setCreatureEcology } from '../tools/build-realtime-objects.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';

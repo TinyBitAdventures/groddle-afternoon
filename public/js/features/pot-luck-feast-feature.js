@@ -30,11 +30,11 @@
 
 import { addItem, countItem, ensureItem, itemIcon, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=3be7988a';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=dc595568';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=d3571803';
 import { activeSeasons, parseSeasonDate, potLuckWindow, seasonYearKey } from '../seasons.js?v=5d8f545a';
 import { shiftMetabolic } from '../metabolics.js?v=48f784bf';
 import { landingY, nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=b8e38103';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js?v=8bb43102';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { SEED_CATALOG } from '../garden.js?v=fefa7bcd';

@@ -114,13 +114,13 @@ import {
   COLD_COMFORT_LEAVE_TEXT,
   HOME_TREE_GROWN_TEXT,
   SEED_TO_SCYTHE,
-} from '../quest-offers.js?v=9e1855e7';
+} from '../quest-offers.js?v=cec1b5e9';
 import { PEAT_TEXT, retireSoloPeatQuest } from '../peat-quest.js?v=654cdb1b';
 import { retireDeadQuests, retiredQuestLine } from '../retired-quests.js?v=61758261';
-import { parseQuestConversation, questUnlockNotices } from '../quests.js?v=d9b316eb';
+import { parseQuestConversation, questUnlockNotices } from '../quests.js?v=f574d2e1';
 import { questRequirementText, renderQuestText, withQuestMarkup } from '../quest-text.js?v=92213536';
 import { addItem, removeItem, countItem } from '../inventory.js?v=3be7988a';
-import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
+import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
 
 const OFFER_CHECK_MS = 30_000;
 /** QuestElementUI.as setTryButton 247-258 and ConversationManager.as 584. */

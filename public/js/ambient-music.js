@@ -12,6 +12,8 @@
  * This module resolves theme + track list; the game streams them (game.js setAmbientForStreet).
  */
 
+import { fetchRetry } from './load-retry.js?v=24823577';
+
 /**
  * @typedef {{
  *   defaultTheme: string,
@@ -42,7 +44,7 @@ export function getAmbientMusicConfig() {
  */
 export async function loadAmbientMusicConfig(
   url = 'assets/content/ambient-music.json',
-  fetchImpl = globalThis.fetch
+  fetchImpl = globalThis.fetch && fetchRetry
 ) {
   if (!fetchImpl) return null;
   try {

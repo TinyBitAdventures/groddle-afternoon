@@ -25,8 +25,8 @@ import {
   mineRock,
   MINING_COSTS,
 } from '../public/js/mining.js?v=7ecaa572';
-import { craftRecipe } from '../public/js/making.js?v=dc595568';
-import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=e334ace2';
+import { craftRecipe } from '../public/js/making.js?v=d3571803';
+import { createPlayerSave, normalizePlayerSave } from '../public/js/player-save.js?v=0bd0e294';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(here, '..', 'public');

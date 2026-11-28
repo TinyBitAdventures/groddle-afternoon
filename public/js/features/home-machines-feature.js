@@ -59,6 +59,7 @@
  * stands you at room x and sets it down.
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import {
   HOME_MACHINES_ID,
   HOME_MACHINES_INTERIOR,
@@ -98,24 +99,24 @@ import {
   TAKEN_KEEP,
 } from '../home-machines.js?v=1fc98bd9';
 import { CALL_PLAYER_LINES, MACHINE_HITBOX, MACHINE_SKILLS, collectLine, machineJobMs, machineMadeLine, refuelCount, runningSoundKey, takeJobIngredients } from '../machine-rooms.js?v=4b6ade29';
-import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=57cc0f50';
+import { MACHINE_ART_SHEETS, LOW_FUEL_BUBBLE_MS, LOW_FUEL_LINE, isLowFuel, machineFrame, machineFrameRect, machineSheetDef, roomMachineState } from '../machine-art.js?v=4dd5ceae';
 import { FUEL_CELL, FUEL_PER_CELL, MAX_FUEL } from '../machines.js?v=93a736f2';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=3be7988a';
 import { receiveToolCopy, takeToolCopy } from '../tools.js?v=4156bba8';
 import { markLeaving, takeCopies } from '../copy-picks.js?v=b368fd49';
-import { RECIPE_CATALOG } from '../making.js?v=dc595568';
-import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
-import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=122d6f45';
-import { lookOf, poseOf } from './realtime-feature.js?v=f36a5ffd';
+import { RECIPE_CATALOG } from '../making.js?v=d3571803';
+import { getSkillCatalog } from '../content-catalogs.js?v=d30c3e0f';
+import { createBackYardState, homeStreetLayout, normalizeCultivationState } from '../home-cultivation.js?v=61295953';
+import { lookOf, poseOf } from './realtime-feature.js?v=02112e91';
 import { insideQuery, readVisitScene } from '../neighbours-mp.js?v=de82fd7d';
 import { saveStore } from '../save-store.js?v=1ccb1d6b';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
-import { createSheetLoader } from '../sprite-sheets.js?v=37ad5c9f';
-import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=70324a94';
-import { payAltarBonus } from './machine-rooms-feature.js?v=0cf03bb7';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
+import { createSheetLoader } from '../sprite-sheets.js?v=d744485b';
+import { STREET_GROUND_Y, homesFeature } from './homes-feature.js?v=d1109a81';
+import { payAltarBonus } from './machine-rooms-feature.js?v=ac3a61c1';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
 import { nearestSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
 import { offlineLine } from '../online-request.js?v=5fa7a635';
 import { DRAG_DIST } from '../ui/home-builder.js?v=26dcf346';
 import { LONG_PRESS_SLOP } from '../ui/context-menu.js?v=0266831a';
@@ -150,7 +151,7 @@ function createSite() {
   const nonceUrl = boot.nonceUrl || new URL('wp-admin/admin-ajax.php?action=rest-nonce', document.baseURI).href;
   async function refresh() {
     try {
-      const res = await fetch(nonceUrl, { credentials: 'same-origin', cache: 'no-store' });
+      const res = await fetchRetry(nonceUrl, { credentials: 'same-origin', cache: 'no-store' });
       const text = String(await res.text()).trim();
       if (res.ok && /^[0-9a-f]{10}$/.test(text)) {
         nonce = text;
@@ -164,7 +165,7 @@ function createSite() {
       const headers = nonce ? { 'X-WP-Nonce': nonce } : {};
       let res;
       try {
-        res = await fetch(api + path, { credentials: 'same-origin', cache: 'no-store', headers });
+        res = await fetchRetry(api + path, { credentials: 'same-origin', cache: 'no-store', headers });
       } catch {
         throw Object.assign(new Error(T.offline), { status: 0 });
       }

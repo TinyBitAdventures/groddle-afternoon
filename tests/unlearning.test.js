@@ -6,8 +6,8 @@
 import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { loadContentCatalogsFromDir, resetContentCatalogs, getSkillCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createSkillState, startSkillStudy } from '../public/js/skills.js?v=3c6dbdff';
+import { loadContentCatalogsFromDir, resetContentCatalogs, getSkillCatalog } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createSkillState, startSkillStudy } from '../public/js/skills.js?v=9f77da71';
 import {
   SKILL_QUEST_MAP,
   canUnlearnSkill,
@@ -19,7 +19,7 @@ import {
   unlearnCheck,
   unlearnSeconds,
   unlearnStatus,
-} from '../public/js/unlearning.js?v=74c2b454';
+} from '../public/js/unlearning.js?v=78321888';
 import { remakeStatus } from '../public/js/imagination-remake.js?v=99997003';
 
 const root = join(import.meta.dirname, '..', 'public');

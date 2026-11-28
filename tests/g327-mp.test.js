@@ -31,11 +31,11 @@ import {
   yourSignLine,
 } from '../public/js/hi-signs-mp.js?v=3948e7ab';
 import { HI_VARIANTS, HI_VARIANT_COLORS, HI_VARIANT_NAMES, hiDay } from '../public/js/hi-signs.js?v=19ce6a48';
-import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=94c91a4c';
-import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=e8c40eab';
+import { hiSignsFeature } from '../public/js/features/hi-signs-feature.js?v=7a248815';
+import { powdersFeature, runPowder } from '../public/js/features/powders-feature.js?v=5af4c857';
 import { addItem, countItem } from '../public/js/inventory.js?v=3be7988a';
-import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=bb7a59f6';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
+import { applyAchievementProgress, createAchievementState, getAchievementProgress, seedAchievementNearCompletion } from '../public/js/achievements.js?v=184f3714';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
 import { HAS_SERVER, serverPath } from '../tools/repos.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

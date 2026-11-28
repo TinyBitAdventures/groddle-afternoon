@@ -29,7 +29,12 @@
  *   loadHeldTexture and gives it back with releaseTexture, which frees it only once every hold is
  *   given back and nobody took it through the plain calls. A freed picture is never handed out again:
  *   the next ask loads it afresh.
+ * - #768: a picture whose request never answers (no load, no error) counts as failed after its time
+ *   limit (js/load-retry.js loadTimeoutFor: 20 s, doubled each try) and is asked for again by itself
+ *   after RETRY_WAIT_MS, so a house built once still fills in.
  */
+
+import { isLoadTimeout, loadTimeoutFor, RETRY_WAITS_MS, timeLimit } from './load-retry.js?v=24823577';
 
 /** @type {Map<string, any>} url -> TextureSource */
 const sources = new Map();
@@ -95,7 +100,8 @@ function placeholderCanvas() {
   return placeholder;
 }
 
-function decodeImage(url) {
+/** An image decoded from `url`; `signal` (timeLimit's) stops the request when it stalls (#768). */
+function decodeImage(url, signal) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     if (/^https?:/i.test(url)) img.crossOrigin = 'anonymous';
@@ -104,12 +110,19 @@ function decodeImage(url) {
       else resolve(img);
     };
     img.onerror = () => reject(new Error(`could not load ${url}`));
+    signal?.addEventListener?.('abort', () => {
+      img.onload = null;
+      img.onerror = null;
+      // Drops the request; the next try asks again.
+      try { img.src = ''; } catch { /* a stand-in without a src setter */ }
+      reject(signal.reason || new Error(`stopped loading ${url}`));
+    }, { once: true });
     img.src = url;
   });
 }
 
-async function rasteriseSvg(url, { width, height, scale } = {}) {
-  const img = await decodeImage(url);
+async function rasteriseSvg(url, { width, height, scale } = {}, signal) {
+  const img = await decodeImage(url, signal);
   const w = Math.max(1, Math.round(width || (img.naturalWidth || img.width) * (scale || 1)));
   const h = Math.max(1, Math.round(height || (img.naturalHeight || img.height) * (scale || 1)));
   const canvas = document.createElement('canvas');
@@ -124,8 +137,8 @@ async function rasteriseSvg(url, { width, height, scale } = {}) {
  * nearer placement, loaded at the far need: js/deco-hires.js sharpDeco). The GPU only ever holds
  * the smaller copy.
  */
-async function resizeImage(url, { width, height }) {
-  const img = await decodeImage(url);
+async function resizeImage(url, { width, height }, signal) {
+  const img = await decodeImage(url, signal);
   const w = Math.max(1, Math.round(width));
   const h = Math.max(1, Math.round(height));
   if (typeof createImageBitmap === 'function') {
@@ -197,7 +210,7 @@ async function withinSideLimit(image) {
  * source's resize, as on a first load). Each failure is counted by path for the bug report.
  */
 export const LOAD_ATTEMPTS = 4;
-export const RETRY_WAIT_MS = Object.freeze([1_000, 4_000, 16_000]);
+export const RETRY_WAIT_MS = RETRY_WAITS_MS;
 
 /** #662: failed image loads by path (no query, no data or blob contents): { count, loaded }. */
 const imageFailures = new Map();
@@ -263,8 +276,8 @@ function createSource(url, opts) {
     scaleMode: opts.scaleMode || 'linear',
   });
   // holds: holdSource/holdTexture takers not yet released; shared: handed out by a plain call (never freed).
-  // attempts, failedAt: #662's retry (startLoad, retryIfDue).
-  const state = { url, opts, resolution, loaded: false, failed: false, promise: null, holds: 0, shared: false, own: false, attempts: 0, failedAt: 0 };
+  // attempts, failedAt: #662's retry (startLoad, retryIfDue); run, startedAt, timeoutMs: #768's time limit.
+  const state = { url, opts, resolution, loaded: false, failed: false, promise: null, holds: 0, shared: false, own: false, attempts: 0, failedAt: 0, run: null, startedAt: 0, timeoutMs: 0 };
   source[LOAD] = state;
   startLoad(source, state);
   return source;
@@ -279,9 +292,17 @@ function startLoad(source, state) {
   const { url, opts, resolution } = state;
   state.attempts += 1;
   state.failed = false;
-  state.promise = (isSvg(url) ? rasteriseSvg(url, opts) : opts.width > 0 && opts.height > 0 ? resizeImage(url, opts) : decodeImage(url)).then(
+  // #768: a try that neither loads nor fails within its limit fails as stalled (and is tried again below).
+  const ms = loadTimeoutFor(state.attempts);
+  const run = timeLimit((signal) => (isSvg(url) ? rasteriseSvg(url, opts, signal) : opts.width > 0 && opts.height > 0 ? resizeImage(url, opts, signal) : decodeImage(url, signal)), { ms });
+  state.run = run;
+  state.startedAt = Date.now();
+  state.timeoutMs = ms;
+  // A try given up on (#768 stalled, a newer one started) changes nothing when it settles late.
+  const current = () => state.run === run;
+  state.promise = run.then(
     (decoded) => withinSideLimit(decoded).catch(() => decoded).then((image) => {
-      if (source.destroyed) return source;
+      if (source.destroyed || !current()) return source;
       source.resource = image;
       // The logical size is the file's; an image kept smaller (#583) is a lower resolution of it.
       const w = (decoded.naturalWidth || decoded.width) / resolution;
@@ -294,10 +315,17 @@ function startLoad(source, state) {
       return source;
     }),
     (err) => {
+      if (!current()) throw err;
+      state.run = null;
       state.failed = true;
       state.failedAt = Date.now();
       noteImageFailure(state);
       source.emit('error', err, source);
+      // #768: nobody may ask again (a house is built once), so a stalled picture asks again itself.
+      if (isLoadTimeout(err) && state.attempts < LOAD_ATTEMPTS) {
+        const t = setTimeout(() => retryIfDue(source, Date.now(), { force: true }), RETRY_WAIT_MS[Math.min(state.attempts, RETRY_WAIT_MS.length) - 1] ?? 0);
+        t?.unref?.();
+      }
       throw err;
     }
   );
@@ -305,13 +333,35 @@ function startLoad(source, state) {
   state.promise.catch(() => {});
 }
 
-/** #662: a failed source is loaded again when asked for, after its wait, while attempts are left. */
-function retryIfDue(source, now = Date.now()) {
+/**
+ * #662: a failed source is loaded again when asked for, after its wait, while attempts are left.
+ * #768: one still loading past its time limit (its timer held back, a tab in the background) is
+ * given up on and asked for again at once: the stall was its wait. `force`: the stalled try's own
+ * timer, already past its wait.
+ */
+function retryIfDue(source, now = Date.now(), { force = false } = {}) {
   const state = source?.[LOAD];
-  // Only a state this module made (a plain object with a number of attempts), failed for sure.
-  if (!state || state.failed !== true || typeof state.attempts !== 'number' || source.destroyed === true || state.attempts >= LOAD_ATTEMPTS) return false;
+  // Only a state this module made (a plain object with a number of attempts).
+  if (!state || typeof state.attempts !== 'number' || source.destroyed === true) return false;
+  if (state.loaded !== true && state.failed === false && state.run && typeof state.run.expire === 'function' && now - state.startedAt >= state.timeoutMs) {
+    // Out of tries: its rejection marks it failed as any other.
+    if (state.attempts >= LOAD_ATTEMPTS) {
+      state.run.expire();
+      return false;
+    }
+    state.run.expire();
+    // The stalled try's failure is noted here, not when its rejection lands (it is no longer current).
+    state.run = null;
+    state.failed = true;
+    state.failedAt = now;
+    noteImageFailure(state);
+    startLoad(source, state);
+    return true;
+  }
+  // Failed for sure.
+  if (state.failed !== true || state.attempts >= LOAD_ATTEMPTS) return false;
   const wait = RETRY_WAIT_MS[Math.min(state.attempts, RETRY_WAIT_MS.length) - 1] ?? 0;
-  if (now - state.failedAt < wait) return false;
+  if (!force && now - state.failedAt < wait) return false;
   startLoad(source, state);
   return true;
 }

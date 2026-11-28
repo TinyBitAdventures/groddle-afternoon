@@ -49,10 +49,10 @@
 
 import { ensureItem } from '../inventory.js?v=3be7988a';
 import { isItemFloor, platformYAt } from '../street-model.js?v=a9a05f9d';
-import { SOIL_FOOTPRINT, SOIL_STEADY_FLOOR, getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=38ad6f13';
+import { SOIL_FOOTPRINT, SOIL_STEADY_FLOOR, getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=63b5b2c0';
 import { trantStatusLabel } from '../trants.js?v=cf0fe1a3';
-import { loadTrantLook, trantLook } from '../trant-looks.js?v=0cd55bd4';
-import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { loadTrantLook, trantLook } from '../trant-looks.js?v=c6507fcd';
+import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
 import { woodTreeStatusLabel } from '../woodcutting.js?v=9e9af511';
 import {
   GROWN_TREE_LABELS,
@@ -74,10 +74,10 @@ import {
   soilSpritePaths,
   tickPlot,
 } from '../patches.js?v=54430bb9';
-import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js?v=8bb43102';
 import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=4156bba8';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
-import { plotSignature, replayRng } from '../shared-patches.js?v=d00594c6';
+import { plotSignature, replayRng } from '../shared-patches.js?v=46273529';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 
 export const PATCHES_FEATURE_ID = 'patches';

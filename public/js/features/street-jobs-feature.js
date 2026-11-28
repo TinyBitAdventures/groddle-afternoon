@@ -49,19 +49,20 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { priceText } from '../price.js?v=35cd2331';
 import { pluralize } from '../words.js?v=274023af';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, packStamp, removeItem } from '../inventory.js?v=3be7988a';
 import { canUseTool, useToolCondition, workStepCost } from '../tools.js?v=4156bba8';
-import { ecologyForStreet } from '../street-ecology.js?v=38ad6f13';
+import { ecologyForStreet } from '../street-ecology.js?v=63b5b2c0';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
-import { signArmWidth } from '../street-render.js?v=4966c68b';
+import { signArmWidth } from '../street-render.js?v=124facce';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
-import { getSkillCatalog } from '../content-catalogs.js?v=c9b84764';
-import { listRecipesProducing } from '../making.js?v=dc595568';
-import { GIANTS } from '../shrines.js?v=48318bec';
+import { getSkillCatalog } from '../content-catalogs.js?v=d30c3e0f';
+import { listRecipesProducing } from '../making.js?v=d3571803';
+import { GIANTS } from '../shrines.js?v=4ff3e019';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
-import { teleportationFeature } from './teleportation-feature.js?v=8f6afdf3';
+import { teleportationFeature } from './teleportation-feature.js?v=3dc439b9';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -117,14 +118,14 @@ import {
   phaseBaseCost,
   percentCompleteText,
   jobRewardsText,
-} from '../street-jobs.js?v=76471e42';
+} from '../street-jobs.js?v=17f103d0';
 import { gateTerms } from '../subway.js?v=ea6921ff';
 import { forceMetabolic, gainMetabolic, loseEnergy } from '../metabolics.js?v=48f784bf';
-import { holdNote, placeIndex, questHold, questStoryKey } from '../quest-reach.js?v=16c3faf9';
-import { fewestClosures, loadStreetGraph, reachableStreets, streetGraph, worldRoads } from '../street-graph.js?v=d767f3a2';
+import { holdNote, placeIndex, questHold, questStoryKey } from '../quest-reach.js?v=e599c56f';
+import { fewestClosures, loadStreetGraph, reachableStreets, streetGraph, worldRoads } from '../street-graph.js?v=16013e6e';
 import { doorKeysHeld } from '../doors.js?v=f815e7c8';
-import { openWorld } from '../open-roads.js?v=2e03b0a6';
-import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=c9b84764';
+import { openWorld } from '../open-roads.js?v=88fb8b19';
+import { getQuestCatalog as questCatalog } from '../content-catalogs.js?v=d30c3e0f';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
 import {
   HALL_TEXT,
@@ -150,30 +151,30 @@ import {
   sharedSlice,
   topLine,
   leaderboard,
-} from '../street-jobs-mp.js?v=1ccfc0c0';
+} from '../street-jobs-mp.js?v=eee3ff15';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { normalizeGroups } from '../groups.js?v=c5e35964';
-import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
 import { createJobIndicator, jobIndicatorTip, jobIndicatorView, jobPerc } from '../job-indicator.js?v=8bea518d';
 import { LOT_ART, LOT_CLASS, LOT_PLACEMENT, LOT_SIGN_BLOCKERS, LOT_SIGN_X, LOT_TEXT, OWNED_TEXT, floorYAt, hallStreetName, lotFit, lotHeadline, lotJobIds, lotOwner, lotVerb, ownedVerb, hallStreetOpen } from '../group-hall-lot.js?v=045c799a';
 import { hallStreetOf } from '../group-hall-street.js?v=fa1921ad';
 import { enterHall, enterVerb } from './group-hall-street-feature.js?v=59e2a499';
 import { JOB_WORK_BUBBLE, JOB_WORK_OVERLAY, JOB_WORK_REMOTE_BUBBLE_DY, avatarDrawnHeight, jobWorkBubbleY, jobWorkFloatPoint, jobWorkSoundKey, jobWorkToolScale, jobWorkToolSheet } from '../job-work-fx.js?v=a2dc6a5a';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { SIGN_ARMS } from '../map-routes.js?v=52140ba2';
+import { SIGN_ARMS } from '../map-routes.js?v=e9f5e3da';
 import { TELEPORTERS } from '../hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../wintry-portal.js?v=1437deda';
-import { PROJECTS_TEXT, aheadEntries, aheadRegions, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=78916eff';
-import { PROJECTS_PANEL_ID, buildProjectsPanel, renderAhead, renderProjects } from '../ui/projects-sheet.js?v=5be0b9ff';
+import { PROJECTS_TEXT, aheadEntries, aheadRegions, contributedJobs, mineTotal, projectEntry, projectList } from '../projects-tracker.js?v=c5f34e96';
+import { PROJECTS_PANEL_ID, buildProjectsPanel, renderAhead, renderProjects } from '../ui/projects-sheet.js?v=f272903d';
 import { SIDE_SHEET_IDS } from '../ui/panel-shell.js?v=5efb38c6';
 import { trophyGotText } from '../home-trophies.js?v=649b111e';
 import { FEATURED_TEXT, featuredChanged, featuredFromServer, featuredNeedsLine, featuredToast, featuredWaitMins, readFeaturedMemo, writeFeaturedMemo } from '../featured-project.js?v=5b2ee7c1';
 import { featuredStore, renderFeaturedLine, renderFeaturedRow } from '../ui/featured-project.js?v=ed9eded9';
 import { GEM_HINTS, isGem } from '../gem-hints.js?v=4b65f7ac';
 import { JOB_ASK_TEXT, itemAskSubject, itemGetHref, itemMakeNote, showAskRule, skillRankLabel, workSkillMissing, workSkillNote } from '../street-job-asks.js?v=32adbe89';
-import { applySoloScale, hopsFromStart, soloAmountsLine } from '../street-jobs-solo.js?v=40d84989';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { applySoloScale, hopsFromStart, soloAmountsLine } from '../street-jobs-solo.js?v=e6d237d8';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 import { sitePageWhere } from '../site-pages.js?v=9b3049cf';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -478,8 +479,8 @@ function load() {
   }
   if (!loading) {
     loading = Promise.all([
-      fetch('assets/content/street-jobs.json?v=jobs-6').then((r) => r.json()),
-      fetch('assets/streets/index.json').then((r) => r.json()),
+      fetchRetry('assets/content/street-jobs.json?v=jobs-6').then((r) => r.json()),
+      fetchRetry('assets/streets/index.json').then((r) => r.json()),
       // Report #425: without the graph every project keeps the far-out amounts.
       loadGraph().catch(() => null),
     ])

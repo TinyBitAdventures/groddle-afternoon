@@ -57,12 +57,13 @@
  * R24: the route planned again when the gate's answer changed).
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
-import { STREET_INDEX } from '../street-loader.js?v=10376267';
-import { SUBWAY_STREETS } from '../street-jobs.js?v=76471e42';
+import { STREET_INDEX } from '../street-loader.js?v=23555e53';
+import { SUBWAY_STREETS } from '../street-jobs.js?v=17f103d0';
 import { CARD_BADGE, STATIONS, SUBWAY_LINE, TEXT as SUBWAY_TEXT, gateFor, isCarTsid, papersHint, stationByTsid, surfaceStation } from '../subway.js?v=ea6921ff';
 import { countItem } from '../inventory.js?v=3be7988a';
-import { hellFeature } from './hell-feature.js?v=a45d6184';
+import { hellFeature } from './hell-feature.js?v=2071e737';
 import { postReachY } from '../street-model.js?v=a9a05f9d';
 import {
   ROUTE_COLOR,
@@ -91,8 +92,8 @@ import {
   startCut,
   subwayRides,
   tsidAliases,
-} from '../map-routes.js?v=52140ba2';
-import { _useStreetGraph, loadStreetGraph, roadsFor, streetGraphLoaded, worldRoads } from '../street-graph.js?v=d767f3a2';
+} from '../map-routes.js?v=e9f5e3da';
+import { _useStreetGraph, loadStreetGraph, roadsFor, streetGraphLoaded, worldRoads } from '../street-graph.js?v=16013e6e';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
 /** One-way roads (player report 82, tools/routes/build-one-way.mjs); js/data-urls.js keys the URL. */
@@ -171,7 +172,7 @@ function loadGraph() {
   // Without the one-way file every road is two-way, as before it.
   graphPromise ||= Promise.all([
     loadStreetGraph(),
-    fetch(ONE_WAY_URL).then((r) => r.json()).then((json) => oneWayRoads(json)).catch(() => ({})),
+    fetchRetry(ONE_WAY_URL).then((r) => r.json()).then((json) => oneWayRoads(json)).catch(() => ({})),
   ]).then(([ok, ways]) => {
     oneWay = ways;
     if (!ok) graphPromise = null;

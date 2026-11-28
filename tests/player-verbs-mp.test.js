@@ -27,12 +27,12 @@ import {
   targetSide,
   underTheInfluence,
 } from '../public/js/player-verbs-mp.js?v=4d0315f5';
-import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=9a802246';
-import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
-import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js?v=9e1855e7';
+import { playerVerbsMpFeature } from '../public/js/features/player-verbs-mp-feature.js?v=dfbb5ea0';
+import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
+import { pendingQuestOffers, acceptOffer } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { MULTIPLAYER_QUESTS, MULTIPLAYER_QUESTS_LEFT_OUT, MP_FACTS, offerableMultiplayerQuest } from '../public/js/quests-mp.js?v=e697cec3';
-import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=bb7a59f6';
+import { createAchievementState, applyAchievementProgress } from '../public/js/achievements.js?v=184f3714';
 import { economyCredits } from '../tools/build-economy.mjs';
 import { tradeTable } from '../tools/build-realtime-trade.mjs';
 

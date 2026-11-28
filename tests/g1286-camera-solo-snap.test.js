@@ -25,12 +25,12 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=8df6ad52';
+import { cameraKey } from '../public/js/features/camera-mode-feature.js?v=71e0cdce';
 import { cameraModeFeature } from '../public/js/features/camera-mode-feature.js?fresh=g1286';
 import { snapsFeature } from '../public/js/features/snaps-feature.js?fresh=g1286';
 import { SNAP_COPY, snapFileName } from '../public/js/snaps.js?v=b5be8bff';
 import { remakeStatus, isOfferedInRemake } from '../public/js/imagination-remake.js?v=99997003';
-import { HOUSE_FILE_SNAP_NOTE, grantPracticeSnapshottery, showHouseFileReport } from '../public/js/house-file-loader.js?v=4dbe8241';
+import { HOUSE_FILE_SNAP_NOTE, grantPracticeSnapshottery, showHouseFileReport } from '../public/js/house-file-loader.js?v=19ff0eae';
 import { roomPieces } from '../public/js/home-wallpaper.js?v=5d3594e4';
 import { createHomeDecorState, INTERIOR } from '../public/js/home-decor.js?v=3a84d959';
 

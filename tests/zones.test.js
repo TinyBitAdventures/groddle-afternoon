@@ -24,11 +24,11 @@ import { GAME_DIR } from '../tools/repos.mjs';
 import { buildZones, files, listZones, mergeZoneIndex, mergeZoneEcology, streetWithZoneEdits, zoneStreets, sha256, overlay, NEW_ART, MADE_DECOS } from '../tools/builder/zones.mjs';
 import { publishZone, unacknowledged } from '../tools/builder/publish.mjs';
 import { loadValidatorContext } from '../tools/builder/validator-context.mjs';
-import { validateZone } from '../public/js/builder/validate.js?v=a9ed716e';
+import { validateZone } from '../public/js/builder/validate.js?v=feecda07';
 import { isZoneTsid, withoutZoneConnects, withoutZoneRows } from '../public/js/zone-streets.js?v=b40010d5';
 import { listHubsFromIndex } from '../public/js/map-graph.js?v=803cc6cd';
 import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js?v=ffe222f1';
-import { applyStreetIndex, clearStreetIndex, clearStreetCache, loadStreetDataFromFs, setZoneStreetsShown, STREET_INDEX } from '../public/js/street-loader.js?v=10376267';
+import { applyStreetIndex, clearStreetIndex, clearStreetCache, loadStreetDataFromFs, setZoneStreetsShown, STREET_INDEX } from '../public/js/street-loader.js?v=23555e53';
 import { run } from '../tools/builder/cli.mjs';
 
 const HECHEY = 'GLI2V0UN7RD1T2J';

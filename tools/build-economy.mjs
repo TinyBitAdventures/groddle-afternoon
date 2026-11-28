@@ -101,15 +101,15 @@ import { CUBIMAL_PACKAGE_IDS, CUBIMAL_SERIES } from '../public/js/cubimals.js?v=
 import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js?v=fc419ecf';
 import { XP_FOR_LEVEL, currantRewardForLevel } from '../public/js/progression.js?v=05ff0260';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js?v=4a85e7fe';
-import { SPINDLE_TOOLS } from '../public/js/making.js?v=dc595568';
+import { SPINDLE_TOOLS } from '../public/js/making.js?v=d3571803';
 import { MACHINE_IDS } from '../public/js/machines.js?v=93a736f2';
 import { GARDEN_SKILL_PACKAGES, SEED_CATALOG } from '../public/js/garden.js?v=fefa7bcd';
 import { SKILL_PACKAGES } from '../public/js/skill-packages-data.js?v=cb4e9ab3';
 import { creditedMultiplayerQuests } from '../public/js/quests-mp.js?v=e697cec3';
 import { FURNITURE_STARTER_KIT } from '../public/js/homes-catalog.js?v=0367f90f';
-import { GIANTS } from '../public/js/shrines.js?v=48318bec';
+import { GIANTS } from '../public/js/shrines.js?v=4ff3e019';
 import { FOUR_LETTER_QUEST_ID } from '../public/js/four-letter-quest.js?v=9540cc6f';
-import { LEGALIZE_QUEST_ID } from '../public/js/legalize-it.js?v=b31c33ad';
+import { LEGALIZE_QUEST_ID } from '../public/js/legalize-it.js?v=b976dcb4';
 import { GREEDY_STREET_SPIRIT_QUEST_ID, GREEDY_STREET_SPIRIT_REPEAT_ID } from '../public/js/greedy-street-spirit.js?v=b0ce2437';
 import { WINTER_WALK_QUEST_ID, WINTER_WALK_REPEAT_QUEST_ID } from '../public/js/winter-walk.js?v=faad1d46';
 import { SUMMERS_DAY_QUEST_ID, SUMMERS_DAY_REPEAT_QUEST_ID } from '../public/js/summers-day.js?v=5ffa5056';
@@ -120,7 +120,7 @@ import { PHANTOM_QUEST_ID, REMEMBER_QUEST_ID } from '../public/js/ghost-quest.js
 import { HOG_HAUL_QUEST_ID } from '../public/js/hog-haul.js?v=50d2e072';
 import { ILMENSKIE_QUEST_ID } from '../public/js/ilmenskie-quest.js?v=433ca65b';
 // G979: Buy a Bag starts with the first skill learned, without its prerequisites (learn_first_skill.js 74-76).
-import { FIRST_SKILL_QUEST_ID } from '../public/js/quest-offers.js?v=9e1855e7';
+import { FIRST_SKILL_QUEST_ID } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { CAMERA_OFFER } from '../public/js/snaps.js?v=b5be8bff';
 // #670: the classes a player keeps their own on shared ground (a note, a Still), which the site's house-floor move reads.
 import { KEPT_OWN } from '../public/js/drops-mp.js?v=351593a6';

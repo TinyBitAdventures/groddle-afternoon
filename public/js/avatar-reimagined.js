@@ -75,7 +75,7 @@ export function installReimaginedTags(doc = globalThis.document) {
   const run = () => { if (catalog) decorateWardrobe(box, catalog); };
   // Our own additions are mutations too; decorateWardrobe is idempotent, so the second pass is a no-op.
   new MutationObserver(run).observe(box, { childList: true, subtree: true });
-  import('./avatar-compositor.js?v=1d3df23e')
+  import('./avatar-compositor.js?v=2b3cd2b7')
     .then(({ loadCatalog }) => loadCatalog())
     .then((c) => { catalog = c; run(); })
     .catch(() => {});

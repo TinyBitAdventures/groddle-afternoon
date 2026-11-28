@@ -9,11 +9,11 @@ import { afterEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { VENDOR_FINDER_TEXT, vendorFinderRows, vendorKinds, vendorRowWhere } from '../public/js/vendor-finder.js?v=7fbfc51d';
-import { vendorFinderFeature } from '../public/js/features/vendor-finder-feature.js?v=783d0f4a';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=38ad6f13';
-import { findRoute } from '../public/js/map-routes.js?v=52140ba2';
-import { streetGraph } from '../public/js/street-graph.js?v=d767f3a2';
-import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
+import { vendorFinderFeature } from '../public/js/features/vendor-finder-feature.js?v=aad53a1c';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=63b5b2c0';
+import { findRoute } from '../public/js/map-routes.js?v=e9f5e3da';
+import { streetGraph } from '../public/js/street-graph.js?v=16013e6e';
+import { applyStreetIndex } from '../public/js/street-loader.js?v=23555e53';
 import { selectVendorProfile } from '../public/js/vendor.js?v=7a07f478';
 
 const PUB = new URL('../public/', import.meta.url);

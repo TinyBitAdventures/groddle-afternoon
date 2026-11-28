@@ -22,15 +22,15 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from '../public/js/achievements.js?v=bb7a59f6';
+} from '../public/js/achievements.js?v=184f3714';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { createPlot, growTree, tickPlot } from '../public/js/patches.js?v=54430bb9';
 import { noteWoodCare } from '../public/js/woodcutting.js?v=9e9af511';
-import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=5922a1ed';
-import { supplyFeature } from '../public/js/features/supply-feature.js?v=408f23d3';
+import { slothsChewing } from '../public/js/features/resource-nodes-feature.js?v=d03dc235';
+import { supplyFeature } from '../public/js/features/supply-feature.js?v=396a928f';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=e334ace2';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { normalizeAchievementSnapshot } from '../public/js/player-save.js?v=0bd0e294';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

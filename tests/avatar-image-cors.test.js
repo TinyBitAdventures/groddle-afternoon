@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { loadArticles } from '../public/js/avatar-compositor.js?v=1d3df23e';
+import { loadArticles } from '../public/js/avatar-compositor.js?v=2b3cd2b7';
 
 describe('avatar part images', () => {
   it('are requested with crossOrigin anonymous', async () => {

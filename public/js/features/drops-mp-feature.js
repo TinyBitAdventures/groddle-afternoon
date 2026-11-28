@@ -70,6 +70,7 @@
  * window.groddleDrops.
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { ITEM_CATALOG, addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { TOOL_CONDITION_CATALOG, leavingCopyTag, leavingToolWear, receiveToolCopy, takeToolCopy } from '../tools.js?v=4156bba8';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
@@ -164,7 +165,7 @@ function createSession(engine, client) {
 
   function loadTable() {
     if (table || tableLoading) return tableLoading;
-    tableLoading = fetch(TABLE_URL, { cache: 'force-cache' })
+    tableLoading = fetchRetry(TABLE_URL, { cache: 'force-cache' })
       .then((r) => (r.ok ? r.json() : null))
       .then((t) => { table = t && t.items ? t : { items: {}, untradeable: {} }; })
       .catch(() => { tableLoading = null; });

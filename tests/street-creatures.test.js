@@ -37,14 +37,14 @@ import {
   restAt,
   sharedCreatureLabel,
   walkerAt,
-} from '../public/js/street-creatures.js?v=cc6d21bf';
-import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=a3cc4ce5';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=0537418b';
-import { FEATURES } from '../public/js/features/index.js?v=3c85d4c4';
+} from '../public/js/street-creatures.js?v=7223cc8f';
+import { actMessage, createStreetCopy, guanoPiles, idKind, reconcile, takeObjs } from '../public/js/street-objects.js?v=93531424';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=2235c767';
+import { FEATURES } from '../public/js/features/index.js?v=cb7a3782';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=57fecfcb';
 import { creatureRequests, setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
-import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=38ad6f13';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=23555e53';
+import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=63b5b2c0';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -285,7 +285,7 @@ describe('street animals: a Chicken\'s walk, turns and pauses (lane CHICKWALK)',
   });
 
   it('the art turns on the spot: the sprite is anchored under the bird (Chicken sheets are cut 27 px off centre)', async () => {
-    const { footOf } = await import('../public/js/sprite-feet.js?v=6283b688');
+    const { footOf } = await import('../public/js/sprite-feet.js?v=1c6452d9');
     const cell = { width: 148, height: 110 };
     const walk = footOf('assets/sprites/npc_chicken__x1_walk_png_1354830385.webp', cell);
     // The bird's middle across the walk (G515 measured 101 of the 148 px cell; R12's builder 101.5).

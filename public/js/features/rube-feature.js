@@ -20,9 +20,10 @@
  *     rubeLast, rubeAutoplay, rubeChance.
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { hellFeature } from './hell-feature.js?v=a45d6184';
+import { hellFeature } from './hell-feature.js?v=2071e737';
 import { landingY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
 import {
   RUBE_CLASS,
@@ -44,9 +45,9 @@ import {
   rubeTalk,
   streetCanHostRube,
 } from '../rube.js?v=0b98cc11';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js?v=8bb43102';
 import { itemZ } from '../item-bands.js?v=ec366be3';
-import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
 import { pcLabel } from '../pc-label.js?v=d54da634';
 
 export const RUBE_FEATURE_ID = 'rube';
@@ -93,7 +94,7 @@ function seeded(seed) {
 
 function loadCatalog() {
   if (catalog) return Promise.resolve(catalog);
-  catalogPromise ||= fetch('assets/content/rube-catalog.json?v=rube-1')
+  catalogPromise ||= fetchRetry('assets/content/rube-catalog.json?v=rube-1')
     .then((r) => r.json())
     .then((json) => {
       catalog = json.items || {};

@@ -17,9 +17,9 @@ import {
   plantSeedChoices,
   seedDropCheck,
 } from '../public/js/garden.js?v=fefa7bcd';
-import { getVerbsFor, runVerb } from '../public/content.js?v=1c0f4a21';
+import { getVerbsFor, runVerb } from '../public/content.js?v=4db66593';
 import { plotDragClass, seedOver } from '../public/js/features/garden-guano-feature.js?v=3faeddbb';
-import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=5bccee33';
+import { sharedGardensFeature } from '../public/js/features/shared-gardens-feature.js?v=d3a8343a';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const COMMUNITY = 'GCR101NQ4BU1SKS';

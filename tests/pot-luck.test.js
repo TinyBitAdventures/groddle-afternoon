@@ -11,7 +11,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { imageSize } from '../tools/image-size.mjs';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=6a4569c4';
 import { HIRES_ICONS } from '../public/js/icon-hires.js?v=60e2474b';
 import { PACKED_SHEETS } from '../public/js/packed-sheets-data.js?v=192c6f15';
 import { SEASONS, SEASONAL_STOCK, SEASONAL_ITEMS, activeSeasons, calendarSeasons, daysLeft, parseSeasonDate, potLuckWindow, seasonalConversions, seasonalSources } from '../public/js/seasons.js?v=5d8f545a';
@@ -28,9 +28,9 @@ import {
   dressWhy,
   featherDrop,
 } from '../public/js/pot-luck.js?v=e704c060';
-import { applyCreatureState } from '../public/js/street-creatures.js?v=cc6d21bf';
+import { applyCreatureState } from '../public/js/street-creatures.js?v=7223cc8f';
 import { dropFor } from '../public/js/world-drop.js?v=a8956ae5';
-import { potLuckFeature } from '../public/js/features/pot-luck-feature.js?v=26c13460';
+import { potLuckFeature } from '../public/js/features/pot-luck-feature.js?v=487baddd';
 import { problems } from '../tools/pot-luck-art/build.mjs';
 
 const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');

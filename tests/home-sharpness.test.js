@@ -25,7 +25,7 @@ async function stageScale() {
 
 /** Every sharpened home graphic: { name, paths (1x URLs from public/), scale (largest world scale it is drawn at) }. */
 async function homeArt() {
-  const { TOWER_ART, TOWER_ART_DIR, TOWER_STYLES, TOWER_VARIANT_ART, PROTO_ART, composeTower } = await import('../public/js/home-tower.js?v=a7fc0cce');
+  const { TOWER_ART, TOWER_ART_DIR, TOWER_STYLES, TOWER_VARIANT_ART, PROTO_ART, composeTower } = await import('../public/js/home-tower.js?v=bb722397');
   const { PROTO_DEPLETED_ART } = await import('../public/js/home-proto-art.js?v=9309e9f3');
   const { NOTE_POLE_PARTS } = await import('../public/js/note-pole-art.js?v=fbda2f8a');
   const { moduleConsts } = await import('./sheet-sources.js');
@@ -90,7 +90,7 @@ test('every sharpened home graphic is found, with the counts the audit measured'
 });
 
 test('each 3x twin exists and is exactly three times its 1x file; the 1x files stay as the fallback', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=dd070ce8');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=6a4569c4');
   const { DENSE_SPRITES } = await import('../public/js/sprite-dense.js?v=67101472');
   const bad = [];
   for (const row of await homeArt()) {
@@ -110,7 +110,7 @@ test('each 3x twin exists and is exactly three times its 1x file; the 1x files s
 });
 
 test('each sharpened home graphic stores at least as many pixels as its largest draw scale', async () => {
-  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=dd070ce8');
+  const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=6a4569c4');
   const { DENSE_SPRITES } = await import('../public/js/sprite-dense.js?v=67101472');
   const stage = await stageScale();
   assert.ok(stage > 2 && stage < 3, `stage ${stage}`);

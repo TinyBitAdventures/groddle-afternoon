@@ -29,7 +29,7 @@ import {
   hallStreetJob,
 } from '../public/js/group-hall-street.js?v=fa1921ad';
 import { OPEN_HALL_STREETS, hallStreetOpen } from '../public/js/group-hall-lot.js?v=045c799a';
-import { HALL_TEXT } from '../public/js/street-jobs-mp.js?v=1ccfc0c0';
+import { HALL_TEXT } from '../public/js/street-jobs-mp.js?v=eee3ff15';
 import { enterHall, enterVerb, groupHallStreetFeature as F, resetGroupHallStreet } from '../public/js/features/group-hall-street-feature.js?v=59e2a499';
 import { arrivalInTarget } from '../public/js/location-navigation.js?v=e9221d85';
 import { ladderTopDeck } from '../public/js/street-model.js?v=a9a05f9d';

@@ -61,7 +61,7 @@ import { priceText } from '../price.js?v=35cd2331';
 import { addItem, countItem, ensureItem } from '../inventory.js?v=3be7988a';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
-import { emblemCostFor } from '../shrines.js?v=48318bec';
+import { emblemCostFor } from '../shrines.js?v=4ff3e019';
 import { giantDisplayName } from '../giant-names.js?v=0e295891';
 import { landingY } from '../walk-surface.js?v=76def2f6';
 import {
@@ -96,8 +96,8 @@ import {
   titheMessage,
   useEmblem,
 } from '../giant-icons.js?v=d21e4a37';
-import { textureFromUrl } from '../textures.js?v=b8e38103';
-import { playSheetOverlay } from '../overlay-art.js?v=e50bacca';
+import { textureFromUrl } from '../textures.js?v=8bb43102';
+import { playSheetOverlay } from '../overlay-art.js?v=d32dce0e';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { forceMetabolic, gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=8b5536cc';
@@ -108,10 +108,10 @@ import { insideProof, readVisitScene } from '../neighbours-mp.js?v=de82fd7d';
 import { isHousePlace } from '../home-floors.js?v=73a434ce';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
-import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=dca6b2cd';
+import { HOME_INTERIOR_TSID, HOME_STREET_TSID } from '../homes.js?v=4f4ade68';
 import { gnomePlaceFor, visitGnomePlace } from '../garden-gnome.js?v=6ae20bdc';
-import { homesFeature } from './homes-feature.js?v=70324a94';
-import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { homesFeature } from './homes-feature.js?v=d1109a81';
+import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.webp`;

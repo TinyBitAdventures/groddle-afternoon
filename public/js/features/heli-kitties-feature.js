@@ -40,10 +40,10 @@
  */
 
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
-import { followPath } from '../street-creatures.js?v=cc6d21bf';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
+import { followPath } from '../street-creatures.js?v=7223cc8f';
 import { followFloorY, landingY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
+import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=7224f78a';
 import {
   KITTY_ID,
   KITTY_MOTION,

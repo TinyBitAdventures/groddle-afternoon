@@ -17,10 +17,10 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HOME_LIMITS } from '../public/js/homes-catalog.js?v=0367f90f';
-import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=122d6f45';
+import { createCultivationState, homeStreetLayout } from '../public/js/home-cultivation.js?v=61295953';
 import { EXTERIOR_STYLES, streetLook } from '../public/js/home-styles.js?v=ec5d2f69';
 import { NEIGHBOURS, neighbourLayout } from '../public/js/neighbours.js?v=13f35acd';
-import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=fe6e52ce';
+import { SCENE_STYLES, propPlan } from '../public/js/features/neighbour-scene.js?v=d54ec8ac';
 import {
   DOORWAY_GAP,
   HOUSE_STYLE_KEYS,
@@ -31,7 +31,7 @@ import {
   streetNearSkip,
   streetTrimSpots,
   towerDoorway,
-} from '../public/js/features/homes-feature.js?v=70324a94';
+} from '../public/js/features/homes-feature.js?v=d1109a81';
 
 const read = (rel) => readFileSync(join(import.meta.dirname, '..', 'public', 'js', rel), 'utf8');
 const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;

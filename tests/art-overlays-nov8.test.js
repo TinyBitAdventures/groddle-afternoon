@@ -7,12 +7,12 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox } from '../public/js/overlays.js?v=91dcee74';
+import { OVERLAY_BUBBLE_URL, OVERLAY_USES, overlayBubbleBox } from '../public/js/overlays.js?v=c788d4ab';
 import { OVERLAYS, expandMotionObjects } from '../tools/overlays/build.mjs';
 import { loadFla } from '../tools/overlay-art/xfl-svg.mjs';
 import { SHRINE_SHEETS, shrineClassFor, shrineRegionForHub, shrineSheet, shrineVariantFor } from '../public/js/shrine-variants.js?v=adf2ba15';
 import { checkVariants, variantFiles } from '../tools/shrine-variants/build.mjs';
-import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=5a4cfe2d';
+import { SLATHER_VERB, SPLATTER_STAGE_SIDE, splatterDy, slatherVerb } from '../public/js/features/quest-verbs-feature.js?v=5a505823';
 import { OVERLAY_EMOTES, EMOTES } from '../public/js/realtime-client.js?v=7e402304';
 import {
   GAME_TELEPORTER_DECO,
@@ -22,7 +22,7 @@ import {
   gameTeleporterFeature,
   payForCrowns,
   teleporterPoint,
-} from '../public/js/features/game-teleporter-feature.js?v=3803484c';
+} from '../public/js/features/game-teleporter-feature.js?v=8b56238e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -258,7 +258,7 @@ describe('Regional shrines wear their own art (33 classes, OGA CC0)', () => {
     const results = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     assert.equal(manifest.jobs.length, 33);
     assert.equal(manifest.firstDraw, true);
-    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=dd070ce8');
+    const { HIRES_SPRITES } = await import('../public/js/sprite-hires.js?v=6a4569c4');
     for (const row of variantFiles()) {
       const job = manifest.jobs.find((j) => j.sheets.some((sh) => sh.path === row.out));
       assert.ok(job, row.out);

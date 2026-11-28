@@ -10,10 +10,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { groundAt } from '../public/js/street-arrival.js?v=32c28820';
-import { applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
+import { groundAt } from '../public/js/street-arrival.js?v=2dfe79ac';
+import { applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=23555e53';
 import { platformYAt, platformsScreen } from '../public/js/street-model.js?v=a9a05f9d';
-import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=38ad6f13';
+import { getStreetEcologyCatalog, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=63b5b2c0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

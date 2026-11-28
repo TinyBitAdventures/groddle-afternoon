@@ -5,6 +5,8 @@
  * whose only archived wildlife is kitties keep their playable fallback.
  */
 
+import { fetchRetry } from './load-retry.js?v=24823577';
+
 export const STREET_ECOLOGY_JSON = 'assets/content/street-ecology.json';
 
 let catalog = null;
@@ -27,7 +29,7 @@ export function wildlifeCatalog() {
 }
 
 /** Fetch the ecology catalog once (shared by the fox and kitty features). */
-export function loadWildlifeCatalog(fetchImpl = globalThis.fetch) {
+export function loadWildlifeCatalog(fetchImpl = globalThis.fetch && fetchRetry) {
   if (catalog) return Promise.resolve(catalog);
   if (!loading) {
     loading = (typeof fetchImpl === 'function'

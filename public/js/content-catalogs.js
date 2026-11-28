@@ -9,6 +9,7 @@
  * Radio's, js/vine-radio.js withOursQuests); quests.json keeps Tiny Speck's only.
  */
 
+import { fetchRetry } from './load-retry.js?v=24823577';
 import { withBetterLearning } from './better-learning.js?v=044ff9ff';
 import { withOursQuests } from './vine-radio.js?v=5436aa09';
 
@@ -26,7 +27,7 @@ export const CONTENT_BASE = 'assets/content';
 /**
  * @param {typeof fetch} [fetchImpl]
  */
-export async function loadContentCatalogs(fetchImpl = globalThis.fetch) {
+export async function loadContentCatalogs(fetchImpl = globalThis.fetch && fetchRetry) {
   if (CACHE.ready) return CACHE;
   const load = async (name) => {
     const res = await fetchImpl(`${CONTENT_BASE}/${name}.json`);

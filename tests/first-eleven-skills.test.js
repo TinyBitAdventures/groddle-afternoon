@@ -9,8 +9,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createSkillState, grantSkillWithPrereqs } from '../public/js/skills.js?v=3c6dbdff';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createSkillState, grantSkillWithPrereqs } from '../public/js/skills.js?v=9f77da71';
 import { STARTER_MINING_SKILLS } from '../public/js/mining.js?v=7ecaa572';
 
 const here = dirname(fileURLToPath(import.meta.url));

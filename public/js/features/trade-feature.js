@@ -40,11 +40,12 @@
  * endRequest, acceptRequest).
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { ITEM_CATALOG, addItem, countItem, itemIcon, listPackSlots, removeItem } from '../inventory.js?v=3be7988a';
 import { TOOL_CONDITION_CATALOG, copyTagKind, copyTags, leavingToolWear, moveToolCopy, receiveToolCopies, receiveToolCopy, setCopyTag, setToolRemaining, toolCopies } from '../tools.js?v=4156bba8';
 import { scriptFromTag, scriptLabel } from '../teleportation.js?v=cbbc673f';
 import { saveStore, savedThrough } from '../save-store.js?v=1ccb1d6b';
-import { playOverlay } from '../overlays.js?v=91dcee74';
+import { playOverlay } from '../overlays.js?v=c788d4ab';
 import {
   APPLIED_KEEP,
   TRADE_SLOTS,
@@ -189,7 +190,7 @@ function createSession(engine, client) {
   // —— Trade table (tools/build-realtime-trade.mjs) ——
   function loadTable() {
     if (table || tableLoading) return tableLoading;
-    tableLoading = fetch(TABLE_URL, { cache: 'force-cache' })
+    tableLoading = fetchRetry(TABLE_URL, { cache: 'force-cache' })
       .then((r) => (r.ok ? r.json() : null))
       .then((t) => {
         table = t && t.items ? t : { items: {}, untradeable: {} };

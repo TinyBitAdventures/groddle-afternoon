@@ -9,8 +9,8 @@
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { applyStreetIndex } from '../public/js/street-loader.js?v=10376267';
-import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=6ae6e44c';
+import { applyStreetIndex } from '../public/js/street-loader.js?v=23555e53';
+import { streetJobsFeature } from '../public/js/features/street-jobs-feature.js?v=8f8c3622';
 import { followMpFeature } from '../public/js/features/follow-mp-feature.js?v=b83f8f33';
 
 const PUB = new URL('../public/', import.meta.url);

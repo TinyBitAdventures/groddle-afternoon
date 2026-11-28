@@ -41,9 +41,9 @@ import {
   questAwardPayload,
   routeQuestEvent,
   turnInQuest,
-} from '../quest-offers.js?v=9e1855e7';
+} from '../quest-offers.js?v=cec1b5e9';
 import { addItem, removeItem, countItem } from '../inventory.js?v=3be7988a';
-import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
+import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
 import {
   MP_FACTS,
   MP_QUEST_COUNTERS as C,

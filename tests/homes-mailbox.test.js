@@ -11,7 +11,7 @@ import {
   enterHomeInterior,
   leaveHomeInterior,
   imagineHome,
-} from '../public/js/homes.js?v=dca6b2cd';
+} from '../public/js/homes.js?v=4f4ade68';
 import {
   MAIL_BASE_COST,
   archiveMail,

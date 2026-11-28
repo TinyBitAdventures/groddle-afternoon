@@ -21,7 +21,7 @@ import { createFeatureHost } from '../public/js/feature-host.js?v=100f3193';
 import { createDroppedItemState } from '../public/js/world-items.js?v=93313aad';
 import { OFFLINE_LINE, PLAY_HERE_STATES } from '../public/js/online-request.js?v=5fa7a635';
 import { PLAY_HERE_STATES as DROPS_PLAY_HERE, dropsMpFeature } from '../public/js/features/drops-mp-feature.js?fresh=play-here-greyed';
-import { PLAY_HERE_TIP, greyForPlayHere } from '../public/js/features/realtime-feature.js?v=f36a5ffd';
+import { PLAY_HERE_TIP, greyForPlayHere } from '../public/js/features/realtime-feature.js?v=02112e91';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const game = read('public/game.js');

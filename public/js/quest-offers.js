@@ -71,7 +71,7 @@
  */
 
 import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js?v=90b0c123';
-import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=c9b84764';
+import { getBuffCatalog, getQuestCatalog } from './content-catalogs.js?v=d30c3e0f';
 import { levelInfoForXp } from './progression.js?v=05ff0260';
 import { brokenToolCopies } from './tools.js?v=4156bba8';
 import { offerableMultiplayerQuest } from './quests-mp.js?v=e697cec3';
@@ -82,7 +82,7 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
   eventToCounter,
-} from './quests.js?v=d9b316eb';
+} from './quests.js?v=f574d2e1';
 
 /** Original: only one offer every 5 minutes (quests_offer delay = 60 * 5). */
 export const OFFER_INTERVAL_MS = 5 * 60 * 1000;

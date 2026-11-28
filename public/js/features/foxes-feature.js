@@ -51,10 +51,10 @@ import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { addItem, countItem, removeItem } from '../inventory.js?v=3be7988a';
 import { getToolCondition } from '../tools.js?v=4156bba8';
 import { worldToScreen } from '../street-model.js?v=a9a05f9d';
-import { OVERLAY_USES, playOverlay } from '../overlays.js?v=91dcee74';
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
+import { OVERLAY_USES, playOverlay } from '../overlays.js?v=c788d4ab';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
 import { followFloorY, nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
-import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=670c3a7f';
+import { loadWildlifeCatalog, wildlifeCatalog, wildlifeFor } from '../wildlife.js?v=7224f78a';
 import {
   FIBER_ID,
   FLEET_FOXER_ACHIEVEMENT,
@@ -88,7 +88,7 @@ import {
   stepFox,
 } from '../foxes.js?v=c0ce235f';
 import { FOX_FLURRY_COUNTER, foxLegFrom, foxOnLeg, igniteBaitXs, normalizeBaits, normalizeFoxes, preserveOverCapacity, serverId } from '../foxes-mp.js?v=20b2e4f9';
-import { clockOffset } from '../street-creatures.js?v=cc6d21bf';
+import { clockOffset } from '../street-creatures.js?v=7223cc8f';
 import { itemZ } from '../item-bands.js?v=ec366be3';
 import { topUpMetabolic } from '../metabolics.js?v=48f784bf';
 import { offlineLine, sharedOffline } from '../online-request.js?v=5fa7a635';

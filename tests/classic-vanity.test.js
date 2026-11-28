@@ -15,7 +15,7 @@ import { FakeEl } from './social-fake-dom.js';
 import { FACE_DIMS, normalizeVectorFields, resolveLook } from '../public/js/avatar-looks.js?v=5a28384d';
 import { ANIMS, CORE_FRAMES } from '../public/js/avatar-anims.js?v=fb921bf4';
 import { EMOTE_TESTS, LEAVING_TEXT, leavingDialogOpen, renderEmoteTests, renderFaceDims, showLeavingDialog } from '../public/js/avatar-builder-ui.js?v=e9e684cf';
-import { appearanceToJson, loadAppearance, migrateAppearance, normalizeAppearance, saveAppearance } from '../public/js/character-builder.js?v=13bbcfff';
+import { appearanceToJson, loadAppearance, migrateAppearance, normalizeAppearance, saveAppearance } from '../public/js/character-builder.js?v=ffd9abe0';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

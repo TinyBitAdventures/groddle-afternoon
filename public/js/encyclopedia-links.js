@@ -23,6 +23,7 @@
  * the client's did (its target 'encyclopedia'), so a second press reuses the Encyclopedia's tab.
  */
 
+import { fetchRetry } from './load-retry.js?v=24823577';
 import { openSitePage, sitePageTip } from './site-pages.js?v=9b3049cf';
 
 /** The home page and the index, relative to the game root (the play pages' <base>). */
@@ -133,7 +134,7 @@ export function isEncyclopediaKey(e) {
  * `onReady()` runs once the index is in, so open sheets can draw their links.
  */
 export function createEncyclopedia({
-  fetchJson = (url) => globalThis.fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))),
+  fetchJson = (url) => fetchRetry(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))),
   openWindow = (url, name) => openSitePage(url, { name, features: '' }),
   resolve = (href) => new URL(href, globalThis.document?.baseURI || globalThis.location?.href).href,
   onReady = () => {},

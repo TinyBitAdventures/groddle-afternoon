@@ -61,7 +61,7 @@
  * spiritReminisceLast.
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
 import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=0371ea0c';
 import {
@@ -102,11 +102,11 @@ import {
   setCurrentState,
 } from '../conversations.js?v=8b5536cc';
 import { pcLabel } from '../pc-label.js?v=d54da634';
-import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=9e1855e7';
-import { getQuestCatalog } from '../content-catalogs.js?v=c9b84764';
-import { questRoomConverse } from './quest-instances-feature.js?v=4866d1a5';
-import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=54008539';
-import { questDoneAt } from '../quests.js?v=d9b316eb';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js?v=cec1b5e9';
+import { getQuestCatalog } from '../content-catalogs.js?v=d30c3e0f';
+import { questRoomConverse } from './quest-instances-feature.js?v=ad6e7cd1';
+import { SPIRIT_REMINISCE_TEXT, isStreetSpiritClass, spiritReminisceOffers, withReminisceVerb } from '../spirit-reminisce.js?v=addcbc4a';
+import { questDoneAt } from '../quests.js?v=f574d2e1';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
 const TALK_MS = 5000; // the remake's talk bubble; the source talks until the conversation ends

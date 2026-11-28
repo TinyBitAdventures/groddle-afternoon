@@ -29,7 +29,7 @@
  */
 
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
-import { ARRIVAL, FLOOR, FLOOR_Y, H, TELEPORTER, VY_MAX, W, buildFall, fallPlatforms, numberAt, sx, sy } from './falling-room-scene.js?v=1a195750';
+import { ARRIVAL, FLOOR, FLOOR_Y, H, TELEPORTER, VY_MAX, W, buildFall, fallPlatforms, numberAt, sx, sy } from './falling-room-scene.js?v=8e539575';
 
 export const STAGE = 'falling';
 export const TEMPLATE = Object.freeze({ prod: 'LLI12DVTLA01HT5', dev: 'LHH12F9DO801RUL' });

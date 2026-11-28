@@ -9,7 +9,7 @@
  * here as clean vectors.
  */
 
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
 import { quoinTouches } from '../quoins.js?v=4d75aec0';
 import { sharpRoomDeco } from '../deco-hires.js?v=34f36d77';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';

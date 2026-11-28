@@ -15,10 +15,10 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createResourceNode, getResourceNodeDef, resourceNodeFrame, tickResourceNode } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { setTrantTables, TRANT_META } from '../public/js/trants.js?v=cf0fe1a3';
-import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=5f56c16f';
-import { trantLook, trantLookFiles } from '../public/js/trant-looks.js?v=0cd55bd4';
+import { treeFrameUrl } from '../public/js/features/patches-feature.js?v=d54ec53e';
+import { trantLook, trantLookFiles } from '../public/js/trant-looks.js?v=c6507fcd';
 import { soilSpritePaths, DEAD_TRANT_CLASSES } from '../public/js/patches.js?v=54430bb9';
-import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=dd070ce8';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js?v=6a4569c4';
 import { ENCHANTED_TREE_SHEETS } from '../public/js/enchanted-forests.js?v=17ac01e4';
 
 const pub = join(import.meta.dirname, '../public');

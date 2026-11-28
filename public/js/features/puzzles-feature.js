@@ -68,6 +68,7 @@
  * card offers the way back here).
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { locationEventsApi } from './location-events-feature.js?v=1c5b6340';
 import { TOUCH_JUMP_EVENT, isPhoneDevice } from '../touch-controls.js?v=8bc690ac';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=4d75aec0';
@@ -92,9 +93,9 @@ import {
   stepTriggers,
 } from '../puzzle-triggers.js?v=221b67a9';
 import { gainMetabolic } from '../metabolics.js?v=48f784bf';
-import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
+import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=8bb43102';
 import { partySpaceForStreet } from '../party-spaces.js?v=91ce15c5';
-import { anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 import { WORLD_FONT_FAMILY } from '../world-text.js?v=6b49f88c';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';
@@ -120,7 +121,7 @@ let instanceHeld = null;
 function load() {
   if (data) return Promise.resolve(data);
   if (!loading) {
-    loading = fetch(`${PUZZLE_DATA_URL}?v=puzzles-3`)
+    loading = fetchRetry(`${PUZZLE_DATA_URL}?v=puzzles-3`)
       .then((r) => r.json())
       .then((raw) => {
         data = normalizePuzzleData(raw);

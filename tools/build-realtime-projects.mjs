@@ -54,10 +54,10 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { requireServer, serverPath } from './repos.mjs';
-import { TOWER_JOBS, towerFloorClass } from '../public/js/home-tower.js?v=a7fc0cce';
-import { SOLO_DIVISOR, STREET_JOB_COOLDOWN_MS, WORK_UNIT_MS, jobDivisor, soloNeed } from '../public/js/street-jobs.js?v=76471e42';
-import { exemptForEveryone, freeWays } from '../public/js/open-roads.js?v=2e03b0a6';
-import { routeGraph } from '../public/js/street-graph.js?v=d767f3a2';
+import { TOWER_JOBS, towerFloorClass } from '../public/js/home-tower.js?v=bb722397';
+import { SOLO_DIVISOR, STREET_JOB_COOLDOWN_MS, WORK_UNIT_MS, jobDivisor, soloNeed } from '../public/js/street-jobs.js?v=17f103d0';
+import { exemptForEveryone, freeWays } from '../public/js/open-roads.js?v=88fb8b19';
+import { routeGraph } from '../public/js/street-graph.js?v=16013e6e';
 import { TELEPORTERS } from '../public/js/hidden-floors.js?v=023336cb';
 import { WINTRY_PORTAL_TELEPORTERS } from '../public/js/wintry-portal.js?v=1437deda';
 

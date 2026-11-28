@@ -26,6 +26,7 @@
  * ones that wait on a verb, a multiplayer message or Austin.
  */
 
+import { fetchRetry } from './load-retry.js?v=24823577';
 import {
   OVERLAY_BASE,
   OVERLAY_FADE,
@@ -46,7 +47,7 @@ import {
   vectorArtStats,
   vectorDensity,
   vectorFrameSvgs,
-} from './overlay-art.js?v=e50bacca';
+} from './overlay-art.js?v=d32dce0e';
 
 // G446: the SVG-frame helpers live in overlay-art.js (playSheetOverlay draws its rainbows the same way).
 // G448: an overlay holds its decoded frames only while it plays (holdVectorTexture).
@@ -167,7 +168,7 @@ let manifestPromise = null;
 
 /** overlays-more.json, once (a failed fetch is retried next time). */
 export function loadMoreOverlays() {
-  manifestPromise ||= fetch(MORE_MANIFEST_URL)
+  manifestPromise ||= fetchRetry(MORE_MANIFEST_URL)
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`overlays-more.json ${r.status}`))))
     .catch((err) => {
       manifestPromise = null;

@@ -36,9 +36,9 @@ import {
   setPaused,
   queueSetActive,
 } from '../public/js/craftybot.js?v=6f09b162';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=9d67b877';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=70324a94';
-import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=d9b5a4ce';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=d1109a81';
+import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=c48e2640';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CATALOG = join(ROOT, 'public/assets/content/craftybot-specs.json');

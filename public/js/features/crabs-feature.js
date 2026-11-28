@@ -44,17 +44,17 @@
  * played. &crabautoplay=...,radioquest answers the offer with Deal!
  */
 
-import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
+import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=d744485b';
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=3be7988a';
 import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js?v=e4c81eb7';
 import { gainMetabolic, loseMood, shiftMetabolic } from '../metabolics.js?v=48f784bf';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { slugsFromEffects } from '../speech-slugs.js?v=d5cc8b6f';
 import { getGameDayKey } from '../game-day.js?v=57fecfcb';
-import { cleanQuestMarkup } from '../quests.js?v=d9b316eb';
-import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=9e1855e7';
+import { cleanQuestMarkup } from '../quests.js?v=f574d2e1';
+import { acceptOffer, npcQuestOffers } from '../quest-offers.js?v=cec1b5e9';
 import { CRAB_TUNES_COUNTER, RADIO_QUEST_ID } from '../vine-radio.js?v=5436aa09';
-import { followPath } from '../street-creatures.js?v=cc6d21bf';
+import { followPath } from '../street-creatures.js?v=7223cc8f';
 import { followFloorY, walkSurfaceY } from '../walk-surface.js?v=76def2f6';
 import { isStandable } from '../street-model.js?v=a9a05f9d';
 import {
@@ -88,7 +88,7 @@ import {
   normalizeCrabMemory,
   playToday,
 } from '../crabs.js?v=eb0bdc39';
-import { standOnFeet } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet } from '../sprite-feet.js?v=1c6452d9';
 
 const ART = 'assets/sprites/crabs/';
 /** OGA npc_crab sheets: 131x129 cells, 6 columns; populated counts measured. */

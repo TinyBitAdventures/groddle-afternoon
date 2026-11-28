@@ -13,13 +13,13 @@
  */
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown, STREET_INDEX } from '../public/js/street-loader.js?v=10376267';
+import { applyStreetIndex, loadStreetDataFromFs, setZoneStreetsShown, STREET_INDEX } from '../public/js/street-loader.js?v=23555e53';
 import { platformsScreen, streetWidth } from '../public/js/street-model.js?v=a9a05f9d';
 import {
   ecologyForStreet, footOverAir, planStreetPlacements, populationForStreet, rockSpawnPlan,
   setStreetEcologyCatalog, streetReservedSpots, ROCK_SHAPE_WIDTHS, PLACEMENT_FOOTPRINTS, STEADY_FLOOR_GROUPS,
-} from '../public/js/street-ecology.js?v=38ad6f13';
-import { resourceSpawnPlan, RESOURCE_GROUP_PREFIX } from '../public/js/features/resource-nodes-feature.js?v=5922a1ed';
+} from '../public/js/street-ecology.js?v=63b5b2c0';
+import { resourceSpawnPlan, RESOURCE_GROUP_PREFIX } from '../public/js/features/resource-nodes-feature.js?v=d03dc235';
 import { creatureRequests, placementRequests, setCreatureEcology } from './build-realtime-objects.mjs';
 import { isZoneTsid } from '../public/js/zone-streets.js?v=b40010d5';
 

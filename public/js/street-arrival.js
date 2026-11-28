@@ -17,7 +17,8 @@
  * other street leads to takes its own way out nearest the middle, where /stuck stands you
  * (street-model.js stuckWay); with neither, null (game.js keeps the planner's spot).
  */
-import { inUnreachedRun, unreachedFloorsFor } from './street-ecology.js?v=38ad6f13';
+import { fetchRetry } from './load-retry.js?v=24823577';
+import { inUnreachedRun, unreachedFloorsFor } from './street-ecology.js?v=63b5b2c0';
 import { isStandable, platformYAt, stuckWay } from './street-model.js?v=a9a05f9d';
 
 export const STREET_ARRIVALS_URL = 'assets/content/street-arrivals.json';
@@ -96,7 +97,7 @@ let tablePromise = null;
  * The arrivals table, fetched once and shared. Resolves null when it cannot be had (offline, an old
  * build): defaultArrival then takes the street's own way out; a failed load is tried again next time.
  */
-export function loadStreetArrivals(fetchFn = globalThis.fetch) {
+export function loadStreetArrivals(fetchFn = globalThis.fetch && fetchRetry) {
   if (typeof fetchFn !== 'function') return Promise.resolve(null);
   tablePromise ||= Promise.resolve()
     .then(() => fetchFn(STREET_ARRIVALS_URL))

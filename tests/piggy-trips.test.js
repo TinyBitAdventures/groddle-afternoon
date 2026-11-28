@@ -22,14 +22,14 @@ import {
   piggyWalkAt,
   tripBaseTime,
   tripFrom,
-} from '../public/js/street-creatures.js?v=cc6d21bf';
+} from '../public/js/street-creatures.js?v=7223cc8f';
 import { EAT_PAUSE_MS } from '../public/js/animal-mood.js?v=c8cc8797';
-import { ANIMAL_BODY, TREE_FOOTPRINT, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=38ad6f13';
+import { ANIMAL_BODY, TREE_FOOTPRINT, setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=63b5b2c0';
 import { GAME_EPOCH_MS } from '../public/js/game-day.js?v=57fecfcb';
-import { createStreetCopy, takeObjs, reconcile } from '../public/js/street-objects.js?v=a3cc4ce5';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=0537418b';
+import { createStreetCopy, takeObjs, reconcile } from '../public/js/street-objects.js?v=93531424';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=2235c767';
 import { setCreatureEcology, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=23555e53';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -231,7 +231,7 @@ describe('a Piggy\'s trip: the feature', () => {
 
 describe('a Piggy\'s trip: animal mood', () => {
   it('a worked tree goes to the server once; the server\'s "ate" is the chew and "Yum!", never a walk of this page\'s own', async () => {
-    const { animalMoodFeature } = await import('../public/js/features/animal-mood-feature.js?v=29b4af76');
+    const { animalMoodFeature } = await import('../public/js/features/animal-mood-feature.js?v=1c654e0e');
     const said = [];
     const asked = [];
     const pig = { classId: 'npc_piggy', animalKey: 'G1:npc_piggy:0', state: { mood: 1, hunger: 4 }, sprite: { x: 100, y: 900, scale: { x: 1 }, range: 90, vx: 0.4, visible: true, destroyed: false } };

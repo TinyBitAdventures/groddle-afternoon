@@ -28,10 +28,10 @@
  *   wrong-shrine:<giant>), giantLoveScreen (open | ready | closed),
  *   giantLoveLine, giantLoveSound, giantLoveArt, giantLoveLayout.
  */
-import { questStatus } from '../quest-offers.js?v=9e1855e7';
+import { questStatus } from '../quest-offers.js?v=cec1b5e9';
 import { GIANT_LAYOUT, GIANT_SCREEN_FADE_MS, GIANT_SCREEN_TIMES, giantCutArt, giantLoveResponse, giantScreenLayout, giantScreenScale } from '../giant-love.js?v=abed6d7d';
 import { pcLabel } from '../pc-label.js?v=d54da634';
-import { GIANTS, inEmblemHitbox } from '../shrines.js?v=48318bec';
+import { GIANTS, inEmblemHitbox } from '../shrines.js?v=4ff3e019';
 import { vogPages } from '../newxp.js?v=abbf0ed6';
 import { screenInput } from '../screen-fx.js?v=7cd62cca';
 

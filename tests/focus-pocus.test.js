@@ -17,9 +17,9 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
-import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=9e1855e7';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
+import { acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { createInventory } from '../public/js/inventory.js?v=3be7988a';
 import { createToolConditionState } from '../public/js/tools.js?v=4156bba8';
 import { setMetabolicGainGate } from '../public/js/metabolics.js?v=48f784bf';
@@ -30,7 +30,7 @@ import {
   bestFocusGain,
   focusPocusHint,
 } from '../public/js/meditation.js?v=96f23682';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=24a45bbf';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=3be95bf0';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(here, '../public/assets/content');

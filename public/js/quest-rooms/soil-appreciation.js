@@ -36,8 +36,8 @@ import {
   SOIL_TSID,
   practiceScreen,
 } from '../practice-streets.js?v=557238c1';
-import { textureFromUrl } from '../textures.js?v=b8e38103';
-import { addFlamingo, addPickup, clearDialogs, pickupVerbs, takePickup, taken, tickExit, tickFlamingo } from './practice-kit.js?v=db538a78';
+import { textureFromUrl } from '../textures.js?v=8bb43102';
+import { addFlamingo, addPickup, clearDialogs, pickupVerbs, takePickup, taken, tickExit, tickFlamingo } from './practice-kit.js?v=81073be3';
 import { runOutcome } from '../autoplay-log.js?v=55bb4823';
 
 export const QUEST = 'soilappreciation_1';

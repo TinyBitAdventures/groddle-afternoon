@@ -11,11 +11,11 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
-import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=9e1855e7';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
+import { acceptOffer, routeQuestEvent, gardenPlotEvents } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { createGarden, listPlotKeys } from '../public/js/garden.js?v=fefa7bcd';
-import { runVerb } from '../public/content.js?v=1c0f4a21';
+import { runVerb } from '../public/content.js?v=4db66593';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUB = join(here, '../public');

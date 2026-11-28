@@ -37,7 +37,7 @@ import { createHomeDecorState, interiorWidth, placeFurniture } from '../../publi
 import { learningTimeModifier } from '../../public/js/imagination-effects.js?v=70169933';
 import { BRAIN_CAPACITY_AMOUNTS, BRAIN_CAPACITY_DEFAULT, BRAIN_CAPACITY_LIMIT } from '../../public/js/imagination.js?v=1bdfd77c';
 import { BETTER_LEARNING_DISCOUNTS } from '../../public/js/better-learning.js?v=044ff9ff';
-import { EMBLEM_SPEND_FAVOR, FAVOR_STUDY_SECONDS } from '../../public/js/shrines.js?v=48318bec';
+import { EMBLEM_SPEND_FAVOR, FAVOR_STUDY_SECONDS } from '../../public/js/shrines.js?v=4ff3e019';
 import { esc } from './parts.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');

@@ -26,11 +26,11 @@ import {
   measuredTreeSpots,
   populationForStreet,
   setStreetEcologyCatalog,
-} from '../public/js/street-ecology.js?v=38ad6f13';
+} from '../public/js/street-ecology.js?v=63b5b2c0';
 import { DIRT_PILE_PICTURE_SPOTS, PEAT_PICTURE_SPOTS, TREE_PICTURE_SPOTS } from '../public/js/node-picture-spots-data.js?v=36608622';
-import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=5922a1ed';
+import { resourcePlacementGroups, resourceSpawnPlan } from '../public/js/features/resource-nodes-feature.js?v=d03dc235';
 import { homeToFromPopulation } from '../public/js/exploration.js?v=8f19e25d';
-import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=10376267';
+import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js?v=23555e53';
 import { streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { floorUnder, streetFloors } from '../tools/snap-placements/node-pictures.mjs';
 import { serverPath, skipWithoutServer } from '../tools/repos.mjs';

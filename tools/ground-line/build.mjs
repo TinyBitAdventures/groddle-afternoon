@@ -30,7 +30,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DECO_TWINS, decoWhollyAboveTop, layerIsDrawn } from '../../public/js/street-render.js?v=4966c68b';
+import { DECO_TWINS, decoWhollyAboveTop, layerIsDrawn } from '../../public/js/street-render.js?v=124facce';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const OUT_PATH = join(root, 'public/js/street-ground-lines.js');

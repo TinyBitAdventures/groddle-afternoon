@@ -10,7 +10,7 @@ import { join } from 'node:path';
 
 import { quoinTouches } from '../public/js/quoins.js?v=4d75aec0';
 import { PARADISE_COURSES, PARADISE_STAR_COURSES, paradisePickupTouches, paradiseQuoinScale } from '../public/js/paradise-flight.js?v=fe7ba6de';
-import { touchesQuoin } from '../public/js/quest-rooms/kit.js?v=0349dc63';
+import { touchesQuoin } from '../public/js/quest-rooms/kit.js?v=c28380e5';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');

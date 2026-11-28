@@ -13,7 +13,7 @@
  *
  * Canvas data: zoneFx (emitters,live,pooled) and zoneRumble (on|off) for QA.
  */
-import { createStreetEffects, RUMBLE_SOUND } from '../street-effects.js?v=18ee8a33';
+import { createStreetEffects, RUMBLE_SOUND } from '../street-effects.js?v=c0c3748c';
 import { isZoneTsid } from '../zone-streets.js?v=b40010d5';
 import { isSolo, resolveGameMode } from '../game-mode.js?v=1ecf2899';
 

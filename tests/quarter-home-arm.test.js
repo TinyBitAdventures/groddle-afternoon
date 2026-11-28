@@ -15,13 +15,13 @@ import { after, before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=55a3cfee';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=70324a94';
-import { quarterFeature } from '../public/js/features/quarter-feature.js?v=f63efd14';
+import { homeStreetMpFeature } from '../public/js/features/home-street-mp-feature.js?v=9e8ffd6a';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=d1109a81';
+import { quarterFeature } from '../public/js/features/quarter-feature.js?v=70929ab6';
 import { visitSceneTsid } from '../public/js/neighbours-mp.js?v=de82fd7d';
-import { SIGN_FIRST_ARM_Y } from '../public/js/street-render.js?v=4966c68b';
+import { SIGN_FIRST_ARM_Y } from '../public/js/street-render.js?v=124facce';
 import { QUARTER_TEXT, homeArm, lotArrival, normalizeHeld } from '../public/js/quarter.js?v=a38887ca';
-import { clearStreetCache, clearStreetIndex } from '../public/js/street-loader.js?v=10376267';
+import { clearStreetCache, clearStreetIndex } from '../public/js/street-loader.js?v=23555e53';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 
 const root = join(import.meta.dirname, '..');

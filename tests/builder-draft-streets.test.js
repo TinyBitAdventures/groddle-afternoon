@@ -11,7 +11,7 @@ import vm from 'node:vm';
 import {
   STREET_INDEX, applyStreetIndex, availableStreetTsids, clearStreetCache, clearStreetIndex, isDraftStreet,
   loadStreetData, registerDraftStreets, resolveIndexTsid,
-} from '../public/js/street-loader.js?v=10376267';
+} from '../public/js/street-loader.js?v=23555e53';
 
 const root = join(import.meta.dirname, '..');
 const zone = JSON.parse(readFileSync(join(root, 'tests/fixtures/builder/mossy-hollow.zone.json'), 'utf8'));

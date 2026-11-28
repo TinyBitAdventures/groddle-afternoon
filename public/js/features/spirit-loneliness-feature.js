@@ -57,14 +57,14 @@
  * else" cheering it up, only makes sense alone. A multiplayer game (engine.mode) runs none of it.
  */
 
-import { STREET_INDEX } from '../street-loader.js?v=10376267';
-import { getStreetEcologyCatalog } from '../street-ecology.js?v=38ad6f13';
-import { graphKey, tsidAliases } from '../map-routes.js?v=52140ba2';
-import { _useStreetGraph, loadStreetGraph, roadsFor, routeDistances, streetGraphLoaded } from '../street-graph.js?v=d767f3a2';
+import { STREET_INDEX } from '../street-loader.js?v=23555e53';
+import { getStreetEcologyCatalog } from '../street-ecology.js?v=63b5b2c0';
+import { graphKey, tsidAliases } from '../map-routes.js?v=e9f5e3da';
+import { _useStreetGraph, loadStreetGraph, roadsFor, routeDistances, streetGraphLoaded } from '../street-graph.js?v=16013e6e';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js?v=8ff6ed59';
 import { grantMoodXp } from '../mood-xp.js?v=e311b45c';
 import { denseFrame, denseSprite } from '../sprite-dense.js?v=67101472';
-import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=e50bacca';
+import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=d32dce0e';
 import {
   INVITE_ART,
   LONELY_RULES,

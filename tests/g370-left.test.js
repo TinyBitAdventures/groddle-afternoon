@@ -25,15 +25,15 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=c9b84764';
-import { createQuestState } from '../public/js/quests.js?v=d9b316eb';
-import { COUNTER_ROUTES, acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=9e1855e7';
-import { applyBuff, createBuffState } from '../public/js/buffs.js?v=09184e60';
+import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { createQuestState } from '../public/js/quests.js?v=f574d2e1';
+import { COUNTER_ROUTES, acceptOffer, routeQuestEvent } from '../public/js/quest-offers.js?v=cec1b5e9';
+import { applyBuff, createBuffState } from '../public/js/buffs.js?v=838b7598';
 import { BUFF_ICONS } from '../public/js/buff-triggers.js?v=9fd877c4';
 import { FEAT_BY_ID, UNWIRED_FEATS, WIRED_FEATS, featsInEpic } from '../public/js/solo-feats.js?v=2224a7a6';
 import { MP_ACTS, MP_ORDER, MP_PACE, mpGoals, reportFor } from '../public/js/feats-mp.js?v=e1fc8239';
 import { featTable } from '../tools/build-realtime-feats.mjs';
-import { endComedian } from '../public/js/features/funpickle-feature.js?v=8f21937b';
+import { endComedian } from '../public/js/features/funpickle-feature.js?v=6f0df99c';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');

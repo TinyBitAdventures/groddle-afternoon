@@ -29,10 +29,10 @@
  * accepted | declined | quiet), room23Last, room23RepeatPaid, room23ExitIn.
  */
 
-import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=9e1855e7';
+import { acceptOffer, declineOffer, npcQuestOffers } from '../quest-offers.js?v=cec1b5e9';
 import { XP_FOR_LEVEL } from '../progression.js?v=05ff0260';
-import { textureFromUrl } from '../textures.js?v=b8e38103';
-import * as kit from '../quest-rooms/kit.js?v=0349dc63';
+import { textureFromUrl } from '../textures.js?v=8bb43102';
+import * as kit from '../quest-rooms/kit.js?v=c28380e5';
 import { GREETERBOT } from '../tower-mid-rooms.js?v=2dd1122c';
 import { ROOM_23_FILES } from '../gwendolyn-room-23-art.js?v=1de55db7';
 import {
@@ -64,7 +64,7 @@ import {
   leadPath,
   toScreen,
 } from '../gwendolyn-room-23.js?v=918c0f6b';
-import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=6283b688';
+import { standOnFeet, anchorBottomCentre } from '../sprite-feet.js?v=1c6452d9';
 
 export const GWENDOLYN_ROOM_23_FEATURE_ID = 'gwendolyn-room-23';
 const CHECK_MS = 120;

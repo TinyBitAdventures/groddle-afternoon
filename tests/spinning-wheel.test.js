@@ -31,8 +31,8 @@ import {
 import {
   createShrineState,
   donateToShrine,
-} from '../public/js/shrines.js?v=48318bec';
-import { getVerbsFor } from '../public/content.js?v=1c0f4a21';
+} from '../public/js/shrines.js?v=4ff3e019';
+import { getVerbsFor } from '../public/content.js?v=4db66593';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -331,7 +331,7 @@ print(json.dumps(out))`;
   });
 
   test('every sheet has a 3x render from npc_spinning_wheel.swf, matched to the 1x frame for frame', async () => {
-    const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=dd070ce8');
+    const { HIRES_SPRITES, SPLIT_SPRITES, FIRST_DRAW_SPRITES } = await import('../public/js/sprite-hires.js?v=6a4569c4');
     const results = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/results.json'), 'utf8'));
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/spinning-wheel.json'), 'utf8'));
     assert.deepEqual(

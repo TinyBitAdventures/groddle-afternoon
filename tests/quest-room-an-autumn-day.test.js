@@ -9,9 +9,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as kit from '../public/js/quest-rooms/kit.js?v=0349dc63';
+import * as kit from '../public/js/quest-rooms/kit.js?v=c28380e5';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js?v=f37a25ba';
-import { questSceneTsid } from '../public/js/quest-instance.js?v=15090adc';
+import { questSceneTsid } from '../public/js/quest-instance.js?v=39e4ca2e';
 import {
   EXIT_PROMPT_MS,
   BODY_H,
@@ -42,13 +42,13 @@ import {
   sentenceSlots,
   slotCorrect,
   touchesToSolve,
-} from '../public/js/quest-rooms/an-autumn-day.js?v=e78fb51e';
+} from '../public/js/quest-rooms/an-autumn-day.js?v=a107a46e';
 import {
   setAmbientMusicConfig,
   resolveAmbientTheme,
   tracksForTheme,
   ambientPlaylist,
-} from '../public/js/ambient-music.js?v=4b3c6041';
+} from '../public/js/ambient-music.js?v=fd8fe13e';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => join(root, 'public', p);
@@ -259,7 +259,7 @@ describe('An Autumn Day: the look of the Snaps (G75)', () => {
     const { fileURLToPath } = await import('node:url');
     const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
     const { AN_AUTUMN_DAY_FILES } = await import('../public/js/an-autumn-day-art.js?v=d6b2601b');
-    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=e78fb51e');
+    const mod = await import('../public/js/quest-rooms/an-autumn-day.js?v=a107a46e');
     const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/an_autumn_day.json'), 'utf8'));
     assert.match(plan.source, /glitch-locations limbo1\.swf \(CC0\)/);
     assert.deepEqual(Object.keys(plan.pieces).sort(), Object.keys(AN_AUTUMN_DAY_FILES).sort());

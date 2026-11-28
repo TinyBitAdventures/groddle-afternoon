@@ -21,8 +21,8 @@ import {
   homeTrophyCount,
   isTrophyClass,
   itemVerbsFeature,
-} from '../public/js/features/item-verbs-feature.js?v=6a822709';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=70324a94';
+} from '../public/js/features/item-verbs-feature.js?v=9e34cd6e';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=d1109a81';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -31,9 +31,9 @@ import {
   resetAchievementCounter,
   seedAchievementNearCompletion,
   worldVerbAchievementCounters,
-} from '../public/js/achievements.js?v=bb7a59f6';
-import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=09184e60';
-import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
+} from '../public/js/achievements.js?v=184f3714';
+import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=838b7598';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');
 

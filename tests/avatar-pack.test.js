@@ -20,7 +20,7 @@ import {
   createRetireQueue,
 } from '../public/js/avatar-pack.js?v=65324246';
 import { ANIMS, CORE_SHEETS, FALL_LOOP, SHEET_FRAMES, animForState, frameRef } from '../public/js/avatar-anims.js?v=fb921bf4';
-import { SHEET_ORDER, bakeLook, bakeSheet } from '../public/js/avatar-compositor.js?v=1d3df23e';
+import { SHEET_ORDER, bakeLook, bakeSheet } from '../public/js/avatar-compositor.js?v=2b3cd2b7';
 import { expandRig, lookMatrices, slotAssignments } from '../public/js/avatar-rig.js?v=b67f0da8';
 import { expandCatalog, resolveLook } from '../public/js/avatar-looks.js?v=5a28384d';
 

@@ -9,8 +9,8 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { shrineStreetsFor } from '../public/js/street-ecology.js?v=38ad6f13';
-import { GIANTS } from '../public/js/shrines.js?v=48318bec';
+import { shrineStreetsFor } from '../public/js/street-ecology.js?v=63b5b2c0';
+import { GIANTS } from '../public/js/shrines.js?v=4ff3e019';
 
 const pub = join(dirname(fileURLToPath(import.meta.url)), '../public');
 const ecology = JSON.parse(readFileSync(join(pub, 'assets/content/street-ecology.json'), 'utf8'));

@@ -42,7 +42,8 @@
  * 251-255, 539, 686-700).
  */
 
-import { frameTexture, sourceFromUrl } from './textures.js?v=b8e38103';
+import { fetchRetry } from './load-retry.js?v=24823577';
+import { frameTexture, sourceFromUrl } from './textures.js?v=8bb43102';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
 export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g448-2`;
@@ -97,7 +98,7 @@ export function liveOverlayCount() {
 
 /** overlays.json, once. */
 export function loadOverlayManifest() {
-  manifestPromise ||= fetch(OVERLAY_MANIFEST_URL)
+  manifestPromise ||= fetchRetry(OVERLAY_MANIFEST_URL)
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`overlays.json ${r.status}`))))
     .catch((err) => {
       manifestPromise = null;
@@ -225,7 +226,7 @@ export function loadVectorFrames(key) {
   const p = loadOverlayManifest().then(async (manifest) => {
     const meta = manifest[key];
     if (!meta || meta.kind !== 'svg') throw new Error(`no vector overlay ${key}`);
-    const res = await fetch(`${OVERLAY_BASE}${meta.file}?v=${meta.fla.slice(0, 8)}`);
+    const res = await fetchRetry(`${OVERLAY_BASE}${meta.file}?v=${meta.fla.slice(0, 8)}`);
     if (!res.ok) throw new Error(`${meta.file} ${res.status}`);
     const svgs = assembleFrames(await res.json());
     const urls = svgs.map((svg) => URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })));
@@ -454,7 +455,7 @@ export function holdVectorArt(key, meta, density) {
   if (!entry) {
     entry = { ready: null, users: 0, timer: null };
     entry.ready = (async () => {
-      const res = await fetch(`${OVERLAY_BASE}${meta.vector.file}?v=${meta.vector.sha256.slice(0, 8)}`);
+      const res = await fetchRetry(`${OVERLAY_BASE}${meta.vector.file}?v=${meta.vector.sha256.slice(0, 8)}`);
       if (!res.ok) throw new Error(`${meta.vector.file} ${res.status}`);
       const [, , bw, bh] = meta.box;
       const w = Math.max(1, Math.round(bw * density));

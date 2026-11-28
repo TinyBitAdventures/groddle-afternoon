@@ -28,7 +28,7 @@
  */
 
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=3be7988a';
-import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=dc595568';
+import { RECIPE_CATALOG, isRecipeCatalogReady, setRecipeCatalog } from '../making.js?v=d3571803';
 import { gainMetabolic } from '../metabolics.js?v=48f784bf';
 import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
 import { parseSeasonDate, urDate } from '../seasons.js?v=5d8f545a';

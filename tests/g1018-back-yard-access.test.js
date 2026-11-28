@@ -15,8 +15,8 @@ import { describe, it } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
-import { BACK_YARD_PREFIX, bareBackYardAnswer, normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=4a75c2f0';
-import { applyStockAct, normalizeStockView } from '../public/js/yard-stock-mp.js?v=38af0730';
+import { BACK_YARD_PREFIX, bareBackYardAnswer, normalizeYardActs } from '../public/js/yard-verbs-mp.js?v=142db74e';
+import { applyStockAct, normalizeStockView } from '../public/js/yard-stock-mp.js?v=2df73f7e';
 import { forgetInside, insideProof, insideQuery, normalizeHomeView, rememberInside, visitSceneTsid } from '../public/js/neighbours-mp.js?v=de82fd7d';
 import { getResourceNodeDef } from '../public/js/resource-nodes.js?v=c2eb46b1';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
@@ -278,8 +278,8 @@ describe('in the house, a guest gets the back yard and acts on it as "b:"; the o
     const token = sign({ k: 'house_in', sub: 9, o: 7, exp: now + 600 });
     rememberInside(7, token);
     try {
-      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=46ad96f0');
-      const { homesFeature } = await import('../public/js/features/homes-feature.js?v=70324a94');
+      const { yardVerbsMpFeature } = await import('../public/js/features/yard-verbs-mp-feature.js?v=0a55e119');
+      const { homesFeature } = await import('../public/js/features/homes-feature.js?v=d1109a81');
       yardVerbsMpFeature.onTick(16, 1, engine);
       for (let i = 0; i < 40 && !globalThis.groddleYard?.visit; i += 1) await new Promise((r) => setTimeout(r, 5));
       const yard = globalThis.groddleYard;

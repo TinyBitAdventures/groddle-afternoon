@@ -78,8 +78,9 @@
  * profilePages (id:public|none, the players looked up).
  */
 
+import { fetchRetry } from '../load-retry.js?v=24823577';
 import { createMinnAccount } from '../minn-account.js?v=7e3d7279';
-import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=1d3df23e';
+import { drawListFor, loadCatalog, paintItems, prepareLook } from '../avatar-compositor.js?v=2b3cd2b7';
 import { drawListBounds } from '../avatar-rig.js?v=b67f0da8';
 import { lookKey, resolveLook } from '../avatar-looks.js?v=5a28384d';
 import {
@@ -89,9 +90,9 @@ import {
   aboutCounter, profilePagePath, profilePageVerb, avatarKeyOf, base64Bytes, homeKeyOf, homeSizes, imageBase64, pngBase64, shouldUpload, staleRefreshDue, stillTransform,
   towerKeyOf, towerShotDue,
 } from '../profiles.js?v=1daccbb9';
-import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=3be041f5';
-import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=a6fed3eb';
-import { renderHomeLocation } from '../home-shot-render.js?v=794770c1';
+import { homeLayoutJson, homeLayoutKeyOf, HOME_LAYOUT_LIMITS } from '../home-layout.js?v=53eabf28';
+import { collectHomeLayout, homeFrameFor } from '../home-layout-scene.js?v=b0e8b5ae';
+import { renderHomeLocation } from '../home-shot-render.js?v=5702eba5';
 import { withPublicView } from '../public-picture.js?v=1a0b03fa';
 import { openSitePage } from '../site-pages.js?v=9b3049cf';
 
@@ -140,7 +141,7 @@ const OWN_PAGE = /^\/players\/[a-z0-9][a-z0-9.-]*\/$/;
  * has no such route.
  */
 async function askListing(id, path) {
-  const r = await fetch(new URL(`/wp-json/groddle/v1/players/${id}/page`, document.baseURI).href, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+  const r = await fetchRetry(new URL(`/wp-json/groddle/v1/players/${id}/page`, document.baseURI).href, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
   if (r.status === 404) {
     listingRoute = false;
     return null;
@@ -155,7 +156,7 @@ async function askListing(id, path) {
 
 /** The lookup as before the route: the page itself (a same-origin GET; below level 5 the site answers 404). */
 async function fetchPage(path) {
-  const r = await fetch(new URL(path, document.baseURI).href, { credentials: 'same-origin', redirect: 'follow', headers: { Accept: 'text/html' } });
+  const r = await fetchRetry(new URL(path, document.baseURI).href, { credentials: 'same-origin', redirect: 'follow', headers: { Accept: 'text/html' } });
   let found = { status: r.status === 404 ? 'none' : 'failed', path };
   if (r.ok) {
     // The page's own address (the site sends /players/<slug>.<id>/ on to it).

@@ -17,11 +17,11 @@ import assert from 'node:assert/strict';
 import { before, describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=c9b84764';
-import { classifyQuests, heldForNpcTurnIn } from '../public/js/quest-offers.js?v=9e1855e7';
+import { getQuestCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js?v=d30c3e0f';
+import { classifyQuests, heldForNpcTurnIn } from '../public/js/quest-offers.js?v=cec1b5e9';
 import { vendorStreetsFor } from '../public/js/vendor-npcs.js?v=90b0c123';
-import { findRoute, routeGraph, ROUTE_SOURCES } from '../public/js/map-routes.js?v=52140ba2';
-import { MERCHANT_ROUTE_SOURCE, routeHeldQuests } from '../public/js/features/vendor-npcs-feature.js?v=49ec74e1';
+import { findRoute, routeGraph, ROUTE_SOURCES } from '../public/js/map-routes.js?v=e9f5e3da';
+import { MERCHANT_ROUTE_SOURCE, routeHeldQuests } from '../public/js/features/vendor-npcs-feature.js?v=1d55f632';
 
 const PUBLIC = join(import.meta.dirname, '..', 'public');
 const json = (p) => JSON.parse(readFileSync(join(PUBLIC, p), 'utf8'));

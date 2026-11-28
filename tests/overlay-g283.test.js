@@ -25,8 +25,8 @@ import {
   setFreeTooltip,
   setFreeVerbState,
 } from '../public/js/animal-set-free.js?v=6fcd8355';
-import { getVerbsFor } from '../public/content.js?v=1c0f4a21';
-import { createAnimalState } from '../public/js/animals.js?v=34acff20';
+import { getVerbsFor } from '../public/content.js?v=4db66593';
+import { createAnimalState } from '../public/js/animals.js?v=45c59ce8';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -44,7 +44,7 @@ describe('G283: the stun orb and the beam in view', () => {
   // Desk ORBERA (G293): the orb moved down to just above the name labels, so
   // the camera no longer looks up for it (tests/desk-decisions.test.js).
   it('the orb (200 px over your feet) sits in the 408 px viewport without the camera looking up', async () => {
-    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=b7568300');
+    const { ORB_ART } = await import('../public/js/features/rook-attack-feature.js?v=25cdf70e');
     const { placeRookBadge, badgeExtent } = await import('../public/js/rook-badge-place.js?v=e2bcbbaa');
     const viewH = 408;
     const feet = viewH * (0.5 + 150 / 600); // movement.js yCamOffsetAnchor(150)
@@ -158,7 +158,7 @@ describe('G285: the last overlay stand-ins', () => {
   it("Feeling Called Love's heart is amorous_philtre_heart, a pc_overlay at delta_y -120", { skip: !haveGsjs }, async () => {
     assert.match(gsjs('items/catalog_buffs.js'), /pc\.announce_add_indicator\('feeling_called_love', 'amorous_philtre_heart'\);/);
     assert.match(gsjs('players/inc_announcements.js'), /delta_y: indicator\.delta_y \? indicator\.delta_y : -120,/);
-    const { LOVE_HEART } = await import('../public/js/features/potions-feature.js?v=ad848967');
+    const { LOVE_HEART } = await import('../public/js/features/potions-feature.js?v=35b2faf2');
     assert.deepEqual({ ...LOVE_HEART }, { key: 'amorous_philtre_heart', dy: -120 });
     assert.equal(manifest.amorous_philtre_heart.kind, 'sheet');
   });
