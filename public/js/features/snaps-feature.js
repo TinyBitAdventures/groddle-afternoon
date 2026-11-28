@@ -251,6 +251,7 @@ function publish(engine, s) {
   engine.setData?.('snapViewer', s.viewer ? String(s.viewer.index) : '');
   engine.setData?.('snapSize', s.size);
   engine.setData?.('snapFile', s.download || '');
+  engine.setData?.('snapMeteor', s.meteor ? '1' : '0');
 }
 
 function note(engine, s, line) {
@@ -550,8 +551,12 @@ function snapNow(engine, s, ctx) {
     return true;
   }
   s.size = `${picture.w}x${picture.h}`;
-  publish(engine, s);
   const spot = snapSpot(engine);
+  // A shooting star in the sky as the shutter went (js/meteor-shower.js meteorOnScreen; ours): the
+  // Snap keeps it, and its page shows a "Shooting star" tag.
+  spot.meteor = engine.query?.('meteorOnScreen', engine) === true;
+  s.meteor = spot.meteor;
+  publish(engine, s);
   flash(() => openPolaroid(engine, s, picture, spot, ctx));
   return true;
 }
@@ -657,7 +662,7 @@ function openPolaroid(engine, s, picture, spot, ctx) {
       if (filters?.tsid) note(engine, s, `filter:${filters.tsid}`);
       shown = kept;
       // G1284: a whole-home Snap says so, and the site checks it against its larger limits.
-      const out = await s.account.saveSnap({ image: kept.b64, caption: cleanCaption(input.value), street: spot.street, x: spot.x, y: spot.y, ...(kept.limits === WHOLE_SNAP ? { whole: true } : {}) });
+      const out = await s.account.saveSnap({ image: kept.b64, caption: cleanCaption(input.value), street: spot.street, x: spot.x, y: spot.y, ...(kept.limits === WHOLE_SNAP ? { whole: true } : {}), ...(spot.meteor ? { meteor: true } : {}) });
       setAlbum(s, out);
       s.size = `${kept.w || shown.w}x${kept.h || shown.h}`;
       note(engine, s, `saved:${out?.snap?.id || ''}`);

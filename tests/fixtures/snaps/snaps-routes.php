@@ -121,7 +121,7 @@ try {
     $snaps = static fn (int $as, ?Request $r = null): Snaps => new Snaps($seams($as, $r));
     $pages = static fn (int $as, Request $r): PlayerPages => new PlayerPages($seams($as, $r), StaticRoot::fromSite($seams($as, $r)));
     $table = $db->table(Snaps::TABLE);
-    $row = static fn (int $id): ?array => $db->row("SELECT id, user_id, file, public FROM {$table} WHERE id = ?", [$id]);
+    $row = static fn (int $id): ?array => $db->row("SELECT id, user_id, file, public, meteor FROM {$table} WHERE id = ?", [$id]);
     $dir = Snaps::dir();
 
     // == Saving: full size (1920x1200, the site's largest) is accepted, and private ==
@@ -133,7 +133,7 @@ try {
         ob_start();
         imagejpeg($img, null, 85);
         $jpeg = (string) ob_get_clean();
-        $r = $request(Method::Post, '/groddle/v1/snaps', ['image' => base64_encode($jpeg), 'caption' => 'A made-up view', 'street' => STREET, 'x' => 100, 'y' => -80]);
+        $r = $request(Method::Post, '/groddle/v1/snaps', ['image' => base64_encode($jpeg), 'caption' => 'A made-up view', 'street' => STREET, 'x' => 100, 'y' => -80, 'meteor' => true]);
         $saved = $answer(static fn (): Response => $snaps(ADA, $r)->save($r));
         $savedId = (int) ($saved['body']['snap']['id'] ?? 0);
         $file = $savedId ? (string) $row($savedId)['file'] : '';
@@ -293,6 +293,21 @@ try {
     $r = $request(Method::Get, '/groddle/v1/snaps/random');
     $one = $answer(static fn (): Response => $snaps(BEA, $r)->random($r));
     $out['randomShape'] = ['url' => $one['body']['snap']['url'] ?? null, 'public' => $one['body']['snap']['public'] ?? null, 'page' => $one['body']['snap']['page'] ?? null];
+
+    // == A shooting star (the game's js/meteor-shower.js; ours): the tag on its page, none on another ==
+    $db->execute("UPDATE {$table} SET meteor = 1 WHERE id = ?", [$adaPublic]);
+    $starred = $page(BEA, 'zz-ada', $adaPublic);
+    $plain = $page(ADA, 'zz-ada', $adaPrivate);
+    $starAlbum = $answer(static fn (): Response => $snaps(ADA)->mine($request(Method::Get, '/groddle/v1/snaps')));
+    $flags = [];
+    foreach ($starAlbum['body']['snaps'] ?? [] as $s) {
+        $flags[$s['id']] = $s['meteor'] ?? null;
+    }
+    $out['meteor'] = [
+        'tagged' => ['status' => $starred['status'], 'tag' => str_contains($starred['html'], 'snap-tag-meteor') && str_contains($starred['html'], '>Shooting star<')],
+        'plain' => ['status' => $plain['status'], 'tag' => str_contains($plain['html'], 'snap-tag-meteor')],
+        'album' => ['public' => $flags[$adaPublic] ?? null, 'private' => $flags[$adaPrivate] ?? null],
+    ];
 
     // == Deleting takes the small copy too ==
     if (!empty($out['save']['snap']['id'])) {

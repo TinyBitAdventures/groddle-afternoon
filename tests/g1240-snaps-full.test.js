@@ -461,6 +461,16 @@ describe('the site\'s Snaps routes on a throwaway database', { skip: skipDb }, (
     assert.equal(r.album.sealedOption, '1');
   });
 
+  it('a Snap that caught a shooting star keeps it, and its page shows the tag (meteor showers, ours)', (t) => {
+    assert.equal(r.meteor.tagged.status, 200);
+    assert.equal(r.meteor.tagged.tag, true, 'a "Shooting star" tag on its page');
+    assert.deepEqual(r.meteor.plain, { status: 200, tag: false }, 'none on another Snap');
+    assert.deepEqual(r.meteor.album, { public: true, private: false });
+    if (!r.gd) return t.skip('no GD in this PHP');
+    assert.equal(r.save.row.meteor, 1, 'saved with meteor: true');
+    assert.equal(r.save.snap.meteor, true);
+  });
+
   it('only the owner makes a Snap public or private', () => {
     assert.deepEqual(r.toggle.notOwner, [404, 'groddle_snap_missing', 0]);
     assert.deepEqual(r.toggle.badBody, [400, 'groddle_snap_public']);
