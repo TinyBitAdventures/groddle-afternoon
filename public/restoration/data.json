@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3930,
+  "commits": 3932,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A Street Spirit in reach before its art loads is drawn as one spirit, not two vendors"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2931,14 +2936,9 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Things in your house, Tower and home street rest on the floor again, wherever it has moved"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "new",
-    "text": "The Crafty Bot says \"All done!\" in the activity feed when its queue is finished"
    }
   ]
  },
- "tests": 1507,
+ "tests": 1508,
  "generatedAt": "2026-11-27"
 }
