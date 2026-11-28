@@ -30,8 +30,8 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import * as HM from '../public/js/home-machines.js?v=c72cb353';
-import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=fd0b1195';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=efa4690f';
+import { homeMachinesFeature } from '../public/js/features/home-machines-feature.js?v=11168960';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=730e56e0';
 import { Display, FakeEl, fakePixi } from './fake-scene.js';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath } from '../tools/repos.mjs';
 import { HAS_PHP, PHP } from './php.js';

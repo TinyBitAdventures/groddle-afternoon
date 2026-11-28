@@ -231,7 +231,7 @@ import { RADIO_TEXT, radioOwned } from '../vine-radio.js?v=5436aa09';
 import { displayTopOf, itemstackOverlayPoint, overlayAlpha, overlayLifeMs, playPoofIn, trackOverlay } from '../overlay-art.js?v=e50bacca';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js?v=37ad5c9f';
 import { fadeInNewNear } from '../poof-fade.js?v=57db6aea';
-import { projectApi } from './street-jobs-feature.js?v=baeda249';
+import { projectApi } from './street-jobs-feature.js?v=311dbb61';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_DOOR_DX, TOWER_GEO, TOWER_PROTO, normalizeTowerState } from '../home-tower.js?v=a7fc0cce';
 import { drawTowerBench, drawTowerElevator, drawTowerExit, towerApi, visitorTowerView } from './home-tower-feature.js?v=a39637c6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=5d3594e4';
@@ -262,7 +262,7 @@ import {
 } from '../home-styles.js?v=ec5d2f69';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js?v=b8e38103';
 import { FALLBACK_MAX as WORLD_ART_FALLBACK_MAX, worldArtFor } from '../world-art.js?v=a67514c8';
-import { oneArmSignpost } from '../street-render.js?v=3f6ebb89';
+import { oneArmSignpost } from '../street-render.js?v=91152d38';
 import { ROCK_CATALOG } from '../mining.js?v=7ecaa572';
 import {
   HOUSE_SIGN,
@@ -1139,6 +1139,7 @@ function interiorBackground(engine, opts = {}) {
     root.skyGradient = land.skyGradient;
     root.setSkyLook = land.setSkyLook;
     root.skyLookNow = land.skyLookNow;
+    root.meteorLayer = land.meteorLayer;
   }
   // #749 at home: the house with its yard ('yard': the room from houseX on is indoors), or a Tower floor.
   root.homePlace = opts.yard ? 'yard' : 'room';
@@ -2451,6 +2452,20 @@ export function drawLandscape(engine, root, style, seed, { width, groundY, lift,
     skyStars.fieldW = w;
     skyStars.fieldH = h;
   };
+  // Meteors (js/meteor-shower.js, ours): a Graphics pinned to the view as the stars are, just in
+  // front of the style's furthest layer (zIndex -90) and behind the nearer ones, as on a street.
+  let skyMeteors = null;
+  const meteorLayer = () => {
+    if (!skyMeteors) {
+      skyMeteors = new PIXI.Graphics();
+      skyMeteors.label = 'sky-meteors';
+      skyMeteors.zIndex = style.layers.length > 1 ? -89.5 : -98.5;
+      skyMeteors.viewW = 0;
+      skyMeteors.viewH = 0;
+      root.addChild(skyMeteors);
+    }
+    return skyMeteors;
+  };
   const setSkyLook = (look) => {
     const next = look && !look.day ? look : null;
     const key = next ? next.key : 'day';
@@ -2480,11 +2495,13 @@ export function drawLandscape(engine, root, style, seed, { width, groundY, lift,
     skyGradient: { top: hex6(style.sky[0]), bottom: hex6(style.sky[style.sky.length - 1]), ownStars: Boolean(style.stars) },
     setSkyLook,
     skyLookNow: () => skyLookNow,
+    meteorLayer,
     update(camX, camY, vpW, skyH) {
       sky.x = camX;
       sky.y = camY;
       sky.width = vpW;
       sky.height = skyH;
+      if (skyMeteors) Object.assign(skyMeteors, { x: camX, y: camY, viewW: vpW, viewH: skyH });
       for (const lc of parallax) lc.x = camX * (1 - lc.parallaxF);
       if (skyStars?.visible) {
         if (vpW > skyStars.fieldW || skyH > skyStars.fieldH) drawStars(Math.max(skyStars.fieldW, Math.ceil(vpW)), Math.max(skyStars.fieldH, Math.ceil(skyH)));
@@ -2567,6 +2584,7 @@ function streetBackground(engine, styleKey, houseStyle = 'cottage') {
   root.skyGradient = land.skyGradient;
   root.setSkyLook = land.setSkyLook;
   root.skyLookNow = land.skyLookNow;
+  root.meteorLayer = land.meteorLayer;
   root.houseDoorX = doorX;
   root.houseSignX = signX;
   root.houseDoorway = houseDoorway(layout, houseStyle);

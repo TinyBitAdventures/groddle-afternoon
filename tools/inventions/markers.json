@@ -456,6 +456,7 @@
     "ours: * Ours: a pin over a carried cultivation, its point": "cultivate-drag-pin-and-reason",
     "ours: // #749 at home (js/sky-clock.js, ours): the clock's sky, as street-render.js": "day-night-skies",
     "ours: // G1245: so can the Vine Radio (ours); it keeps its music for when it is put out": "ours-vine-radio",
+    "ours: // Meteors (js/meteor-shower.js, ours): a Graphics over the stars, pinned to the view": "meteor-shower",
     "ours: // Ours (#743, Austin's ruling 2026-11-26): a toggle,": "furniture-store-tray-toggle",
     "ours: // Report 153: the Mail Dispatcher (our own addition to the street) can be put": "ours-homes",
     "reimagined: // (reimagined); this reaches them from the": "ours-homes",
@@ -467,7 +468,8 @@
     "remake-own: * Where a card jump under x1 counts as x1: the remake's own layouts, built for the": "ours-imagination"
   },
   "public/js/features/index.js": {
-    "ours: G1245 (#661, ours): the Vine Radio on a home street, its Choose": "ours-vine-radio"
+    "ours: G1245 (#661, ours): the Vine Radio on a home street, its Choose": "ours-vine-radio",
+    "ours: and lone shooting stars in the night sky (ours): started from the console, synced by the": "meteor-shower"
   },
   "public/js/features/interrogation-room-feature.js": {
     "ours: * past the booth; ours stops short of it (EDGE_ALPHA) so a visitor": "ours-interrogation-room"
@@ -493,6 +495,10 @@
   },
   "public/js/features/map-routes-feature.js": {
     "ours: x (clamped to the street), to know it is still ours.": "map-route-line"
+  },
+  "public/js/features/meteor-shower-feature.js": {
+    "invented: * the drawing are js/meteor-shower.js, inventions register": "meteor-shower",
+    "ours: and lone shooting stars in the night sky (ours, Austin 2026-11-27; the rules": "meteor-shower"
   },
   "public/js/features/musicblocks-feature.js": {
     "invented: * kept by Austin 2026-11-18 (G1001; invention": "collection-count-on-arrival",
@@ -622,6 +628,7 @@
     "glitch-had-none: * camera-solo-download): Glitch had no solo game; its snaps always went to the": "camera-solo-download",
     "invented: * A remake addition (inventions: camera-whole-house): Glitch's camera snapped": "camera-whole-house",
     "invented: and Close (openDownload). A remake addition (inventions:": "camera-solo-download",
+    "ours: went (js/meteor-shower.js meteorOnScreen; ours):": "meteor-shower",
     "remake-own: * A remake addition (inventions: camera-whole-house): Glitch's": "camera-whole-house",
     "remake-own: snapFileName) and Close (openDownload). A remake addition": "camera-solo-download"
   },
@@ -925,6 +932,10 @@
     "ours: // Ours (the rules card the colour game's title picture": "ours-math-mayhem",
     "ours: Ours: a round with no answer at the target ends with": "ours-math-mayhem",
     "ours: Ours: players who share a start stand this far apart": "ours-math-mayhem"
+  },
+  "public/js/meteor-shower.js": {
+    "invented: AND SHOOTING STARS (ours, Austin 2026-11-27; inventions register": "meteor-shower",
+    "ours: * METEOR SHOWERS AND SHOOTING STARS (ours, Austin 2026-11-27; inventions register": "meteor-shower"
   },
   "public/js/mining.js": {
     "ours: it at 1.8 s x that, v0.41.0 gave it Glitch's). Ours": "remake-pace"
@@ -1409,6 +1420,7 @@
   "public/js/street-render.js": {
     "glitch-had-none: * about it) lies over the street's top. Glitch never showed one: CameraMan kept the view inside": "not-an-invention",
     "glitch-had-none: art parked wholly over the street's top, which Glitch never": "not-an-invention",
+    "ours: // Meteors (js/meteor-shower.js, ours): a Graphics over the stars, pinned to the view": "meteor-shower",
     "ours: frame instead, empty, its plaque blank (CUTS, ours).": "stoot-shrine-empty-frame"
   },
   "public/js/subway-mp.js": {

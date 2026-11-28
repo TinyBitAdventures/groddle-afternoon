@@ -4,7 +4,7 @@
  */
 import { ITEM_ICONS, ITEM_LABELS, getVerbsFor, ordinaryItems, runVerb } from './content.js?v=da2b8879';
 import { createErrorOnce, createFeatureHost, createFrameStages } from './js/feature-host.js?v=b87e2cbc';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=32bbf0f7';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=a6ded3b5';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, enterHintPick, hoverText, stackHoverLabel, groupHead, hoverRimShown, reachGlowTargets, spriteHasRimArt, rimArtParts, trimmedIconUrl, drawTileArt } from './js/enter-chooser.js?v=297c6d15';
 import { firstTendKey, STICK_TEND_DELAY_MS, STICK_TEND_DIRS, STICK_TEND_REPEAT_MS, stepTendKey, stepTendKeys, stickTendKey, tendKeyAction } from './js/garden-tend.js?v=a7470c4a';
 import { avatarHitBox, behindFloor, bodyReachDistance, OUT_OF_REACH_LINE, playerClickBox } from './js/reach.js?v=456da8a8';
@@ -747,7 +747,7 @@ import {
   ensureStreetIndex,
   resolveIndexTsid,
 } from './js/street-loader.js?v=10376267';
-import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=5a194506';
+import { showDraftBanner, startDraftPlay } from './js/builder/draft-play.js?v=63c344fc';
 import { bootHouseFile } from './js/house-file-loader.js?v=014960b6';
 import {
   ladderTopDeck,
@@ -782,7 +782,7 @@ import {
   signpostBoardAt,
   signpostGlowFilters,
   signpostGlowParts,
-} from './js/street-render.js?v=3f6ebb89';
+} from './js/street-render.js?v=91152d38';
 import {
   GAME_DAY_MS,
   GAME_EPOCH_MS,
@@ -3700,7 +3700,7 @@ function updateDametimeChrome(now = dametimeDisplayNow()) {
  * once a game minute (an unchanged minute, street view and setting do nothing). Returns the share
  * of the world tint that stays (1 where the sky keeps its own colours).
  */
-const skyClock = { view: null, minute: NaN, on: null, place: null, share: 1 };
+const skyClock = { view: null, minute: NaN, on: null, place: null, share: 1, look: null };
 function applySkyClock(light = daylightState(dametimeDisplayNow())) {
   const view = bgLayer;
   if (!view?.setSkyLook) return 1;
@@ -3712,7 +3712,8 @@ function applySkyClock(light = daylightState(dametimeDisplayNow())) {
   if (skyClock.view === view && skyClock.minute === minute && skyClock.on === on && skyClock.place === place) return skyClock.share;
   const look = on ? skyLook(currentStreet.gradient.top, currentStreet.gradient.bottom, minute / 60) : null;
   view.setSkyLook(look);
-  Object.assign(skyClock, { view, minute, on, place, share: look && place !== 'room' ? look.worldTint : 1 });
+  // Meteors (js/meteor-shower.js) show in this look's sky, never from the house's room.
+  Object.assign(skyClock, { view, minute, on, place, share: look && place !== 'room' ? look.worldTint : 1, look: place === 'room' ? null : look });
   if (app?.canvas) app.canvas.dataset.sky = look && !look.day ? look.key : 'own';
   return skyClock.share;
 }
@@ -14634,6 +14635,12 @@ const engine = {
   },
   /** G1284: the player's own stacks kept for `tsid` drawn into `layer` (drawOwnStacksInto). */
   drawOwnStacks: (tsid, layer) => drawOwnStacksInto(tsid, layer),
+  /**
+   * Meteors (js/meteor-shower.js, features/meteor-shower-feature.js): the clock's sky look drawn on
+   * this view now (#749 applySkyClock; null where the sky is the street's own, indoors, NIGHT TINT
+   * off or standing in the house's room), and the view's meteor Graphics (null where it has no sky).
+   */
+  meteorSky: () => ({ look: skyClock.view === bgLayer && skyClock.on ? skyClock.look : null, layer: bgLayer?.meteorLayer?.() || null }),
   get entityLayer() {
     return entityLayer;
   },

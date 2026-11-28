@@ -35,8 +35,8 @@ import {
   setJobTotal,
   setPaused,
 } from '../public/js/craftybot.js?v=4efdfd85';
-import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=5a5df938';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=efa4690f';
+import { craftybotFeature } from '../public/js/features/craftybot-feature.js?v=80039cf6';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=730e56e0';
 import { dropsMpFeature } from '../public/js/features/drops-mp-feature.js?v=a34f5a9b';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

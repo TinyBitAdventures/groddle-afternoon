@@ -1,0 +1,216 @@
+/**
+ * Meteor showers and lone shooting stars in the night sky (ours, Austin 2026-11-27; the rules and
+ * the drawing are js/meteor-shower.js, inventions register meteor-shower).
+ *
+ * Online the realtime server owns the event (meteor.go): an administrator starts one from the
+ * console, and every game online gets {"t":"meteor","id","kind","seed","start","dur","hint","now"};
+ * this page keeps the server's clock (now minus its own) and draws the streaks the seed gives at
+ * that moment, so every player sees the same ones. It asks for the running event as it comes
+ * online (meteor_sync), so a page that connects mid-shower joins it. {"t":"meteor","kind":"stop"}
+ * ends it. A hinted shower (the console's "in 2 minutes") puts METEOR_TEXT.hint in the activity
+ * feed as the frame comes, once per event.
+ *
+ * The streaks go into the view's meteor Graphics (street-render.js / homes-feature.js meteorLayer,
+ * over the stars) at the strength of the clock's sky (engine.meteorSky: #749's look, null where
+ * the sky is the street's own, indoors or NIGHT TINT off), slower and dimmer under
+ * prefers-reduced-motion. A Snap asks meteorOnScreen (features/snaps-feature.js) to keep the tag.
+ *
+ * QA (solo preview): ?autostart=1&questoffer=off&streetdemo=<street>&timedemo=night&meteordemo=shower
+ * (a shower from the first second) or meteordemo=star (a lone star, one after another). Canvas:
+ * meteor (none | soon | on | over), meteorKind, meteorStreaks (drawn now), meteorStrength, meteorClock
+ * (local | demo | server). window.groddleMeteor: state(), start(kind), stop(), onScreen().
+ */
+
+import { exposeQA } from '../qa-gate.js?v=f4e2cd82';
+import {
+  METEOR,
+  METEOR_TEXT,
+  demoMeteorEvent,
+  drawMeteorStreaks,
+  meteorEventOf,
+  meteorOnScreen,
+  meteorPhase,
+  meteorSchedule,
+  meteorStrength,
+  meteorStreaksAt,
+} from '../meteor-shower.js?v=833f0d52';
+
+export const METEOR_FEATURE_ID = 'meteor-shower';
+
+const run = {
+  event: null,
+  schedule: [],
+  offset: 0,
+  clock: 'local',
+  hinted: new Set(),
+  layer: null,
+  drawn: 0,
+  strength: 0,
+  demo: null, // 'shower' | 'star' once the QA param was read
+  demoN: 0,
+  client: null,
+  last: '',
+};
+
+const reducedMotion = () => {
+  try { return Boolean(globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches); } catch { return false; }
+};
+
+const clockNow = () => Date.now() + run.offset;
+
+function setEvent(ev, engine, now = clockNow()) {
+  run.event = ev;
+  run.schedule = ev ? meteorSchedule(ev) : [];
+  if (!ev) clearLayer();
+  if (ev?.hint && now < ev.start && !run.hinted.has(ev.id)) {
+    run.hinted.add(ev.id);
+    engine?.pushActivity?.(METEOR_TEXT.hint);
+  }
+}
+
+function clearLayer() {
+  if (run.layer && !run.layer.destroyed) run.layer.clear?.();
+  run.drawn = 0;
+}
+
+/** The server's meteor frame: an event to run (or the same one again), or a stop. */
+export function takeMeteorFrame(m, engine, nowLocal = Date.now()) {
+  if (m?.kind === 'stop') {
+    if (!m.id || m.id === run.event?.id) setEvent(null, engine);
+    return 'stopped';
+  }
+  const ev = meteorEventOf(m);
+  if (!ev) return 'bad';
+  if (Number.isFinite(m.now)) {
+    run.offset = m.now - nowLocal;
+    run.clock = 'server';
+  }
+  if (run.event?.id === ev.id) return 'same';
+  setEvent(ev, engine, nowLocal + run.offset);
+  return 'started';
+}
+
+function watchServer(engine) {
+  if (run.client || engine?.mode !== 'multiplayer') return;
+  const c = engine.query?.('realtimeClient');
+  if (!c?.on) return;
+  run.client = c;
+  c.on('msg:meteor', (m) => takeMeteorFrame(m, engine));
+  c.on('state', ({ state: s } = {}) => {
+    if (s === 'online') c.send?.('meteor_sync', {});
+  });
+  c.send?.('meteor_sync', {});
+}
+
+function startDemo(kind, engine) {
+  const ev = demoMeteorEvent(kind, Date.now(), { n: run.demoN++ });
+  if (!ev) return null;
+  run.offset = 0;
+  run.clock = 'demo';
+  setEvent(ev, engine);
+  return ev;
+}
+
+function applyDemo(engine) {
+  if (run.demo !== null) return;
+  const want = String(engine.param?.('meteordemo') || '').toLowerCase();
+  run.demo = want === 'shower' || want === 'star' ? want : '';
+  if (run.demo) startDemo(run.demo, engine);
+}
+
+/** The sky now: its strength and the view's meteor Graphics (engine.meteorSky). */
+function skyNow(engine) {
+  const sky = engine.meteorSky?.() || {};
+  return { strength: meteorStrength(sky.look), layer: sky.layer || null };
+}
+
+function viewSize(layer) {
+  const w = layer?.viewW || globalThis.innerWidth || 1280;
+  const h = layer?.viewH || globalThis.innerHeight || 800;
+  return { w, h };
+}
+
+function publish(engine) {
+  const phase = meteorPhase(run.event, clockNow());
+  const sig = `${phase}|${run.event?.kind || ''}|${run.drawn}|${run.strength.toFixed(2)}|${run.clock}`;
+  if (sig === run.last || !engine?.setData) return;
+  run.last = sig;
+  engine.setData('meteor', phase);
+  engine.setData('meteorKind', run.event?.kind || '');
+  engine.setData('meteorStreaks', String(run.drawn));
+  engine.setData('meteorStrength', run.strength.toFixed(2));
+  engine.setData('meteorClock', run.clock);
+}
+
+export const meteorShowerFeature = {
+  id: METEOR_FEATURE_ID,
+
+  init(engine) {
+    exposeQA('groddleMeteor', {
+      state: () => ({ event: run.event, phase: meteorPhase(run.event, clockNow()), clock: run.clock, now: clockNow(), drawn: run.drawn, strength: run.strength, streaks: run.schedule.length, onScreen: meteorShowerFeature.meteorOnScreen(engine) }),
+      start: (kind = 'shower') => startDemo(kind, engine),
+      stop: () => setEvent(null, engine),
+      onScreen: () => meteorShowerFeature.meteorOnScreen(engine),
+    });
+  },
+
+  onStreetClear() {
+    // The view and its Graphics go with the street; the next street's is asked for afresh.
+    run.layer = null;
+    run.drawn = 0;
+  },
+
+  onTick(_dtMs, _now, engine) {
+    if (!engine.started) return;
+    watchServer(engine);
+    applyDemo(engine);
+    const now = clockNow();
+    let phase = meteorPhase(run.event, now);
+    if (phase === 'over') {
+      // The star preview runs one lone star after another.
+      if (run.event?.demo && run.demo === 'star') startDemo('star', engine);
+      else setEvent(null, engine);
+      phase = meteorPhase(run.event, now);
+    }
+    if (phase !== 'on') {
+      if (run.drawn) clearLayer();
+      run.strength = 0;
+      publish(engine);
+      return;
+    }
+    const { strength, layer } = skyNow(engine);
+    if (layer !== run.layer) {
+      clearLayer();
+      run.layer = layer;
+    }
+    run.strength = strength;
+    if (!layer || layer.destroyed) {
+      run.drawn = 0;
+      publish(engine);
+      return;
+    }
+    const reduced = reducedMotion();
+    const list = strength > 0 ? meteorStreaksAt(run.event, now, { reduced, schedule: run.schedule }) : [];
+    const { w, h } = viewSize(layer);
+    run.drawn = drawMeteorStreaks(layer, list, w, h, { strength, reduced }) ? list.length : 0;
+    publish(engine);
+  },
+
+  /** engine.query('meteorOnScreen'): a streak is in sight now, bright enough for a Snap to keep it. */
+  meteorOnScreen(engine) {
+    if (!engine || meteorPhase(run.event, clockNow()) !== 'on') return false;
+    const { strength, layer } = skyNow(engine);
+    const { w, h } = viewSize(layer);
+    return meteorOnScreen(run.event, clockNow(), { strength, reduced: reducedMotion(), w, h });
+  },
+};
+
+/** Tests: the run state back to a fresh page. */
+export function resetMeteorRun() {
+  Object.assign(run, { event: null, schedule: [], offset: 0, clock: 'local', hinted: new Set(), layer: null, drawn: 0, strength: 0, demo: null, demoN: 0, client: null, last: '' });
+}
+
+/** Tests: the run state. */
+export const meteorRun = () => run;
+
+export { METEOR };

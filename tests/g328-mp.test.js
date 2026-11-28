@@ -35,9 +35,9 @@ import {
   visitSceneTsid,
 } from '../public/js/neighbours-mp.js?v=0896a4d7';
 import { createMinnAccount } from '../public/js/minn-account.js?v=7e3d7279';
-import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=efa4690f';
-import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=4f02cf28';
-import { FEATURES } from '../public/js/features/index.js?v=32bbf0f7';
+import { homesFeature, visitorHomeScene, visitorHomeState } from '../public/js/features/homes-feature.js?v=730e56e0';
+import { neighboursMpApi, neighboursMpFeature } from '../public/js/features/neighbours-mp-feature.js?v=47fb9a23';
+import { FEATURES } from '../public/js/features/index.js?v=a6ded3b5';
 import { YARD_STYLE_BY_KEY, streetLook, yardLook, yardStyleFor } from '../public/js/home-styles.js?v=ec5d2f69';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 import { PHP } from './php.js';

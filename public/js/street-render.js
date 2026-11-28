@@ -3934,6 +3934,32 @@ export function buildStreetView(street, PIXI, opts = {}) {
     for (const star of starField(w, h, 7)) skyStars.circle(star.x, star.y, star.r).fill({ color: 0xffffff, alpha: star.alpha });
     skyStars.fieldW = w;
   };
+  // Meteors (js/meteor-shower.js, ours): a Graphics pinned to the view as the stars are, which
+  // features/meteor-shower-feature.js draws the streaks into. It goes just in front of the furthest
+  // layer (Groddle's `sky` layer: the distant mountains and cloud banks) and behind every nearer
+  // one, so a streak shows over the far ranges and slips behind hills and trees; in front of only
+  // the gradient it hid behind the mountains that fill the top of most views. A street with no far
+  // layer has it over the stars.
+  let skyMeteors = null;
+  const farZ = Math.min(...layerContainers.filter((lc) => lc.parallaxLayer && lc.zIndex < 0).map((lc) => lc.zIndex));
+  /** The meteors' Graphics (made on first ask), its 0,0 the view's top-left, viewW x viewH; null with no sky. */
+  root.meteorLayer = () => {
+    if (!skyParts) return null;
+    if (!skyMeteors) {
+      skyMeteors = new PIXI.Graphics();
+      skyMeteors.label = 'sky-meteors';
+      skyMeteors.viewW = 0;
+      skyMeteors.viewH = 0;
+      if (Number.isFinite(farZ)) {
+        // Over the furthest layer's own edge strips and covers (its zIndex + 5), under the next (+ 10).
+        skyMeteors.zIndex = farZ + 6;
+        root.addChild(skyMeteors);
+      } else {
+        skyView.addChildAt(skyMeteors, skyView.children.indexOf(skyStars || skyParts.gradient) + 1);
+      }
+    }
+    return skyMeteors;
+  };
   /**
    * G1167: put the sky for a view whose top-left is camX, camY, vpW x skyH (the canvas, the pack's
    * band included): the gradient on the backmost layer where updateParallax left it this frame.
@@ -3960,6 +3986,12 @@ export function buildStreetView(street, PIXI, opts = {}) {
       if (vpW > skyStars.fieldW) drawStars(vpW);
       skyStars.x = camX;
       skyStars.y = at.gradient.y - STAR_CAP_PX;
+    }
+    if (skyMeteors) {
+      skyMeteors.x = camX;
+      skyMeteors.y = camY;
+      skyMeteors.viewW = vpW;
+      skyMeteors.viewH = skyH;
     }
     skyParts.cap.visible = Boolean(at.cap);
     if (at.cap) put(skyParts.cap, at.cap);
@@ -4003,7 +4035,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
     } else if (skyStars) {
       skyStars.visible = false;
     }
-    const far = root.children.filter((c) => c !== skyView && c.label !== 'ground-skirt' && (c.edgeOf || c.skyTintOf || c).zIndex < 0);
+    const far = root.children.filter((c) => c !== skyView && c !== skyMeteors && c.label !== 'ground-skirt' && (c.edgeOf || c.skyTintOf || c).zIndex < 0);
     const zs = far.map((c) => (c.edgeOf || c.skyTintOf || c).zIndex);
     const zMin = Math.min(...zs);
     const zMax = Math.max(...zs);
