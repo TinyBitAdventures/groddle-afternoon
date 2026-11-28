@@ -2814,9 +2814,14 @@
   "deployed": "2026-11-27"
  },
  "git": {
-  "commits": 3894,
+  "commits": 3897,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-11-27",
+    "kind": "fix",
+    "text": "A Crafty Bot whose fetch finds its stack gone no longer hangs for good"
+   },
    {
     "date": "2026-11-27",
     "kind": "new",
@@ -2931,11 +2936,6 @@
     "date": "2026-11-27",
     "kind": "fix",
     "text": "Ice Nubbins in Drifa hang on the icy walls in clusters too, a few high enough to jump for, instead of standing on the path"
-   },
-   {
-    "date": "2026-11-27",
-    "kind": "fix",
-    "text": "The What's new styles and window code pass the Classic naming rule and the site-link sweep"
    }
   ]
  },
